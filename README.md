@@ -1,9 +1,17 @@
-# GenerativeApp
+# 🤖 GenerativeApp
 Use LLM's to dynamically update the existing Streamlit App.
 
 ## Demo
 
 TODO
+
+## Features
+
+- Natural Language Processing (NLP): The chatbot utilizes NLP techniques to understand and interpret user instructions.
+- Conversation Flow: The chatbot follows a well-defined conversational flow to interact with users and gather instructions.
+- Code Generation: The chatbot dynamically generates Python code snippets based on user instructions.
+- Streamlit Integration: The generated code is incorporated into a Streamlit application, providing an interactive web interface.
+- Code Explanation: The chatbot provides detailed explanations of the generated code to help users understand its functionality.
 
 ## Getting Started
 
@@ -34,14 +42,24 @@ streamlit run generative_app/🏠StreamlitBot.py
 
 3. Interact with the bot to generate the Streamlit App of your dreams !
 
+## Usage Examples
+
+Here are some example instructions you can provide to the chatbot:
+
+    "Create a bar chart showing the sales data for the last quarter given earlier."
+    "Generate a scatter plot with the temperature and humidity data given earlier."
+    "Add a sidebar to the application with a dropdown menu for selecting options ("update", "save", "reset")."
+
+The chatbot will interpret these instructions, generate the corresponding Python code, and create a Streamlit application accordingly in the page 🤖GeneratedApp.
+
 ## Roadmap
 
 - [x] Add a chatbot
 - [x] Add a sandbox page for the bot to play with
 - [x] Add commands to /undo, /reset, /save
-- [] Embed in vector stores the up to dat documentation of Streamlit https://github.com/streamlit/docs/tree/main/content
-- [] Add a voice assistant (text to speech and speech to text)
-- [] Add a page to show the documentation of the app
+- [ ] Embed in vector stores the up to dat documentation of Streamlit https://github.com/streamlit/docs/tree/main/content
+- [ ] Add a voice assistant (text to speech and speech to text)
+- [ ] Add a page to show the documentation of the app
 
 
 ## Built With
