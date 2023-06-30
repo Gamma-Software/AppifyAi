@@ -4,6 +4,7 @@ Welcome to ChatbotX, an innovative project that brings together the power of nat
 
 <details>
   <summary>Click me for more</summary>
+
 ## Unleash the Power of Conversational Programming
 
 With ChatbotX, you don't need to be a coding expert to create stunning web applications. Simply engage in a conversation with our intelligent chatbot, express your vision, and watch as the magic happens. Our cutting-edge natural language processing engine comprehends your instructions with remarkable accuracy, ensuring a seamless user experience.
