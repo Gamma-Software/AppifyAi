@@ -11,19 +11,15 @@ def generate_app(code:str, python_script_path: str):
         app_file.write(code)
 
 def reset(python_script_path: str):
-    st.session_state.messages.clear()
+    if "messages" in st.session_state:
+        st.session_state.messages.clear()
     st.session_state["messages"] = [
-            {"role": "assistant", "content": "Hello! I'm a chatbot designed to help you with Streamlit App Coding."},
+            {"role": "assistant", "content": "Hello! I'm a chatbot designed to help you create a Streamlit App."},
             {"role": "assistant", "content": "here are the few commands to control me:\n\n/undo: undo the last instruction\n\n/reset: reset the app and the conversation\n\n/save: save the streamlit script in an independant app"},
             {"role": "assistant", "content": "I will generate the Streamlit App in the 🤖GeneratedApp page (see sidebar)"},
         ]
-    generate_app("""
-                 import streamlit as st
-                 import pandas as pd
-                 import numpy as np
-                 import plotly.figure_factory as ff
-                 import pydeck as pdk
-                 import altair as alt""", python_script_path)
+    generate_app("import streamlit as st\n\nimport pandas as pd\nimport numpy as np\nimport plotly.figure_factory as ff\nimport pydeck as pdk\nimport altair as alt",
+                 python_script_path)
 
 def setup(llm: LLMChain, python_script_path: str):
     if "generated" not in st.session_state:
@@ -38,12 +34,7 @@ def setup(llm: LLMChain, python_script_path: str):
         st.session_state["stored_session"] = []
 
     if "messages" not in st.session_state:
-        st.session_state["messages"] = [
-            {"role": "assistant", "content": "Hello! I'm a chatbot designed to help you with Streamlit App Coding."},
-            {"role": "assistant", "content": "here are the few commands to control me:\n\n/undo: undo the last instruction\n\n/reset: reset the app and the conversation\n\n/save: save the streamlit script in an independant app"},
-            {"role": "assistant", "content": "I will generate the Streamlit App in the 🤖GeneratedApp page (see sidebar)"},
-        ]
-        generate_app("import streamlit as st", python_script_path)
+        reset(python_script_path)
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
