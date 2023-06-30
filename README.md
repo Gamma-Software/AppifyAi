@@ -30,13 +30,15 @@ Become a part of the ChatbotX revolution and redefine the way web applications a
 
 TODO
 
-## Features
+## Why using ChatbotX ?
 
-- Natural Language Processing (NLP): The chatbot utilizes NLP techniques to understand and interpret user instructions.
-- Conversation Flow: The chatbot follows a well-defined conversational flow to interact with users and gather instructions.
-- Code Generation: The chatbot dynamically generates Python code snippets based on user instructions.
-- Streamlit Integration: The generated code is incorporated into a Streamlit application, providing an interactive web interface.
-- Code Explanation: The chatbot provides detailed explanations of the generated code to help users understand its functionality.
+- Creativity and Flexibility: You can express your ideas in a natural way and the chatbot will generate the corresponding code. You can also ask him to be creative and let you surprise.
+- Rapid Prototyping: The chatbot enables users to quickly prototype web applications without the need for coding.
+- Collaborative Development: Chat with the assistant to create a web application together as you may do with a colleague.
+- Empowering Non-Technical Users: The chatbot enables non-technical users to create web applications without the need for coding. the assistant will explain the code to you.
+- Dynamic Code Generation: The application code is generated dynamically based on user instructions and you can see the result in seconds.
+- Natural Language Interaction: The chatbot utilizes natural language processing techniques to interact with users. You can use whatever Language, the chatbot will respond to you accordingly.
+- Simplicity: The chatbot provides a simple and intuitive interface for creating web applications.
 
 ## Getting Started
 
@@ -94,13 +96,14 @@ Upload files and display charts:
 - "Display the function f(x) = x^2 in a line chart for x in [-10, 10] and give the graph an adequat name."
 - "Give the possibility to upload a csv file and display its content in a table after upload"
 - "Give the possibility to upload a csv file and display a bar chart showing the data"
+- "Give the possibility to upload a csv file store the data in a pandas dataframe to later display statistics then create a select box to select the column to display the statictics. Be creative and display whatever statictics you want"
 
 Useful apps:
 - "Ask to enter a first date and a second date input and display the number of days between them. Add a title and some explanation text accordingly before the date inputs."
 - "Ask to enter a first date and a second date input and display the number of business days between them. Add a title and some explanation text accordingly before the date inputs."
 
 Webscraping:
-- "Webscrap the site Generate a scatter plot with the temperature and humidity data given earlier."
+- "Webscrap this site (https://fr.wikipedia.org/wiki/Blog) and display all the 'mw-headline' classes"
 
 Creating games:
 - "Create me a rolling dice game"
