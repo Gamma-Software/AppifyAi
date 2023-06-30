@@ -17,7 +17,7 @@ import streamlit as st
 python_script = os.path.join(os.getcwd() , "langchain" ,"generated_script.py")
 
 
-template = """You're an AI assistant specializing in python development. Based on the input provided, you must update the python code that is compatible with python 3.9. Additionally, offer a brief explanation about how you arrived at the python code.
+template = """You're an AI assistant specializing in python development. Based on the input provided, you must update the python code that is compatible with python 3.9. Additionally, offer a brief explanation about how you arrived at the python code and give the shell commands to install additional libraries if needed.
 If the input is a question, you must explain the code only and additionnaly propose some code. Do not halucinate or make up information. If you do not know the answer, just say "I don't know".
 
 The python code you must update is the following:
@@ -25,7 +25,7 @@ The python code you must update is the following:
 {python_code}
 ```
 
-Do not forget about importing the necessary libraries.
+Do not remove the imports. You can add new imports if needed.
 
 Write your anwser in the following format: the code and explanation in markdown format
 
