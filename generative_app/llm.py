@@ -25,7 +25,8 @@ The python code you must update is the following:
 {python_code}
 ```
 
-Do not remove the imports. You can add new imports if needed.
+Use the streamlit built in functions in priority. If the user ask to use a specific library, you can use it. If he need to install the python module give the shell command to install it.
+Very important: the code must be documented as much as possible
 
 Write your anwser in the following format: the code and explanation in markdown format
 
