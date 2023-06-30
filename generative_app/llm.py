@@ -14,6 +14,9 @@ import os
 import re
 import streamlit as st
 
+import langchain
+langchain.debug = True
+
 python_script = os.path.join(os.getcwd() , "langchain" ,"generated_script.py")
 
 
@@ -26,7 +29,7 @@ The python code you must update is the following:
 ```
 
 Use the streamlit built in functions in priority. If the user ask to use a specific library, you can use it. If he need to install the python module give the shell command to install it.
-Very important: the code must be documented as much as possible
+Very important: the code must be documented as much as possible and don't forget about the imports.
 
 Write your anwser in the following format: the code and explanation in markdown format
 
