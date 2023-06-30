@@ -43,11 +43,6 @@ def parse(output):
     python_code = None
     explain_code = None
     python_code_match = re.search(r"```python\n(.*?)\n```\n(.*)", output, re.DOTALL)
-    if python_code_match:
-        python_code = python_code_match.group(1)
-        explain_code = python_code_match.group(2)
-        print(python_code)
-        print(explain_code)
-    else:
-        print("Python code not found.")
+    python_code = python_code_match.group(1)
+    explain_code = python_code_match.group(2)
     return python_code, explain_code
