@@ -1,5 +1,19 @@
-# 🤖 GenerativeApp
-Use LLM's to dynamically update the existing Streamlit App.
+# 🤖 ChatbotX
+
+________/\\\\\\\\\__/\\\_______________________________________/\\\_____________________________________/\\\_______/\\\_
+ _____/\\\////////__\/\\\______________________________________\/\\\____________________________________\///\\\___/\\\/__
+  ___/\\\/___________\/\\\____________________________/\\\______\/\\\__________________________/\\\________\///\\\\\\/____
+   __/\\\_____________\/\\\__________/\\\\\\\\\_____/\\\\\\\\\\\_\/\\\____________/\\\\\_____/\\\\\\\\\\\_____\//\\\\______
+    _\/\\\_____________\/\\\\\\\\\\__\////////\\\___\////\\\////__\/\\\\\\\\\____/\\\///\\\__\////\\\////_______\/\\\\______
+     _\//\\\____________\/\\\/////\\\___/\\\\\\\\\\_____\/\\\______\/\\\////\\\__/\\\__\//\\\____\/\\\___________/\\\\\\_____
+      __\///\\\__________\/\\\___\/\\\__/\\\/////\\\_____\/\\\_/\\__\/\\\__\/\\\_\//\\\__/\\\_____\/\\\_/\\_____/\\\////\\\___
+       ____\////\\\\\\\\\_\/\\\___\/\\\_\//\\\\\\\\/\\____\//\\\\\___\/\\\\\\\\\___\///\\\\\/______\//\\\\\____/\\\/___\///\\\_
+        _______\/////////__\///____\///___\////////\//______\/////____\/////////______\/////_________\/////____\///_______\///__
+
+
+Welcome to ChatbotX, an innovative project that brings together the power of natural language processing and dynamic web application generation. ChatbotX is your personal assistant that can transform your instructions into fully functional and interactive web applications with just a conversation.
+
+See the [details](DETAILED_README.md) for more details.
 
 ## Demo
 
@@ -37,7 +51,7 @@ openai_api_key = "your key here"
 2. Then run the following command to start the app:
 
 ```shell
-streamlit run generative_app/🏠StreamlitBot.py
+streamlit run generative_app/🏠ChatbotX.py
 ```
 
 3. Interact with the bot to generate the Streamlit App of your dreams !
