@@ -15,13 +15,14 @@ Upload files and display charts:
 - "Display the function f(x) = x^2 in a line chart for x in [-10, 10] and give the graph an adequat name."
 - "Give the possibility to upload a csv file and display its content in a table after upload"
 - "Give the possibility to upload a csv file and display a bar chart showing the data"
+- "Give the possibility to upload a csv file store the data in a pandas dataframe to later display statistics then create a select box to select the column to display the statictics. Be creative and display whatever statictics you want"
 
 Useful apps:
 - "Ask to enter a first date and a second date input and display the number of days between them. Add a title and some explanation text accordingly before the date inputs."
-- "Ask to enter a first date and a second date input and display the number of business days between them. Add a title and some explanation text accordingly before the date inputs."
+- "Ask to enter a first date and a second date input and display the number of business days between them. Add a title and some explanation text accordingly before the date inputs. Be creative with the explanation text and add some emojis."
 
 Webscraping:
-- "Webscrap the site Generate a scatter plot with the temperature and humidity data given earlier."
+- "Webscrap this site (https://fr.wikipedia.org/wiki/Blog) and display all the 'mw-headline' classes"
 
 Creating games:
 - "Create me a rolling dice game"
