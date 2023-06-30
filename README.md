@@ -52,7 +52,7 @@ pip install -r requirements.txt
 
 That's it ! You are ready to go !
 
-### Usage
+### Running the app
 
 1. Add you own OpenAI API key, by renaming the file `.streamlit/secrets_template.toml` to `.streamlit/secrets.toml` and add your own API key in the following line:
 ```toml
@@ -67,13 +67,46 @@ streamlit run generative_app/🏠ChatbotX.py
 
 3. Interact with the bot to generate the Streamlit App of your dreams !
 
-## Usage Examples
+### Usage
 
-Here are some example instructions you can provide to the chatbot:
+This is a **chatbot**, simply enter your instruction and it will generate the corresponding Python code and create a Streamlit Web app application accordingly. To see it in action go to the page 🤖GeneratedApp.
 
-    "Create a bar chart showing the sales data for the last quarter given earlier."
-    "Generate a scatter plot with the temperature and humidity data given earlier."
-    "Add a sidebar to the application with a dropdown menu for selecting options ("update", "save", "reset")."
+It understand the context and remembers what you said before. For example, if you ask the bot the following instructions in order:
+1. "add a title with the text 'Hello World'"
+2. "replace the title with the text 'Hello World, this is my first Streamlit application'"
+3. "replace the title with a subtitle and the same text"
+You will end up with a Streamlit application with a subtitle with the text 'Hello World, this is my first Streamlit application'.
+
+#### Commands
+
+If you want to reset the context, you can use the command `/reset` or `/undo` to undo the last action. You can also use `/save` to save the current generated app and download the script.
+
+#### Usage Examples
+
+Tell ChatbotX the following instructions:
+
+Simple instructions:
+- "Add a title with the text 'Hello World' and a subtitle with the text 'This is my first Streamlit application'."
+- "Add an input text box with the label 'Enter your name' and an other one with the label 'Enter your age' and a button with the label 'Submit'. When the button is clicked, display the text 'Hello, <name>! You are <age> years old.'"
+- "Add a sidebar to the application with a dropdown menu for selecting options ("update", "save", "reset")."
+
+Upload files and display charts:
+- "Display the function f(x) = x^2 in a line chart for x in [-10, 10] and give the graph an adequat name."
+- "Give the possibility to upload a csv file and display its content in a table after upload"
+- "Give the possibility to upload a csv file and display a bar chart showing the data"
+
+Useful apps:
+- "Ask to enter a first date and a second date input and display the number of days between them. Add a title and some explanation text accordingly before the date inputs."
+- "Ask to enter a first date and a second date input and display the number of business days between them. Add a title and some explanation text accordingly before the date inputs."
+
+Webscraping:
+- "Webscrap the site Generate a scatter plot with the temperature and humidity data given earlier."
+
+Creating games:
+- "Create me a rolling dice game"
+
+Using open APIs:
+- "Display me random cats pictures using open apis and add button to update the image"
 
 The chatbot will interpret these instructions, generate the corresponding Python code, and create a Streamlit application accordingly in the page 🤖GeneratedApp.
 
@@ -85,7 +118,8 @@ The chatbot will interpret these instructions, generate the corresponding Python
 - [ ] Embed in vector stores the up to dat documentation of Streamlit https://github.com/streamlit/docs/tree/main/content
 - [ ] Add a voice assistant (text to speech and speech to text)
 - [ ] Add a page to show the documentation of the app
-
+- [ ] Automate the installation of more libraries
+- [ ] Check confusing instructions and give the chatbot the possibility to improve the instruction of the user and he will need to valide the new instruction.
 
 ## Built With
 
