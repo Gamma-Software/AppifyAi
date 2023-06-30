@@ -10,13 +10,13 @@ warnings.filterwarnings("ignore")
 
 
 st.set_page_config(
-    page_title="Generative Streamlit App",
+    page_title="ChatbotX",
     page_icon="🤖",
     layout="centered",
     initial_sidebar_state=sidebar.sidebar_init_state,
     menu_items={
         "Report a bug": "https://github.com/Gamma-Software/GenerativeApp/issues",
-        "About": """Generative App is a chatbot designed to help you creating Streamlit apps. It is built using OpenAI's GPT-4 and Streamlit.
+        "About": """CChatbotX: Transform conversations into stunning web apps. Dynamic code generation + intuitive interface. Unleash your creativity effortlessly. Use the power of GPT OpenAI LLM and Langchain.
             Go to the GitHub repo to learn more about the project. https://github.com/Gamma-Software/GenerativeApp
             """,
     },
