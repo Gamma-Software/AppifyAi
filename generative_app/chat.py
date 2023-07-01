@@ -3,8 +3,6 @@ from langchain.chains import LLMChain
 import streamlit as st
 from llm import parse
 
-avatar = 'https://avataaars.io/?avatarStyle=Transparent&topType=ShortHairShortCurly&accessoriesType=Blank&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Default&eyebrowType=RaisedExcited&mouthType=Twinkle&skinColor=Tanned'
-
 def generate_app(code:str, python_script_path: str):
     if not code:
         return
@@ -43,7 +41,7 @@ def setup(llm: LLMChain, python_script_path: str):
     instruction = st.chat_input("Tell him what to do")
     if instruction:
         st.session_state.messages.append({"role": "user", "content": instruction})
-        with st.chat_message("user", avatar=avatar):
+        with st.chat_message("user"):
             st.markdown(instruction)
 
         # Process the instruction if the user did not enter a specific command
@@ -51,13 +49,13 @@ def setup(llm: LLMChain, python_script_path: str):
         if not check_command[0] or check_command[1]:
             if check_command[1]:
                 # If an error must be displayed
-                with st.chat_message("assistant", avatar='🤖'):
+                with st.chat_message("assistant"):
                     message_placeholder = st.empty()
                     response = check_command[1]
                     message_placeholder.markdown(response)
                 st.session_state.messages.append({"role": "assistant", "content": response})
             else:
-                with st.chat_message("assistant", avatar='🤖'):
+                with st.chat_message("assistant"):
                     message_placeholder = st.empty()
                     with message_placeholder:
                         message_placeholder.write("⌛Processing... do not leave this page until I respond.")
