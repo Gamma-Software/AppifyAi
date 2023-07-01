@@ -1,0 +1,1 @@
+docker run -p 8503:8501 --name streamlitclient1 --restart=unless-stopped streamlit_app
