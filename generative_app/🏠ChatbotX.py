@@ -22,6 +22,7 @@ st.set_page_config(
 
             # Author
             [Valentin Rudloff](https://valentin.pival.fr/) is a French engineer that loves to learn and build things with code.
+            [☕ Buy me a coffee](https://www.buymeacoffee.com/valentinrudloff)
 
             Go to the GitHub repo to learn more about the project. https://github.com/Gamma-Software/ChatbotX
             """,
