@@ -19,8 +19,7 @@ def reset(python_script_path: str):
             {"role": "assistant", "content": "here are the few commands to control me:\n\n/undo: undo the last instruction\n\n/reset: reset the app and the conversation\n\n/save: save the streamlit script in an independant app"},
             {"role": "assistant", "content": "I will generate the Streamlit App in the 🤖GeneratedApp page (see sidebar)"},
         ]
-    generate_app("import streamlit as st\n\nimport pandas as pd\nimport numpy as np\nimport plotly.figure_factory as ff\nimport pydeck as pdk\nimport altair as alt",
-                 python_script_path)
+    generate_app("", python_script_path)
 
 def setup(llm: LLMChain, python_script_path: str):
     if "generated" not in st.session_state:
@@ -49,7 +48,6 @@ def setup(llm: LLMChain, python_script_path: str):
 
         # Process the instruction if the user did not enter a specific command
         check_command = check_commands(instruction, python_script_path)
-        print(check_command)
         if not check_command[0] or check_command[1]:
             if check_command[1]:
                 # If an error must be displayed
@@ -65,11 +63,16 @@ def setup(llm: LLMChain, python_script_path: str):
                         message_placeholder.write("⌛Processing... do not leave this page until I respond.")
                         st.session_state.last_code = open(python_script_path).read()
                         full_response_raw = llm.predict(question=instruction, python_code=st.session_state.last_code)
-                        code = parse(full_response_raw)[0]
-                        generate_app(code, python_script_path)
-                        message_placeholder = st.empty()
-                        message_placeholder.markdown(full_response_raw)
-                st.session_state.messages.append({"role": "assistant", "content": full_response_raw})
+                        code, explanation = parse(full_response_raw)
+                        message = ""
+                        if code:
+                            generate_app(code, python_script_path)
+                            message = "\n".join([f"```python\n{code}\n```", explanation])
+                            message_placeholder.markdown(message)
+                        else:
+                            message = explanation
+                            message_placeholder.markdown(message)
+                st.session_state.messages.append({"role": "assistant", "content": message})
 
 def check_commands(instruction, python_script_path):
     if "/undo" in instruction:
