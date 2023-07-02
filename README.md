@@ -28,7 +28,7 @@ Become a part of the ChatbotX revolution and redefine the way web applications a
 
 ## Demo
 
-TODO
+[![Simple task](demo/simple_demo.mov)](demo/simple_demo.mov)
 
 ## Why using ChatbotX ?
 

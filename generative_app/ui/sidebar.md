@@ -29,3 +29,6 @@ Creating games:
 
 Using open APIs:
 - "Display me random cats pictures using open apis and add button to update the image"
+
+More complexe instructions:
+- "store the csv values from this url : "https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/exports/csv?limit=-1&timezone=UTC&use_labels=false&epsg=4326" in a pandas dataframe (and cache it). use the ";" delimiter. Clean the data by applying a 100000 division to the latitude and longitude column and removing all None datas in the "gazole_prix" column and remove all "gazole_prix" above 3 . And add a plotly graph with streamlit lib that displays an open-street-map layout map with the coordinates from the dataframe "latitude" and "longitude" column and label them with the "gazole_prix" column. Also use "gazole_prix" to color and size the markers. The marker color range should correspond to the min and max of the column. Create a new size column that is 1/("gazole_prix")^4 thus the pricier the gazole the smaller the marker is."
