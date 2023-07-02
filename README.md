@@ -28,7 +28,9 @@ Become a part of the ChatbotX revolution and redefine the way web applications a
 
 ## Demo
 
-[![Simple task](demo/simple_demo.mov)](demo/simple_demo.mov)
+![Simple demo](https://github.com/Gamma-Software/ChatbotX/assets/6960910/d34206e1-90cf-4408-b7c9-932d745ed96d)
+
+![Complex demo but yet simple to prompt](https://github.com/Gamma-Software/ChatbotX/assets/6960910/0360af37-23c7-49e1-8794-1d035435a13f)
 
 ## Why using ChatbotX ?
 
