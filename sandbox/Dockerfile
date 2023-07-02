@@ -4,7 +4,7 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY . /app
+COPY requirements.txt /app/requirements.txt
 
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install -r requirements.txt
+
+COPY . /app
 
 EXPOSE 8501
 
