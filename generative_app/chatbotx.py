@@ -1,13 +1,12 @@
 import warnings
 import os
 import streamlit as st
-
+import uuid
 import sidebar
-import chat
-import llm
+from chat import ChatBot
+import time_sandbox
 
 warnings.filterwarnings("ignore")
-
 
 st.set_page_config(
     page_title="ChatbotX",
@@ -31,11 +30,16 @@ st.set_page_config(
 
 sidebar.setup()
 
-openai_api_key = st.secrets["openai_api_key"]
+# Generate uuid
+if "client_id" not in st.session_state:
+    st.session_state["client_id"] = str(uuid.uuid4())
 
-if openai_api_key:
-    assistant = llm.setup(openai_api_key)
-    generative_app_path = os.path.join(os.getcwd() , "generative_app", "pages" ,"🤖GeneratedApp.py")
-    chat.setup(assistant, generative_app_path)
+# Check if it's the first run
+st.session_state["first_run"] = "first_run" not in st.session_state
+
+generative_app_path = os.path.join(os.getcwd() , "sandbox", "app.py")
+#if time_sandbox.setup():
+chat = ChatBot(generative_app_path)
+chat.setup(st.session_state["first_run"])
 
 st.markdown('<div id="input-container-placeholder"></div>', unsafe_allow_html=True)

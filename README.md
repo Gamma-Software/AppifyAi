@@ -28,7 +28,9 @@ Become a part of the ChatbotX revolution and redefine the way web applications a
 
 ## Demo
 
-TODO
+https://github.com/Gamma-Software/ChatbotX/assets/6960910/d34206e1-90cf-4408-b7c9-932d745ed96d
+
+https://github.com/Gamma-Software/ChatbotX/assets/6960910/0360af37-23c7-49e1-8794-1d035435a13f
 
 ## Why using ChatbotX ?
 
@@ -118,7 +120,7 @@ The chatbot will interpret these instructions, generate the corresponding Python
 - [x] Add a chatbot
 - [x] Add a sandbox page for the bot to play with
 - [x] Add commands to /undo, /reset, /save
-- [ ] Embed in vector stores the up to dat documentation of Streamlit https://github.com/streamlit/docs/tree/main/content
+- [ ] Embed in vector stores the up to date documentation of Streamlit https://github.com/streamlit/docs/tree/main/content and Langchain (and other libraries)
 - [ ] Add a voice assistant (text to speech and speech to text)
 - [ ] Add a page to show the documentation of the app
 - [ ] Automate the installation of more libraries

@@ -1,0 +1,1 @@
+docker run -p 8503:8501 -v /mnt/data/workspace/ai_projects/GenerativeApp/sandboxes/app.py:/app/app.py --name streamlitclient1 --restart=unless-stopped -e CLIENTID=1 streamlit_app
