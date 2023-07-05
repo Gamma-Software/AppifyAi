@@ -101,13 +101,15 @@ class ChatBot:
                 st.session_state.messages.append({"role": "user", "content": instruction})
                 with assistant_message_placeholder:
                     current_assistant_message_placeholder = st.empty()
-                    chain = llm.llm_chain(current_assistant_message_placeholder)
+                    #chain = llm.llm_chain(current_assistant_message_placeholder)
+                    chain = llm.conversation_chain(current_assistant_message_placeholder)
                     message = ""
 
                     # Wait for the response of the LLM and display a loading message in the meantime
                     loop = asyncio.new_event_loop()
                     try:
-                        llm_result = loop.run_until_complete(chain.apredict(question=instruction, python_code=st.session_state.last_code))
+                        #llm_result = loop.run_until_complete(chain.apredict(question=instruction, python_code=st.session_state.last_code))
+                        llm_result = loop.run_until_complete(chain.arun(question=instruction, python_code=st.session_state.last_code))
                         pass
                     except Exception as e:
                         current_assistant_message_placeholder.error("Error...{type(e)}")
