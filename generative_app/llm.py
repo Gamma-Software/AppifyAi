@@ -1,23 +1,28 @@
+import langchain
+langchain.debug = True
 from langchain.llms import OpenAI
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain.prompts.prompt import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.schema import LLMResult
+from langchain.chat_models import ChatOpenAI
+from langchain.chains import ConversationalRetrievalChain, ConversationChain
+from langchain.memory import ConversationBufferMemory
 
-from langchain.callbacks.base import AsyncCallbackHandler, BaseCallbackHandler
+from langchain.callbacks.base import AsyncCallbackHandler
 
 import asyncio
 from uuid import UUID
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 import os
 import re
 
 from streamlit.delta_generator import DeltaGenerator
 import streamlit as st
 
-import langchain
-langchain.debug = True
+import doc_retriever
+
 
 python_script = os.path.join(os.getcwd() , "langchain" ,"generated_script.py")
 
@@ -121,6 +126,18 @@ def llm_chain(message_placeholder: DeltaGenerator) -> LLMChain:
     prompt_template = PromptTemplate(template=template, input_variables=["question", "python_code"])
     python_assistant_chain = LLMChain(llm=llm, prompt=prompt_template, verbose=True)
     return python_assistant_chain
+
+def conversation_chain(message_placeholder: DeltaGenerator) -> ConversationChain:
+    model_name = "gpt-4"
+    model_name = "gpt-3.5-turbo"
+    model_name = "text-davinci-003"
+    if st.secrets["openai_api_key"] is None:
+        st.error("OpenAI API key is missing! Please add it to your secrets.")
+        st.stop()
+    model = ChatOpenAI(temperature=0, max_tokens=2000, streaming=True, model_name=model_name,
+                       openai_api_key=st.secrets["openai_api_key"])
+    chain = ConversationalRetrievalChain.from_llm(model, retriever=doc_retriever.load_streamlit_docs(), memory=ConversationBufferMemory(), callbacks=[AsyncHandler(message_placeholder)])
+    return chain
 
 def parse(output):
     python_code = None
