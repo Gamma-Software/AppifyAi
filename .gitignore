@@ -1,4 +1,5 @@
 .streamlit/secrets.toml
+.doc_db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
