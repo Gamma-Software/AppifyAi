@@ -53,9 +53,6 @@ if __name__ == '__main__':
     #optional logout label, can be blank for something nicer!
     app.add_app("Login", LoginApp(title='Login'), is_home=True, is_login=True)
 
-    #add all your application classes here
-    app.add_app("ChatbotX", icon="💬", app=ChatBotApp(title="ChatbotX"))
-
     #we have added a sign-up app to demonstrate the ability to run an unsecure app
     #only 1 unsecure app is allowed
     app.add_app("Signup", icon="🛰️", app=SignUpApp(title='Signup'), is_unsecure=True)
@@ -86,6 +83,9 @@ if __name__ == '__main__':
     # If the menu is cluttered, just rearrange it into sections!
     # completely optional, but if you have too many entries, you can make it nicer by using accordian menus
     if user_access_level > 0:
+        #add all your application classes here
+        app.add_app("ChatbotX", icon="💬", app=ChatBotApp(title="ChatbotX"))
+
         #add all your application classes here
         app_to_add = APPS[user_access_level-1]
         app.add_app(app_to_add.title, icon="💫", app=app_to_add)
