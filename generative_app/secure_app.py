@@ -87,12 +87,12 @@ if __name__ == '__main__':
     # completely optional, but if you have too many entries, you can make it nicer by using accordian menus
     if user_access_level > 0:
         #add all your application classes here
-        app_name, app_class = APPS[user_access_level-1]
-        app.add_app(app_name, icon="💫", app=app_class)
+        app_to_add = APPS[user_access_level-1]
+        app.add_app(app_to_add.title, icon="💫", app=app_to_add)
         complex_nav = {
             'ChatbotX': ['ChatbotX'],
         }
-        complex_nav.update({app_name: [app_name]})
+        complex_nav.update({app_to_add.title: [app_to_add.title]})
     else:
         complex_nav = {
             'ChatbotX': ['ChatbotX'],
