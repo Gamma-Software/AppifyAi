@@ -50,7 +50,7 @@ class BaseConversationalRetrievalCodeChain(Chain):
     @property
     def input_keys(self) -> List[str]:
         """Input keys."""
-        return ["question", "chat_history", "python_code"]
+        return ["question"]
 
     @property
     def output_keys(self) -> List[str]:
@@ -84,14 +84,10 @@ class BaseConversationalRetrievalCodeChain(Chain):
         question = inputs["question"]
         get_chat_history = self.get_chat_history or _get_chat_history
         chat_history_str = get_chat_history(inputs["chat_history"])
-        source_code_str = inputs["python_code"]
-        if chat_history_str and source_code_str:
-            callbacks = _run_manager.get_child()
-            new_question = self.question_generator.run(
-                question=question, chat_history=chat_history_str, python_code=source_code_str, callbacks=callbacks
-            )
-        else:
-            new_question = question
+        callbacks = _run_manager.get_child()
+        new_question = self.question_generator.run(
+            question=question, callbacks=callbacks
+        )
         accepts_run_manager = (
             "run_manager" in inspect.signature(self._get_docs).parameters
         )
@@ -132,14 +128,10 @@ class BaseConversationalRetrievalCodeChain(Chain):
         question = inputs["question"]
         get_chat_history = self.get_chat_history or _get_chat_history
         chat_history_str = get_chat_history(inputs["chat_history"])
-        source_code_str = inputs["python_code"]
-        if chat_history_str:
-            callbacks = _run_manager.get_child()
-            new_question = await self.question_generator.arun(
-                question=question, chat_history=chat_history_str, python_code=source_code_str, callbacks=callbacks
-            )
-        else:
-            new_question = question
+        callbacks = _run_manager.get_child()
+        new_question = await self.question_generator.arun(
+            question=question, callbacks=callbacks
+        )
         accepts_run_manager = (
             "run_manager" in inspect.signature(self._aget_docs).parameters
         )

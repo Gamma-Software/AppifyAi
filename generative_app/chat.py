@@ -21,7 +21,7 @@ class ChatBot:
 
     @staticmethod
     def apply_code(code:str, python_script_path):
-        if not code:
+        if code is None:
             return
         with open(python_script_path, "w") as app_file:
             app_file.write(code)
@@ -46,8 +46,7 @@ class ChatBot:
             self.apply_code(st.session_state.last_code, self.python_script_path)
             chat_placeholder.info("Code reverted")
         if command == CommandResult.RESET:
-            self.apply_code("", self.python_script_path)
-            chat_placeholder.info("Code resetted")
+            self.reset_chat()
         if command == CommandResult.SAVE:
             chat_placeholder.info("Download the file by clicking on the button below.\nYou can then run it with `streamlit run streamlit_app.py`")
             chat_placeholder.download_button("Download app", st.session_state.last_code, "streamlit_app.py")
@@ -66,24 +65,27 @@ class ChatBot:
              I will generate the Streamlit App here [Sandbox](https://chatbotx-client1.pival.fr/)"""
              },
         ]
+        st.session_state.chat_history = []
         self.apply_code("", self.python_script_path)
+        st.experimental_rerun()
 
     def setup(self, reset_at_start: bool):
         # If this is the first time the chatbot is launched reset it and the code
         if reset_at_start:
             self.reset_chat()
 
-        # Save last code
-        st.session_state.last_code = open(self.python_script_path).read()
-
         # Add cached messages
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = []
+
         # Setup user input
         if instruction := st.chat_input("Tell me what to do"):
-            print(instruction)
+            # Save last code
+            st.session_state.last_code = open(self.python_script_path).read()
             # Add user message to the chat
             st.session_state.messages.append({"role": "user", "content": instruction})
             # Process the instruction if the user did not enter a specific command
@@ -93,34 +95,40 @@ class ChatBot:
             if command := self.check_commands(instruction):
                 user_message_placeholder.markdown(instruction)
                 self.apply_command(command, assistant_message_placeholder)
-                st.session_state.messages.append({"role": "user", "content": instruction})
                 st.session_state.messages.append({"role": "assistant", "content": command.value[1]})
             else:
                 # If its not a command, process the instruction
                 user_message_placeholder.markdown(instruction)
-                st.session_state.messages.append({"role": "user", "content": instruction})
                 with assistant_message_placeholder:
                     current_assistant_message_placeholder = st.empty()
                     #chain = llm.llm_chain(current_assistant_message_placeholder)
-                    chain = llm.conversation_chain(current_assistant_message_placeholder)
+                    chain = llm.load_conversation_chain(current_assistant_message_placeholder)
                     message = ""
 
                     # Wait for the response of the LLM and display a loading message in the meantime
                     loop = asyncio.new_event_loop()
                     try:
                         #llm_result = loop.run_until_complete(chain.apredict(question=instruction, python_code=st.session_state.last_code))
-                        llm_result = loop.run_until_complete(chain.arun(question=instruction, python_code=st.session_state.last_code))
-                        pass
+                        llm_result = chain({"question": instruction, "chat_history": st.session_state.chat_history, "python_code": st.session_state.last_code})
                     except Exception as e:
-                        current_assistant_message_placeholder.error("Error...{type(e)}")
+                        current_assistant_message_placeholder.error(f"Error...{e}")
                         raise
                     finally:
-                        code, explanation = parse(llm_result)
+                        code, explanation = parse(llm_result["answer"])
+                        print(explanation)
                         # Apply the code if there is one and display the result
                         if code:
                             message = f"```python\n{code}\n```\n"
                             self.apply_code(code, self.python_script_path)
                         message += f"{explanation}"
                         current_assistant_message_placeholder.markdown(message)
+                        st.session_state.chat_history.append((instruction, explanation))
                         st.session_state.messages.append({"role": "assistant", "content": message})
+                        self.prune_chat_history()
+
+    def prune_chat_history(self):
+        # Make sure that the buffer history is not filled with too many messages (max 3)
+        if len(st.session_state.chat_history) > 3:
+            # Take the last 3 messages
+            st.session_state.chat_history = st.session_state.chat_history[-3:]
 
