@@ -1,4 +1,5 @@
 .streamlit/secrets.toml
+sandbox/app.py
 .doc_db
 
 # Byte-compiled / optimized / DLL files
