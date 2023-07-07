@@ -32,6 +32,9 @@ https://github.com/Gamma-Software/ChatbotX/assets/6960910/d34206e1-90cf-4408-b7c
 
 https://github.com/Gamma-Software/ChatbotX/assets/6960910/0360af37-23c7-49e1-8794-1d035435a13f
 
+Here is a simple conversation with the chatbot:
+![Simple conversation](simple_conversation.png)
+
 ## Why using ChatbotX ?
 
 - Creativity and Flexibility: You can express your ideas in a natural way and the chatbot will generate the corresponding code. You can also ask him to be creative and let you surprise.
