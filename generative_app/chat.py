@@ -1,5 +1,5 @@
 import enum
-
+import re
 from langchain.chains import LLMChain
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
@@ -24,8 +24,24 @@ class ChatBot:
     def apply_code(code:str, python_script_path):
         if code is None:
             return
+        # apply 8 space indentation
+        code = re.sub(r"^", " " * 8, code, flags=re.MULTILINE)
+
         with open(python_script_path, "w") as app_file:
             app_file.write(template_app.format(code=code))
+
+    @staticmethod
+    def parse_code(code:str):
+        python_code = None
+        pattern = r"#---start\n(.*?)\n#---end"
+        python_code_match = re.search(pattern, code, re.DOTALL)
+        if python_code_match:
+            python_code = python_code_match.group(1)
+            print(python_code)
+            if python_code == "None":
+                python_code = None
+        return python_code
+
 
     @staticmethod
     def check_commands(instruction) -> CommandResult or None:
@@ -86,7 +102,7 @@ class ChatBot:
         # Setup user input
         if instruction := st.chat_input("Tell me what to do"):
             # Save last code
-            st.session_state.last_code = open(self.python_script_path).read()
+            st.session_state.last_code = self.parse_code(open(self.python_script_path, "r").read())
             # Add user message to the chat
             st.session_state.messages.append({"role": "user", "content": instruction})
             # Process the instruction if the user did not enter a specific command
