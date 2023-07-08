@@ -23,5 +23,4 @@ class App(HydraHeadApp):
         Application entry point.
         """
         #---start sandbox
-        st.write("This is your sandbox application.")
         #---end sandbox

@@ -13,6 +13,6 @@ class App(HydraHeadApp):
 
     def run(self) -> None:
         #---start
-        {code}
+{code}
         #---end
 """

@@ -55,6 +55,6 @@ class Auth:
         session_token = generate_user_session_token()
 
         # Execute query.
-        add_user_session = f"INSERT INTO user_sessions (\"user_id\", \"session_token\") VALUES (%s,%s);"
+        add_user_session = f"INSERT INTO UserSessions (\"user_id\", \"session_token\") VALUES (%s,%s);"
         self.insert_query(add_user_session, (user_id, session_token))
 
