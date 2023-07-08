@@ -19,6 +19,14 @@ CREATE TABLE UserSessions (
   FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
+-- Create the UserData table
+CREATE TABLE UserData (
+  user_id INT NOT NULL,
+  source_code TEXT NOT NULL,
+  message_history JSONB,
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
 -- Add a random user
 INSERT INTO Users (username, password, email, role)
 VALUES ('joe', 'joe', 'john.doe@example.com', 'guest');
