@@ -1,0 +1,28 @@
+version: '3.1'
+
+services:
+  db:
+    container_name: postgres-auth
+    image: postgres
+    restart: always
+    ports:
+      - 5442:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: auth
+    volumes:
+      - ./docker_entrypoint/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 9456:8080
+
+  gen_app:
+    container_name: generative-app
+    image: generative-app
+    restart: unless-stopped
+    ports:
+      - 8504:8504
