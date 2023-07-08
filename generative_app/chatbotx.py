@@ -24,12 +24,9 @@ class ChatBotApp(HydraHeadApp):
 
         sidebar.setup()
 
-        # Check if it's the first run
-        st.session_state["first_run"] = "first_run" not in st.session_state
-
         #if time_sandbox.setup():
         chat = ChatBot(user_id, self.generative_app_path)
-        chat.setup(st.session_state["first_run"])
+        chat.setup()
 
         st.markdown('<div id="input-container-placeholder"></div>', unsafe_allow_html=True)
 
