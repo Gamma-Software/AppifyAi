@@ -141,6 +141,7 @@ class ChatBot:
                     #chain = llm.llm_chain(current_assistant_message_placeholder)
                     chain = llm.load_conversation_chain(current_assistant_message_placeholder)
                     message = ""
+                    current_assistant_message_placeholder.info("⌛Processing")
 
                     # Wait for the response of the LLM and display a loading message in the meantime
                     try:
