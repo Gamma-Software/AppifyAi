@@ -5,7 +5,6 @@ from login_app import LoginApp
 from signup import SignUpApp
 from chatbotx import ChatBotApp
 from load_app import LoadingApp
-from generated import APPS
 import sidebar
 
 import streamlit as st
@@ -58,7 +57,7 @@ if __name__ == '__main__':
     app.add_app("Signup", icon="🛰️", app=SignUpApp(title='Signup'), is_unsecure=True)
 
     #specify a custom loading app for a custom transition between apps, this includes a nice custom spinner
-    app.add_loader_app(LoadingApp(delay=0))
+    app.add_loader_app(LoadingApp(delay=1))
 
     #we can inject a method to be called everytime a user logs out
     #---------------------------------------------------------------------
@@ -82,18 +81,33 @@ if __name__ == '__main__':
 
     # If the menu is cluttered, just rearrange it into sections!
     # completely optional, but if you have too many entries, you can make it nicer by using accordian menus
-    if user_access_level > 0:
-        #add all your application classes here
-        app.add_app("ChatbotX", icon="💬", app=ChatBotApp(title="ChatbotX"))
-
-        #add all your application classes here
-        app_to_add = APPS[user_access_level-1]
-        app.add_app(app_to_add.title, icon="💫", app=app_to_add)
+    if user_access_level == 0 and username == "guest":
+        app.add_app("ChatbotX", icon="💬", is_unsecure=True, app=ChatBotApp(
+            title="ChatbotX", generative_app_path="generative_app/sandboxes/guest_0.py"))
         complex_nav = {
             'ChatbotX': ['ChatbotX'],
         }
-        complex_nav.update({app_to_add.title: [app_to_add.title]})
+    elif user_access_level > 0:
+        from sandboxes import APPS
+        sandbox_app = [item for item in APPS if item[0] == "_".join([username, str(user_access_level)])]
+        if len(sandbox_app) == 0:
+            raise ValueError("No sandbox found for user {} with access level {}".format(username, user_access_level))
+        title = "Generated App"
+        _, path_to_script, app_to_add = sandbox_app[0]
+
+        #add all your application classes here
+        print(path_to_script)
+        app.add_app("ChatbotX", icon="💬", app=ChatBotApp(title="ChatbotX", generative_app_path=path_to_script))
+
+        #add all your application classes here
+        app.add_app(title, icon="💫", app=app_to_add)
+        complex_nav = {
+            'ChatbotX': ['ChatbotX'],
+        }
+        complex_nav.update({title: [title]})
     else:
+        app.add_app("ChatbotX", icon="💬", is_unsecure=True, app=ChatBotApp(
+            title="ChatbotX", generative_app_path="generative_app/sandboxes/guest_0.py"))
         complex_nav = {
             'ChatbotX': ['ChatbotX'],
         }
@@ -105,10 +119,10 @@ if __name__ == '__main__':
 
     #print user movements and current login details used by Hydralit
     #---------------------------------------------------------------------
-    # user_access_level, username = app.check_access()
-    # prev_app, curr_app = app.get_nav_transition()
-    # print(prev_app,'- >', curr_app)
-    # print(int(user_access_level),'- >', username)
-    # print('Other Nav after: ',app.session_state.other_nav_app)
+    user_access_level, username = app.check_access()
+    prev_app, curr_app = app.get_nav_transition()
+    print(prev_app,'- >', curr_app)
+    print(int(user_access_level),'- >', username)
+    print('Other Nav after: ',app.session_state.other_nav_app)
     #---------------------------------------------------------------------
 

@@ -45,22 +45,12 @@ class LoadingApp(HydraHeadApp):
             if hasattr(app_target,'title'):
                 app_title = app_target.title
 
-            if app_title == 'Sequency Denoising':
-                with HyLoader(se_loader_txt, loader_name=Loaders.pacman):
-                    time.sleep(int(self.delay))
-                    app_target.run()
-
-            elif app_title == 'Loader Playground':
+            if app_title == 'ChatbotX':
                 app_target.run()
             else:
-                with HyLoader("✨Now loading {}".format(app_title), loader_name=self._loader,index=[3,0,5]):
-                    time.sleep(int(self.delay))
-                    app_target.run()
-
-
+                app_target.run()
 
         except Exception as e:
             st.image("./resources/failure.png",width=100,)
             st.error('An error has occurred, someone will be punished for your inconvenience, we humbly request you try again.')
             st.error('Error details: {}'.format(e))
-
