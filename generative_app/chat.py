@@ -107,13 +107,14 @@ class ChatBot:
 
     def setup(self, reset_at_start: bool):
         # If this is the first time the chatbot is launched reset it and the code
-        if reset_at_start:
-            self.reset_chat()
         # Add saved messages
         st.session_state.messages = self.auth.get_message_history(self.user_id)
-        for _, message in st.session_state.messages.items():
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
+        if st.session_state.messages:
+            for _, message in st.session_state.messages.items():
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+        else:
+            self.reset_chat()
 
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
