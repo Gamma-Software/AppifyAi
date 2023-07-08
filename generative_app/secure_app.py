@@ -119,10 +119,10 @@ if __name__ == '__main__':
 
     #print user movements and current login details used by Hydralit
     #---------------------------------------------------------------------
-    user_access_level, username = app.check_access()
-    prev_app, curr_app = app.get_nav_transition()
-    print(prev_app,'- >', curr_app)
-    print(int(user_access_level),'- >', username)
-    print('Other Nav after: ',app.session_state.other_nav_app)
+    # user_access_level, username = app.check_access()
+    # prev_app, curr_app = app.get_nav_transition()
+    # print(prev_app,'- >', curr_app)
+    # print(int(user_access_level),'- >', username)
+    # print('Other Nav after: ',app.session_state.other_nav_app)
     #---------------------------------------------------------------------
 
