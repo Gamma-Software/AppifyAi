@@ -1,6 +1,5 @@
 import os
 import streamlit as st
-import uuid
 import sidebar
 from hydralit import HydraHeadApp
 
@@ -14,7 +13,6 @@ class ChatBotApp(HydraHeadApp):
     This application is an example of allowing an application to run from the login without requiring authentication.
 
     """
-
     def __init__(self, title = '', generative_app_path = None, **kwargs):
         self.__dict__.update(kwargs)
         self.title = title
@@ -23,10 +21,6 @@ class ChatBotApp(HydraHeadApp):
 
     def run(self) -> None:
         sidebar.setup()
-
-        # Generate uuid
-        if "client_id" not in st.session_state:
-            st.session_state["client_id"] = str(uuid.uuid4())
 
         # Check if it's the first run
         st.session_state["first_run"] = "first_run" not in st.session_state

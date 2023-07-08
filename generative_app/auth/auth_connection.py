@@ -1,5 +1,9 @@
 import streamlit as st
 import psycopg2
+import uuid
+
+def generate_user_session_token() -> str:
+    return str(uuid.uuid4())
 
 class Auth:
 
@@ -10,8 +14,6 @@ class Auth:
     # Uses st.cache_resource to only run once.
     def init_connection(self):
         return psycopg2.connect(**st.secrets["postgres"])
-
-
 
     # Perform query.
     # Uses st.cache_data to only rerun when the query changes or after 10 min.
@@ -48,4 +50,11 @@ class Auth:
         # Execute query.
         add_user = f"INSERT INTO users (\"username\", \"password\", \"email\", \"role\") VALUES (%s,%s,%s,%s);"
         self.insert_query(add_user, (username, password, email, 'guest'))
+
+    def add_user_session(self, user_id:int):
+        session_token = generate_user_session_token()
+
+        # Execute query.
+        add_user_session = f"INSERT INTO user_sessions (\"user_id\", \"session_token\") VALUES (%s,%s);"
+        self.insert_query(add_user_session, (user_id, session_token))
 

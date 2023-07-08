@@ -1,7 +1,7 @@
 import time
 from typing import Dict, Union
 import streamlit as st
-from auth.auth_connection import Auth
+from auth.auth_connection import Auth, generate_user_session_token
 from hydralit import HydraHeadApp
 from streamlit.delta_generator import DeltaGenerator
 
@@ -79,6 +79,9 @@ class LoginApp(HydraHeadApp):
 
                     #access control uses an int value to allow for levels of permission that can be set for each user, this can then be checked within each app seperately.
                     self.set_access(access_level, form_data['username'])
+
+                    # Add user sesssion
+                    self.auth.add_user_session(access_level)
 
                     #Do the kick to the home page
                     self.do_redirect()

@@ -81,13 +81,7 @@ if __name__ == '__main__':
 
     # If the menu is cluttered, just rearrange it into sections!
     # completely optional, but if you have too many entries, you can make it nicer by using accordian menus
-    if user_access_level == 0 and username == "guest":
-        app.add_app("ChatbotX", icon="💬", is_unsecure=True, app=ChatBotApp(
-            title="ChatbotX", generative_app_path="generative_app/sandboxes/guest_0.py"))
-        complex_nav = {
-            'ChatbotX': ['ChatbotX'],
-        }
-    elif user_access_level > 0:
+    if user_access_level > 0:
         from sandboxes import APPS
         sandbox_app = [item for item in APPS if item[0] == "_".join([username, str(user_access_level)])]
         if len(sandbox_app) == 0:
@@ -106,8 +100,6 @@ if __name__ == '__main__':
         }
         complex_nav.update({title: [title]})
     else:
-        app.add_app("ChatbotX", icon="💬", is_unsecure=True, app=ChatBotApp(
-            title="ChatbotX", generative_app_path="generative_app/sandboxes/guest_0.py"))
         complex_nav = {
             'ChatbotX': ['ChatbotX'],
         }
