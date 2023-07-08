@@ -1,1 +1,11 @@
 Dockerfile
+.git
+.venv
+.env
+*.env
+.vscode
+docker_entrypoint
+prototypes
+.gitignore
+README.md
+simple_conversation.png
