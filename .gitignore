@@ -1,7 +1,6 @@
 .streamlit/secrets.toml
-sandbox/app.py
 .doc_db
-generative_app/generated/**/*
+generative_app/sandboxes/**/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
