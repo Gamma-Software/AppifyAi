@@ -105,7 +105,7 @@ class ChatBot:
         idx = len(st.session_state.messages)
         st.session_state.messages.update({f"message_{idx}": {"role": role, "content": content}})
 
-    def setup(self, reset_at_start: bool):
+    def setup(self):
         # If this is the first time the chatbot is launched reset it and the code
         # Add saved messages
         st.session_state.messages = self.auth.get_message_history(self.user_id)
