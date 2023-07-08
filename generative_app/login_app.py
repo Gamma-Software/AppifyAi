@@ -20,7 +20,6 @@ class LoginApp(HydraHeadApp):
         self.title = title
         self.auth = Auth()
 
-
     def run(self) -> None:
         """
         Application entry point.

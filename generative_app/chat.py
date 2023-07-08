@@ -6,6 +6,7 @@ from streamlit.delta_generator import DeltaGenerator
 from llm import parse
 import llm
 import asyncio
+from auth.auth_connection import Auth
 from templates.template_app import template_app
 
 class CommandResult(enum.Enum):
@@ -16,18 +17,22 @@ class CommandResult(enum.Enum):
     SAVE = [4, "Code saved"]
 
 class ChatBot:
-    def __init__(self, python_script_path: str):
+    def __init__(self, user_id: int,python_script_path: str):
         self.python_script_path = python_script_path
         self.background_tasks = set()
+        self.auth = Auth()
+        self.user_id = user_id
 
-    @staticmethod
-    def apply_code(code:str, python_script_path):
+    def apply_code(self, code:str):
         if code is None:
             return
         # apply 8 space indentation
         code = re.sub(r"^", " " * 8, code, flags=re.MULTILINE)
 
-        with open(python_script_path, "w") as app_file:
+        # save code to database
+        self.auth.set_code(self.user_id, code)
+
+        with open(self.python_script_path, "w") as app_file:
             app_file.write(template_app.format(code=code))
 
     @staticmethod
@@ -60,7 +65,7 @@ class ChatBot:
         if command == CommandResult.NOTUNDO:
             chat_placeholder.error("Nothing to undo")
         if command == CommandResult.UNDO:
-            self.apply_code(st.session_state.last_code, self.python_script_path)
+            self.apply_code(st.session_state.last_code)
             chat_placeholder.info("Code reverted")
         if command == CommandResult.RESET:
             self.reset_chat()
@@ -83,15 +88,16 @@ class ChatBot:
              },
         ]
         st.session_state.chat_history = []
-        self.apply_code("st.write('Hello')", self.python_script_path)
+        self.apply_code("st.write('Hello')")
         st.experimental_rerun()
 
     def setup(self, reset_at_start: bool):
         # If this is the first time the chatbot is launched reset it and the code
         if reset_at_start:
             self.reset_chat()
-
-        # Add cached messages
+        # Add saved messages
+        st.session_state.messages = self.auth.get_message_history(self.user_id)
+        print(st.session_state.messages)
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
@@ -136,12 +142,13 @@ class ChatBot:
                         # Apply the code if there is one and display the result
                         if code:
                             message = f"```python\n{code}\n```\n"
-                            self.apply_code(code, self.python_script_path)
+                            self.apply_code(code)
                         message += f"{explanation}"
                         current_assistant_message_placeholder.markdown(message)
                         st.session_state.chat_history.append((instruction, explanation))
                         st.session_state.messages.append({"role": "assistant", "content": message})
                         self.prune_chat_history()
+                        self.save_chat_history()
 
     def prune_chat_history(self):
         # Make sure that the buffer history is not filled with too many messages (max 3)
@@ -149,3 +156,5 @@ class ChatBot:
             # Take the last 3 messages
             st.session_state.chat_history = st.session_state.chat_history[-3:]
 
+    def save_chat_history(self):
+        self.auth.set_message_history(self.user_id,  st.session_state.messages)
