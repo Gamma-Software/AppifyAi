@@ -39,13 +39,15 @@ class ChatBot:
     def parse_code(code:str):
         python_code = None
         pattern = r"#---start\n(.*?)\n#---end"
-        python_code_match = re.search(pattern, code, re.DOTALL)
-        if python_code_match:
-            python_code = python_code_match.group(1)
-            print(python_code)
-            if python_code == "None":
-                python_code = None
-        return python_code
+        matches = re.finditer(pattern, code, re.DOTALL)
+        for matchNum, match in enumerate(matches, start=1):
+
+            print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
+
+            for groupNum in range(0, len(match.groups())):
+                groupNum = groupNum + 1
+
+                print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
 
 
     @staticmethod
@@ -71,25 +73,34 @@ class ChatBot:
             self.reset_chat()
         if command == CommandResult.SAVE:
             chat_placeholder.info("Download the file by clicking on the button below.\nYou can then run it with `streamlit run streamlit_app.py`")
-            chat_placeholder.download_button("Download app", st.session_state.last_code, "streamlit_app.py")
+            code = self.parse_code(open(self.python_script_path, "r").read())
+            print(code)
+            chat_placeholder.download_button(label="Download app", file_name= "streamlit_app.py",
+                                             mime='text/x-python', data=code)
 
     def reset_chat(self):
-        st.session_state["messages"] = [
-            {"role": "assistant",
-             "content": """
-             Hello! I'm 🤖ChatbotX designed to help you create a Streamlit App.
+        st.session_state["messages"] = {
+            "message_0":
+                {"role": "assistant",
+                "content": """
+                Hello! I'm 🤖ChatbotX designed to help you create a Streamlit App.
 
-             here are the few commands to control me:
-             /undo: undo the last instruction
-             /reset: reset the app
-             /save: save the streamlit script in an independant app
+                here are the few commands to control me:
+                /undo: undo the last instruction
+                /reset: reset the app
+                /save: save the streamlit script in an independant app
 
-             I will generate the Streamlit App here [Sandbox](https://chatbotx-client1.pival.fr/)"""
-             },
-        ]
+                I will generate the Streamlit App in the Generate App tab (Find it in the sidebar menu)"""
+                },
+        }
+        self.save_chat_history()
         st.session_state.chat_history = []
-        self.apply_code("st.write('Hello')")
+        self.apply_code("import streamlit as st\nst.write('Hello')")
         st.experimental_rerun()
+
+    def add_message(self, role: str, content: str):
+        idx = len(st.session_state.messages)
+        st.session_state.messages.update({f"message_{idx}": {"role": role, "content": content}})
 
     def setup(self, reset_at_start: bool):
         # If this is the first time the chatbot is launched reset it and the code
@@ -97,8 +108,7 @@ class ChatBot:
             self.reset_chat()
         # Add saved messages
         st.session_state.messages = self.auth.get_message_history(self.user_id)
-        print(st.session_state.messages)
-        for message in st.session_state.messages:
+        for _, message in st.session_state.messages.items():
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
@@ -110,7 +120,7 @@ class ChatBot:
             # Save last code
             st.session_state.last_code = self.parse_code(open(self.python_script_path, "r").read())
             # Add user message to the chat
-            st.session_state.messages.append({"role": "user", "content": instruction})
+            self.add_message("user", instruction)
             # Process the instruction if the user did not enter a specific command
             user_message_placeholder = st.chat_message("user")
             assistant_message_placeholder = st.chat_message("assistant")
@@ -118,7 +128,7 @@ class ChatBot:
             if command := self.check_commands(instruction):
                 user_message_placeholder.markdown(instruction)
                 self.apply_command(command, assistant_message_placeholder)
-                st.session_state.messages.append({"role": "assistant", "content": command.value[1]})
+                self.add_message("assistant", command.value[1])
             else:
                 # If its not a command, process the instruction
                 user_message_placeholder.markdown(instruction)
@@ -129,7 +139,6 @@ class ChatBot:
                     message = ""
 
                     # Wait for the response of the LLM and display a loading message in the meantime
-                    loop = asyncio.new_event_loop()
                     try:
                         #llm_result = loop.run_until_complete(chain.apredict(question=instruction, python_code=st.session_state.last_code))
                         llm_result = chain({"question": instruction, "chat_history": st.session_state.chat_history, "python_code": st.session_state.last_code})
@@ -138,7 +147,6 @@ class ChatBot:
                         raise
                     finally:
                         code, explanation = parse(llm_result["answer"])
-                        print(explanation)
                         # Apply the code if there is one and display the result
                         if code:
                             message = f"```python\n{code}\n```\n"
@@ -146,7 +154,7 @@ class ChatBot:
                         message += f"{explanation}"
                         current_assistant_message_placeholder.markdown(message)
                         st.session_state.chat_history.append((instruction, explanation))
-                        st.session_state.messages.append({"role": "assistant", "content": message})
+                        self.add_message("assistant", message)
                         self.prune_chat_history()
                         self.save_chat_history()
 
