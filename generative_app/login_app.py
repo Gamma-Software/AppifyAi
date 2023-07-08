@@ -57,7 +57,7 @@ class LoginApp(HydraHeadApp):
         form_state['password'] = login_form.text_input('Password',type="password")
         form_state['submitted'] = login_form.form_submit_button('Login')
 
-        parent_container.markdown("<p style='text-align: center;'>Guest login -> joe & joe</p>", unsafe_allow_html=True)
+        #parent_container.markdown("<p style='text-align: center;'>Guest login -> joe & joe</p>", unsafe_allow_html=True)
 
         if parent_container.button('Sign Up',key='signupbtn'):
             # set access level to a negative number to allow a kick to the unsecure_app set in the parent
