@@ -37,17 +37,20 @@ class ChatBot:
 
     @staticmethod
     def parse_code(code:str):
+        from textwrap import dedent
         python_code = None
-        pattern = r"#---start\n(.*?)\n#---end"
-        matches = re.finditer(pattern, code, re.DOTALL)
-        for matchNum, match in enumerate(matches, start=1):
-
-            print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
-
-            for groupNum in range(0, len(match.groups())):
-                groupNum = groupNum + 1
-
-                print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+        pattern = r"#---start\n(.*?)#---end"
+        python_code_match = re.search(pattern, code, re.DOTALL)
+        print("code2:", python_code_match)
+        if python_code_match:
+            python_code = python_code_match.group(1)
+            print("code", python_code)
+            if python_code == "None":
+                python_code = None
+        # Remove the 8 space indentation
+        if python_code:
+            python_code = dedent(python_code)
+        return python_code
 
 
     @staticmethod
