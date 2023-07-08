@@ -20,20 +20,18 @@ class ChatBotApp(HydraHeadApp):
 
 
     def run(self) -> None:
+        user_id, _ = self.check_access()
+
         sidebar.setup()
 
         # Check if it's the first run
         st.session_state["first_run"] = "first_run" not in st.session_state
 
         #if time_sandbox.setup():
-        chat = ChatBot(self.generative_app_path)
+        chat = ChatBot(user_id, self.generative_app_path)
         chat.setup(st.session_state["first_run"])
 
         st.markdown('<div id="input-container-placeholder"></div>', unsafe_allow_html=True)
-
-    def get_sandbox_path(self) -> str:
-        level, username = self.check_access()
-        return os.path.join(os.getcwd(), "sandboxes", f"{username}_{level}.py")
 
 if __name__ == '__main__':
     ChatBotApp().run()
