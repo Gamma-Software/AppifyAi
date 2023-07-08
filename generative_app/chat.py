@@ -6,6 +6,7 @@ from streamlit.delta_generator import DeltaGenerator
 from llm import parse
 import llm
 import asyncio
+from templates.template_app import template_app
 
 class CommandResult(enum.Enum):
     UNKNOWN = [0, "Unknown command"]
@@ -24,7 +25,7 @@ class ChatBot:
         if code is None:
             return
         with open(python_script_path, "w") as app_file:
-            app_file.write(code)
+            app_file.write(template_app.format(code=code))
 
     @staticmethod
     def check_commands(instruction) -> CommandResult or None:
@@ -66,7 +67,7 @@ class ChatBot:
              },
         ]
         st.session_state.chat_history = []
-        self.apply_code("", self.python_script_path)
+        self.apply_code("st.write('Hello')", self.python_script_path)
         st.experimental_rerun()
 
     def setup(self, reset_at_start: bool):

@@ -1,6 +1,10 @@
 import time
 import os
+import shutil
+from pathlib import Path
+import re
 from typing import Dict
+from auth.auth_connection import Auth
 import streamlit as st
 from hydralit import HydraHeadApp
 
@@ -16,6 +20,7 @@ class SignUpApp(HydraHeadApp):
     def __init__(self, title = '', **kwargs):
         self.__dict__.update(kwargs)
         self.title = title
+        self.auth = Auth()
 
 
     def run(self) -> None:
@@ -66,6 +71,7 @@ class SignUpApp(HydraHeadApp):
         form_state['username'] = login_form.text_input('Username')
         form_state['password'] = login_form.text_input('Password',type="password")
         form_state['password2'] = login_form.text_input('Confirm Password',type="password")
+        form_state['email'] = login_form.text_input('email')
         #form_state['access_level'] = login_form.selectbox('Example Access Level',(1,2))
         form_state['submitted'] = login_form.form_submit_button('Sign Up')
 
@@ -81,9 +87,12 @@ class SignUpApp(HydraHeadApp):
     def _do_signup(self, form_data, msg_container) -> None:
         if form_data['submitted'] and (form_data['password'] != form_data['password2']):
             st.error('Passwords do not match, please try again.')
+        elif form_data['submitted'] and not self._email_is_valid(form_data['email']):
+            st.error('Email format is invalid, please try again.')
         else:
             with st.spinner("🤓 now redirecting to login...."):
-                self._save_signup(form_data)
+                level = self._save_signup(form_data)
+                self.seed_sandbox(level, form_data['username'])
                 time.sleep(2)
 
                 #access control uses an int value to allow for levels of permission that can be set for each user, this can then be checked within each app seperately.
@@ -92,20 +101,32 @@ class SignUpApp(HydraHeadApp):
                 #Do the kick back to the login screen
                 self.do_redirect()
 
-    def _save_signup(self, signup_data):
+    def seed_sandbox(self, level, username):
+        # Check if the sandbox exists
+        sandboxes_path = Path(__file__).parent / 'sandboxes'
+        template_sandbox_app = Path(__file__).parent / 'templates' / 'app.py'
+        sandbox_user_path = sandboxes_path / f"{username}_{level}.py"
+        print("path:", sandboxes_path)
+        if sandboxes_path.exists():
+            if not sandbox_user_path.exists():
+                # Create the sandbox app
+                shutil.copyfile(src=template_sandbox_app, dst=sandbox_user_path)
+                print(f"Created sandbox app for {username} at {sandbox_user_path}")
+
+    @staticmethod
+    def _email_is_valid(email):
+        regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+        return (re.search(regex,email))
+
+    def _save_signup(self, signup_data) -> int:
         #get the user details from the form and save somehwere
 
         #signup_data
         # this is the data submitted
+        self.auth.add_user(signup_data['username'], signup_data['password'], signup_data['email'])
 
-        #just show the data we captured
-        signup_data['access_level'] = 0 # Should be generated based on the user index
-        what_we_got = f"""
-        captured signup details: \n
-        username: {signup_data['username']} \n
-        password: {signup_data['password']} \n
-        access level: {signup_data['access_level']} \n
-        """
-
-        st.write(what_we_got)
+        if self.auth.check_user(signup_data['username'], signup_data['password']):
+            st.write("User added")
+            return self.auth.get_user_id(signup_data['username'], signup_data['password'])
+        return None
 
