@@ -106,7 +106,6 @@ class SignUpApp(HydraHeadApp):
         sandboxes_path = Path(__file__).parent / 'sandboxes'
         template_sandbox_app = Path(__file__).parent / 'templates' / 'app.py'
         sandbox_user_path = sandboxes_path / f"{username}_{level}.py"
-        print("path:", sandboxes_path)
         if sandboxes_path.exists():
             if not sandbox_user_path.exists():
                 # Create the sandbox app
