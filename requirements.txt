@@ -18,3 +18,4 @@ folium
 debugpy
 python-dotenv
 hydralit
+psycopg2-binary
