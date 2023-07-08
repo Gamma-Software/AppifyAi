@@ -1,5 +1,7 @@
 import time
 from typing import Dict, Union
+import shutil
+from pathlib import Path
 import streamlit as st
 from auth.auth_connection import Auth, generate_user_session_token
 from hydralit import HydraHeadApp
@@ -80,6 +82,9 @@ class LoginApp(HydraHeadApp):
                     #access control uses an int value to allow for levels of permission that can be set for each user, this can then be checked within each app seperately.
                     self.set_access(access_level, form_data['username'])
 
+                    # Seed the sandbox if not already done
+                    self.seed_sandbox(access_level, form_data['username'])
+
                     # Add user sesssion
                     self.auth.add_user_session(access_level)
 
@@ -99,3 +104,14 @@ class LoginApp(HydraHeadApp):
         if self.auth.check_user(login_data['username'], login_data['password']):
             return self.auth.get_user_id(login_data['username'], login_data['password'])
         return -1
+
+    def seed_sandbox(self, level, username):
+        # Check if the sandbox exists
+        sandboxes_path = Path(__file__).parent / 'sandboxes'
+        template_sandbox_app = Path(__file__).parent / 'templates' / 'app.py'
+        sandbox_user_path = sandboxes_path / f"{username}_{level}.py"
+        if sandboxes_path.exists():
+            if not sandbox_user_path.exists():
+                # Create the sandbox app
+                shutil.copyfile(src=template_sandbox_app, dst=sandbox_user_path)
+                print(f"Created sandbox app for {username} at {sandbox_user_path}")
