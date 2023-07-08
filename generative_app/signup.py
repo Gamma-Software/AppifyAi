@@ -1,7 +1,5 @@
 import time
 import os
-import shutil
-from pathlib import Path
 import re
 from typing import Dict
 from auth.auth_connection import Auth
@@ -72,7 +70,6 @@ class SignUpApp(HydraHeadApp):
         form_state['password'] = login_form.text_input('Password',type="password")
         form_state['password2'] = login_form.text_input('Confirm Password',type="password")
         form_state['email'] = login_form.text_input('email')
-        #form_state['access_level'] = login_form.selectbox('Example Access Level',(1,2))
         form_state['submitted'] = login_form.form_submit_button('Sign Up')
 
         if parent_container.button('Login',key='loginbtn'):
@@ -100,17 +97,6 @@ class SignUpApp(HydraHeadApp):
 
                 #Do the kick back to the login screen
                 self.do_redirect()
-
-    def seed_sandbox(self, level, username):
-        # Check if the sandbox exists
-        sandboxes_path = Path(__file__).parent / 'sandboxes'
-        template_sandbox_app = Path(__file__).parent / 'templates' / 'app.py'
-        sandbox_user_path = sandboxes_path / f"{username}_{level}.py"
-        if sandboxes_path.exists():
-            if not sandbox_user_path.exists():
-                # Create the sandbox app
-                shutil.copyfile(src=template_sandbox_app, dst=sandbox_user_path)
-                print(f"Created sandbox app for {username} at {sandbox_user_path}")
 
     @staticmethod
     def _email_is_valid(email):
