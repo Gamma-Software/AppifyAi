@@ -26,3 +26,7 @@ services:
       - 8504:8504
     volumes:
       - ./.streamlit/docker_secrets.toml:/app/.streamlit/secrets.toml
+      - sandboxes:/app/generative_app/sandboxes
+
+volumes:
+  sandboxes:

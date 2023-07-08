@@ -21,4 +21,4 @@ EXPOSE 8504
 
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
-ENTRYPOINT ["streamlit", "run", "secure_app.py", "--server.port=8504", "--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "generative_app/secure_app.py", "--server.port=8504", "--server.address=0.0.0.0"]
