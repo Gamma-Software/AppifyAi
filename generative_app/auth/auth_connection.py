@@ -6,6 +6,8 @@ import datetime
 import auth.cookie_manager as cookie_manager
 from typing import Dict, List, Any, Tuple, Union
 
+from auth.utils import crypt_password, is_password_ok
+
 def generate_user_session_token() -> str:
     return str(uuid.uuid4())
 
@@ -35,20 +37,19 @@ class Auth:
 
     def check_user(self, username:str, password:str):
         # Execute query.
+        get_pass = f"SELECT password FROM users WHERE username = '{username}' LIMIT 1;"
+        password_bytes = self.run_query(get_pass)
+        if password_bytes:
+            return is_password_ok(password, password_bytes[0][0])
+        return False
 
-        check_user = f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}' LIMIT 50;"
-        rows = self.run_query(check_user)
-        if len(rows) == 0:
-            return False
-        else:
-            return True
-
-    def get_user_id(self, username:str, password:str):
+    def get_user_id(self, username:str, password:str) -> int:
         # Execute query.
-        check_user = f"SELECT user_id FROM users WHERE username = '{username}' AND password = '{password}' LIMIT 1;"
-        if rows := self.run_query(check_user):
-            return int(rows[0][0])
-        return None
+        check_user = f"SELECT user_id, password FROM users WHERE username = '{username}' LIMIT 1;"
+        user_id, password_bytes = self.run_query(check_user)[0]
+        if user_id and is_password_ok(password, password_bytes):
+            return int(user_id)
+        return -1
 
     def get_username_from_id(self, user_id:int):
         # Execute query.
@@ -60,14 +61,15 @@ class Auth:
     def is_mail_exists(self, username:str):
         # Execute query.
         get_mail = f"SELECT email FROM users WHERE username = '{username}' LIMIT 1;"
-        if rows := self.run_query(get_mail):
+        rows = self.run_query(get_mail)
+        if rows:
             return str(rows[0][0])
         return None
 
     def add_user(self, username:str, password:str, email:str):
         # Execute query.
-        add_user = f"INSERT INTO users (\"username\", \"password\", \"email\", \"role\") VALUES (,%s,%s,%s);"
-        self.insert_query(add_user, [username, password, email, 'guest'])
+        add_user = f"INSERT INTO users (\"username\", \"password\", \"email\", \"role\") VALUES (%s,%s,%s,%s);"
+        self.insert_query(add_user, (username, crypt_password(password), email, 'guest'))
 
     def get_user_session(self, user_id:str) -> bool:
         check_code = f"SELECT * FROM UserSessions WHERE user_id = '{user_id}' LIMIT 1;"
@@ -92,7 +94,8 @@ class Auth:
         self.cookies.set('user_token', session_token, expires_at=expires_at)
 
     def extend_user_session(self, user_id:int, user_token:str):
-        if not self.can_auto_login(user_token):
+        auto_login = self.can_auto_login()
+        if auto_login[0] and auto_login[2] == "User token not found.":
             raise Exception("User cannot extend session because the token is expired")
 
         expires_at = datetime.datetime.now() + datetime.timedelta(minutes=self.token_expiration_min)
@@ -114,10 +117,10 @@ class Auth:
         self.insert_query(query, (user_id, ))
         self.cookies.delete('user_token')
 
-    def can_auto_login(self) -> Union[bool, int]:
+    def can_auto_login(self) -> Union[bool, int, str]:
         user_token = self.cookies.get('user_token')
         if not user_token:
-            return False, None
+            return False, None, "User token not found."
 
         """ Check if user can auto login. If not you should consider logging them out."""
         query = f"SELECT last_accessed, user_id FROM UserSessions WHERE session_token = '{user_token}' LIMIT 1;"
@@ -126,8 +129,8 @@ class Auth:
             if last_accessed:
                 last_accessed = last_accessed
                 token_expired = datetime.datetime.now() > last_accessed + datetime.timedelta(minutes=self.token_expiration_min)
-                return not token_expired, user_id
-        return False, None
+                return not token_expired, user_id, "User logged out due to inactivity." if token_expired else "User logged in."
+        return False, None, "User session not found."
 
     def get_code(self, user_id:int) -> str | None:
         # Execute query.
@@ -141,8 +144,10 @@ class Auth:
         # Execute query.
         check_code = f"SELECT message_history FROM userdata WHERE user_id = '{user_id}' LIMIT 1;"
         message_history = self.run_query(check_code)
-        if message_history[0][0]:
-            return message_history[0][0]
+
+        if message_history:
+            if message_history[0][0]:
+                return message_history[0][0]
         return None
 
     def set_code(self, user_id:int, code:str) -> str:

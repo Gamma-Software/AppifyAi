@@ -20,28 +20,37 @@ class LoginApp(HydraHeadApp):
         self.title = title
 
     def check_auto_login(self):
-        auto_login, user_id = AuthSingleton().get_instance().can_auto_login()
-        return auto_login, user_id
+        auto_login, user_id, reason = AuthSingleton().get_instance().can_auto_login()
+        return auto_login, user_id, reason
 
     def run(self) -> None:
         """
         Application entry point.
         """
-
         # Check if the user is already logged in
-        auto_login, user_id = self.check_auto_login()
+        auto_login, user_id, reason = self.check_auto_login()
 
         if auto_login:
             print("Auto login detected of user_id: ", user_id)
             self.redirect_after_login(user_id, AuthSingleton().get_instance().get_username_from_id(user_id))
-            return
-
 
         st.markdown("<h1 style='text-align: center;'>Login to ChatbotX 💫</h1>", unsafe_allow_html=True)
 
         c1,c2,c3, = st.columns([2,2,2])
 
         form_data, login_message_placeholder = self._create_login_form(c2)
+
+        if reason == "User logged out due to inactivity.":
+            login_message_placeholder.info(reason)
+
+        # Check if the user is already logged in
+        auto_login, user_id, reason = self.check_auto_login()
+
+        if auto_login:
+            print("Auto login detected of user_id: ", user_id)
+            self.redirect_after_login(user_id, AuthSingleton().get_instance().get_username_from_id(user_id))
+        elif reason == "User logged out due to inactivity.":
+            "User logged out due to inactivity."
 
         pretty_btn = """
         <style>
@@ -86,13 +95,13 @@ class LoginApp(HydraHeadApp):
         # Seed the sandbox if not already done
         self.seed_sandbox(access_level, username)
 
+        print("Redirecting to home page...")
         #Do the kick to the home page
         self.do_redirect()
 
 
     def _do_login(self, form_data, msg_container) -> None:
         access_level = self._check_login(form_data)
-
         if access_level > 0:
             with msg_container:
                 st.success(f"✔️ Login success")
@@ -111,10 +120,9 @@ class LoginApp(HydraHeadApp):
 
     def _check_login(self, login_data) -> int:
         #this method returns a value indicating the success of verifying the login details provided and the permission level, 1 for default access, 0 no access etc.
-        if login_data['username'] == 'joe' or login_data['password'] == 'joe':
-            return 1
         if AuthSingleton().get_instance().check_user(login_data['username'], login_data['password']):
-            return AuthSingleton().get_instance().get_user_id(login_data['username'], login_data['password'])
+            user_id = AuthSingleton().get_instance().get_user_id(login_data['username'], login_data['password'])
+            return user_id
         return -1
 
     def seed_sandbox(self, level, username):

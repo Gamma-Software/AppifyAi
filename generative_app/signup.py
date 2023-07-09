@@ -98,7 +98,7 @@ class SignUpApp(HydraHeadApp):
         elif AuthSingleton().get_instance().check_user(form_data['username'], form_data['password']):
             msg_container.error('User already exists, please login instead.')
         else:
-            with msg_container.spinner("🤓 now redirecting to login...."):
+            with st.spinner("now redirecting to login...."):
                 level = self._save_signup(form_data)
                 self.seed_sandbox(level, form_data['username'])
                 time.sleep(2)
@@ -117,7 +117,6 @@ class SignUpApp(HydraHeadApp):
     def _save_signup(self, signup_data) -> int:
         #get the user details from the form and save somehwere
 
-        #signup_data
         # this is the data submitted
         AuthSingleton().get_instance().add_user(signup_data['username'], signup_data['password'], signup_data['email'])
 

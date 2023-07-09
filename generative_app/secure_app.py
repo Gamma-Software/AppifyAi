@@ -79,7 +79,7 @@ if __name__ == '__main__':
     #---------------------------------------------------------------------
     @app.login_callback
     def mylogin_cb():
-        print('I was called from Hydralit at login!')
+        pass
     #---------------------------------------------------------------------
 
     #if we want to auto login a guest but still have a secure app, we can assign a guest account and go straight in
