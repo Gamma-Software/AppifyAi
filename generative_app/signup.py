@@ -1,10 +1,12 @@
 import time
 import os
 import re
+import PIL
 from typing import Dict
 from auth.auth_connection import AuthSingleton
 import streamlit as st
 from hydralit import HydraHeadApp
+from stripe.wrapper import paylink_html
 
 
 class SignUpApp(HydraHeadApp):
@@ -38,6 +40,8 @@ class SignUpApp(HydraHeadApp):
         c1,c2,c3, = st.columns([2,2,2])
         message_placeholder = c2.empty()
         #c2.markdown(pretty_btn,unsafe_allow_html=True)
+
+        c2.image(PIL.Image.open(os.path.join(os.getcwd(), "generative_app", "stripe" ,'qr_code.png')))
 
         if 'MSG' in os.environ.keys():
             st.info(os.environ['MSG'])
