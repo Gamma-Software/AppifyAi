@@ -1,14 +1,12 @@
 import time
 import langchain
 from langchain.schema.messages import BaseMessage
-langchain.debug = False
-from langchain.llms import OpenAI
+langchain.debug = True
 from langchain.prompts import PromptTemplate
 from langchain.prompts.prompt import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.schema import LLMResult
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import ConversationalRetrievalChain, ConversationChain
 from langchain.agents import Tool
 from langchain.agents import AgentType
 from langchain import OpenAI
@@ -61,6 +59,7 @@ Remember to be polite.
 Question: {question}
 
 Answer:"""
+
 
 class AsyncHandler(AsyncCallbackHandler):
     """Async callback handler that can be used to handle callbacks from langchain."""
