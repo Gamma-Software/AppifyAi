@@ -78,7 +78,12 @@ class SignUpApp(HydraHeadApp):
 
         return form_state
 
-    def _do_signup(self, form_data, msg_container) -> None:
+    def _do_signup(self, form_data, msg_container):
+        # Check if the user already exists
+        if self.auth.check_user(form_data['username'], form_data['password']):
+            st.error('User already exists, please login instead.')
+            return
+
         if form_data['submitted'] and (form_data['password'] != form_data['password2']):
             st.error('Passwords do not match, please try again.')
         elif form_data['submitted'] and not self._email_is_valid(form_data['email']):
