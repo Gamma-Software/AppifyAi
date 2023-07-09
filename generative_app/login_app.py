@@ -15,15 +15,24 @@ class LoginApp(HydraHeadApp):
 
     """
 
-    def __init__(self, title = '', **kwargs):
+    def __init__(self, auth: Auth, title = '', **kwargs):
         self.__dict__.update(kwargs)
         self.title = title
-        self.auth = Auth()
+        self.auth = auth
+
+    def check_auto_login(self) -> bool:
+        auto_login, user_id = self.auth.can_auto_login()
+        if auto_login:
+            print("Auto login detected of user_id: ", user_id)
+            self.redirect_after_login(user_id, self.auth.get_username_from_id(user_id))
 
     def run(self) -> None:
         """
         Application entry point.
         """
+
+        # Check if the user is already logged in
+        self.check_auto_login()
 
         st.markdown("<h1 style='text-align: center;'>Login to ChatbotX 💫</h1>", unsafe_allow_html=True)
 
@@ -67,6 +76,16 @@ class LoginApp(HydraHeadApp):
 
         return form_state, login_message
 
+    def redirect_after_login(self, access_level:int, username:str):
+        #access control uses an int value to allow for levels of permission that can be set for each user, this can then be checked within each app seperately.
+        self.set_access(access_level, username)
+
+        # Seed the sandbox if not already done
+        self.seed_sandbox(access_level, username)
+
+        #Do the kick to the home page
+        self.do_redirect()
+
 
     def _do_login(self, form_data, msg_container) -> None:
         access_level = self._check_login(form_data)
@@ -74,21 +93,12 @@ class LoginApp(HydraHeadApp):
         if access_level > 0:
             with msg_container:
                 st.success(f"✔️ Login success")
+                # Add user sesssion
+                self.auth.add_user_session(access_level)
                 time.sleep(1)
                 with st.spinner("now redirecting to application...."):
                     time.sleep(1)
-
-                    #access control uses an int value to allow for levels of permission that can be set for each user, this can then be checked within each app seperately.
-                    self.set_access(access_level, form_data['username'])
-
-                    # Seed the sandbox if not already done
-                    self.seed_sandbox(access_level, form_data['username'])
-
-                    # Add user sesssion
-                    self.auth.add_user_session(access_level)
-
-                    #Do the kick to the home page
-                    self.do_redirect()
+                    self.redirect_after_login(access_level, form_data['username'])
         else:
             self.session_state.allow_access = 0
             self.session_state.current_user = None

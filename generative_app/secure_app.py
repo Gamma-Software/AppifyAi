@@ -7,6 +7,8 @@ from chatbotx import ChatBotApp
 from load_app import LoadingApp
 import sidebar
 
+from auth.auth_connection import Auth
+
 import streamlit as st
 
 #Only need to set these here as we are add controls outside of Hydralit, to customise a run Hydralit!
@@ -47,23 +49,29 @@ if __name__ == '__main__':
         navbar_theme=over_theme
     )
 
+    # Authentication instance
+    auth = Auth()
 
     #we want to have secure access for this HydraApp, so we provide a login application
     #optional logout label, can be blank for something nicer!
-    app.add_app("Login", LoginApp(title='Login'), is_home=True, is_login=True)
+    app.add_app("Login page", LoginApp(title='Login', auth=auth), is_home=True, is_login=True)
 
     #we have added a sign-up app to demonstrate the ability to run an unsecure app
     #only 1 unsecure app is allowed
-    app.add_app("Signup", icon="🛰️", app=SignUpApp(title='Signup'), is_unsecure=True)
+    app.add_app("Signup", icon="🛰️", app=SignUpApp(title='Signup', auth=auth), is_unsecure=True)
 
     #specify a custom loading app for a custom transition between apps, this includes a nice custom spinner
     app.add_loader_app(LoadingApp(delay=1))
+
+    #check user access level to determine what should be shown on the menu
+    user_access_level, username = app.check_access()
 
     #we can inject a method to be called everytime a user logs out
     #---------------------------------------------------------------------
     @app.logout_callback
     def mylogout_cb():
-        print('I was called from Hydralit at logout!')
+        if user_access_level:
+            auth.remove_user_session(user_access_level)
     #---------------------------------------------------------------------
 
     #we can inject a method to be called everytime a user logs in
@@ -75,9 +83,6 @@ if __name__ == '__main__':
 
     #if we want to auto login a guest but still have a secure app, we can assign a guest account and go straight in
     #app.enable_guest_access()
-
-    #check user access level to determine what should be shown on the menu
-    user_access_level, username = app.check_access()
 
     # If the menu is cluttered, just rearrange it into sections!
     # completely optional, but if you have too many entries, you can make it nicer by using accordian menus

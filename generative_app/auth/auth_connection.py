@@ -2,15 +2,19 @@ import streamlit as st
 import psycopg2
 import uuid
 import json
-from typing import Dict, List, Any, Tuple
+import datetime
+import auth.cookie_manager as cookie_manager
+from typing import Dict, List, Any, Tuple, Union
 
 def generate_user_session_token() -> str:
     return str(uuid.uuid4())
 
 class Auth:
 
-    def __init__(self, title = '', **kwargs):
+    def __init__(self, expiration_time=10):
         self.conn = self.init_connection()
+        self.cookies = cookie_manager.CookieManager()
+        self.token_expiration_min = expiration_time
 
     # Initialize connection.
     # Uses st.cache_resource to only run once.
@@ -44,21 +48,81 @@ class Auth:
     def get_user_id(self, username:str, password:str):
         # Execute query.
         check_user = f"SELECT user_id FROM users WHERE username = '{username}' AND password = '{password}' LIMIT 1;"
-        rows = self.run_query(check_user)
-        print('get_user_id', rows[0][0])
-        return int(rows[0][0])
+        if rows := self.run_query(check_user):
+            return int(rows[0][0])
+        return None
+
+    def get_username_from_id(self, user_id:int):
+        # Execute query.
+        get_username = f"SELECT username FROM users WHERE user_id = '{user_id}' LIMIT 1;"
+        if rows := self.run_query(get_username):
+            return str(rows[0][0])
+        return None
 
     def add_user(self, username:str, password:str, email:str):
         # Execute query.
         add_user = f"INSERT INTO users (\"username\", \"password\", \"email\", \"role\") VALUES (,%s,%s,%s);"
         self.insert_query(add_user, [username, password, email, 'guest'])
 
+    def get_user_session(self, user_id:str) -> bool:
+        check_code = f"SELECT * FROM UserSessions WHERE user_id = '{user_id}' LIMIT 1;"
+        if self.run_query(check_code):
+            return True
+        return False
+
     def add_user_session(self, user_id:int):
+        # Check if the user already has a session.
+        if self.get_user_session(user_id):
+            # Remove the user session before anything.
+            self.remove_user_session(user_id)
+
         session_token = generate_user_session_token()
+        expires_at = datetime.datetime.now() + datetime.timedelta(minutes=self.token_expiration_min)
 
         # Execute query.
-        add_user_session = "INSERT INTO UserSessions (\"user_id\", \"session_token\") VALUES (%s,%s);"
-        self.insert_query(add_user_session, (user_id, session_token))
+        add_user_session = "INSERT INTO UserSessions (\"user_id\", \"session_token\", \"created_at\", \"last_accessed\") VALUES (%s,%s,%s,%s);"
+        self.insert_query(add_user_session, (user_id, session_token, datetime.datetime.now(), datetime.datetime.now()))
+
+        # Set cookie. The expiration should be 10 minutes from now.
+        self.cookies.set('user_token', session_token, expires_at=expires_at)
+
+    def extend_user_session(self, user_id:int, user_token:str):
+        if not self.can_auto_login(user_token):
+            raise Exception("User cannot extend session because the token is expired")
+
+        expires_at = datetime.datetime.now() + datetime.timedelta(minutes=self.token_expiration_min)
+
+        # Execute query.
+        add_user_session = "UPDATE UserSessions SET last_accessed = %s WHERE user_id = %s;"
+        self.insert_query(add_user_session, [datetime.datetime.now(), user_id])
+
+        # Reset expiration cookie. The expiration should be 10 minutes from now.
+        if user_cookie := self.cookies.get('user_token'):
+            self.cookies.delete('user_token')
+            self.cookies.set('user_token', user_cookie, expires_at=expires_at)
+        else:
+            raise Exception("User cookie not found.")
+
+    def remove_user_session(self, user_id:int):
+        """ Remove user session from database and the user token """
+        query = "DELETE FROM UserSessions WHERE user_id = %s;"
+        self.insert_query(query, (user_id, ))
+        self.cookies.delete('user_token')
+
+    def can_auto_login(self) -> Union[bool, int]:
+        user_token = self.cookies.get('user_token')
+        if not user_token:
+            return False, None
+
+        """ Check if user can auto login. If not you should consider logging them out."""
+        query = f"SELECT last_accessed, user_id FROM UserSessions WHERE session_token = '{user_token}' LIMIT 1;"
+        if result := self.run_query(query):
+            last_accessed, user_id = result[0]
+            if last_accessed:
+                last_accessed = last_accessed
+                token_expired = datetime.datetime.now() > last_accessed + datetime.timedelta(minutes=self.token_expiration_min)
+                return not token_expired, user_id
+        return False, None
 
     def get_code(self, user_id:int) -> str | None:
         # Execute query.
@@ -104,33 +168,3 @@ class Auth:
             insert_messages = "INSERT INTO userdata (\"user_id\", \"message_history\") VALUES (%s,%s);"
             self.insert_query(insert_messages, (user_id, json.dumps(message_history)))
 
-if __name__ == '__main__':
-    auth = Auth()
-    message = [
-            {"role": "assistant",
-             "content": """
-             Hello! I'm 🤖ChatbotX designed to help you create a Streamlit App.
-
-             here are the few commands to control me:
-             /undo: undo the last instruction
-             /reset: reset the app
-             /save: save the streamlit script in an independant app
-
-             I will generate the Streamlit App here [Sandbox](https://chatbotx-client1.pival.fr/)"""
-             },
-        ]
-    auth.set_message_history(10, auth.list_to_dict(message))
-    message = auth.get_message_history(1)
-    if message:
-        for _, values in auth.get_message_history(1).items():
-            for role, message in values.items():
-                print("role:", role)
-                print("message:", message)
-
-    auth.set_code(10, "print('hello world')")
-    code = auth.get_code(1)
-    if code:
-        print(code)
-    code = auth.get_code(10)
-    if code:
-        print(code)
