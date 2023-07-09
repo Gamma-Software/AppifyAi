@@ -19,3 +19,4 @@ debugpy
 python-dotenv
 hydralit
 psycopg2-binary
+extra-streamlit-components

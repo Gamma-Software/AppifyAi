@@ -15,11 +15,10 @@ class SignUpApp(HydraHeadApp):
 
     """
 
-    def __init__(self, title = '', **kwargs):
+    def __init__(self, auth:Auth, title = '', **kwargs):
         self.__dict__.update(kwargs)
         self.title = title
-        self.auth = Auth()
-
+        self.auth = auth
 
     def run(self) -> None:
         """
@@ -27,7 +26,7 @@ class SignUpApp(HydraHeadApp):
 
         """
 
-        st.markdown("<h1 style='text-align: center;'>Secure Hydralit Signup</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center;'>Signup to ChatbotX💫</h1>", unsafe_allow_html=True)
 
         pretty_btn = """
         <style>
@@ -54,8 +53,6 @@ class SignUpApp(HydraHeadApp):
         <br><br>
         """
         c2.markdown(pretty_btn,unsafe_allow_html=True)
-
-
 
         if form_data['submitted']:
             self._do_signup(form_data, c2)
