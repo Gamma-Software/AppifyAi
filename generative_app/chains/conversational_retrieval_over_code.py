@@ -102,8 +102,7 @@ class BaseConversationalRetrievalCodeChain(Chain):
         answer = self.combine_docs_chain.run(
             input_documents=docs, callbacks=_run_manager.get_child(), **new_inputs
         )
-        revised_answer = self.constitutional_chain.run(answer, callbacks=_run_manager.get_child(), **new_inputs)
-        output: Dict[str, Any] = {self.output_key: revised_answer}
+        output: Dict[str, Any] = {self.output_key: answer}
         if self.return_source_documents:
             output["source_documents"] = docs
         if self.return_generated_question:
@@ -148,9 +147,7 @@ class BaseConversationalRetrievalCodeChain(Chain):
         answer = await self.combine_docs_chain.arun(
             input_documents=docs, callbacks=_run_manager.get_child(), **new_inputs
         )
-        revised_answer = await self.constitutional_chain.arun(
-            answer, callbacks=_run_manager.get_child(), **new_inputs)
-        output: Dict[str, Any] = {self.output_key: revised_answer}
+        output: Dict[str, Any] = {self.output_key: answer}
         if self.return_source_documents:
             output["source_documents"] = docs
         if self.return_generated_question:
