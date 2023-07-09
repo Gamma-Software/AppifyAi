@@ -40,17 +40,9 @@ class LoginApp(HydraHeadApp):
 
         form_data, login_message_placeholder = self._create_login_form(c2)
 
+        print(reason)
         if reason == "User logged out due to inactivity.":
             login_message_placeholder.info(reason)
-
-        # Check if the user is already logged in
-        auto_login, user_id, reason = self.check_auto_login()
-
-        if auto_login:
-            print("Auto login detected of user_id: ", user_id)
-            self.redirect_after_login(user_id, AuthSingleton().get_instance().get_username_from_id(user_id))
-        elif reason == "User logged out due to inactivity.":
-            "User logged out due to inactivity."
 
         pretty_btn = """
         <style>
@@ -95,7 +87,6 @@ class LoginApp(HydraHeadApp):
         # Seed the sandbox if not already done
         self.seed_sandbox(access_level, username)
 
-        print("Redirecting to home page...")
         #Do the kick to the home page
         self.do_redirect()
 
