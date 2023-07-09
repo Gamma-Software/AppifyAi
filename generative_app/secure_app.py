@@ -90,7 +90,6 @@ if __name__ == '__main__':
     if user_access_level > 0:
         from sandboxes import APPS
         sandbox_app = [item for item in APPS if item[0] == "_".join([username, str(user_access_level)])]
-        print(sandbox_app)
         if len(sandbox_app) == 0:
             raise ValueError("No sandbox found for user {} with access level {}".format(username, user_access_level))
         title =  f"{username} - Generated App"

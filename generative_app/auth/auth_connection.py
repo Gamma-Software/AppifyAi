@@ -58,6 +58,15 @@ class Auth:
             return str(rows[0][0])
         return None
 
+    def init_userdata(self, user_id:int):
+        # check if user already has userdata.
+        userdata = f"SELECT tries FROM userdata WHERE user_id = '{user_id}' LIMIT 1;"
+        if self.run_query(userdata):
+            return # No need to initialize.
+
+        init_query = f"INSERT INTO userdata (\"user_id\") VALUES (%s);"
+        self.insert_query(init_query, (user_id, ))
+
     def is_mail_exists(self, username:str):
         # Execute query.
         get_mail = f"SELECT email FROM users WHERE username = '{username}' LIMIT 1;"

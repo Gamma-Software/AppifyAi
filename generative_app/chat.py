@@ -91,8 +91,11 @@ class ChatBot:
                 Hello {self.username}! I'm 🤖ChatbotX designed to help you create a Streamlit App.
 
                 here are the few commands to control me:
+
                 /undo: undo the last instruction
+
                 /reset: reset the app
+
                 /save: save the streamlit script in an independant app
 
                 I will generate the Streamlit App in the Generate App tab (Find it in the sidebar menu)"""
@@ -124,6 +127,7 @@ class ChatBot:
             else:
                 st.warning("No code to download")
             return
+
 
         # If this is the first time the chatbot is launched reset it and the code
         # Add saved messages
@@ -205,7 +209,8 @@ class ChatBot:
                         self.save_chat_history_to_database()
 
     def check_tries_exceeded(self) -> bool:
-        if self.auth.get_tries(self.user_id) < 5:
+        tries = self.auth.get_tries(self.user_id)
+        if tries < 5:
             return False
         return True
 

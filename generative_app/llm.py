@@ -9,7 +9,7 @@ from langchain.schema import LLMResult
 from langchain.chat_models import ChatOpenAI
 from langchain.agents import Tool
 from langchain.agents import AgentType
-from langchain import OpenAI
+from langchain.llms import OpenAI
 
 from langchain.agents import initialize_agent
 from langchain.memory import ConversationBufferMemory
@@ -173,7 +173,7 @@ class Handler(BaseCallbackHandler):
             if explain:
                 message += f"{explain}"
 
-            if message is not "":
+            if message != "":
                 # Add a blinking cursor to simulate typing
                 self.message_placeholder.markdown(message + "▌")
 
