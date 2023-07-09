@@ -85,6 +85,9 @@ class SignUpApp(HydraHeadApp):
                 msg_container.error('Please fill in all fields')
                 return
 
+        if AuthSingleton().get_instance().is_mail_exists(form_data['username']):
+            msg_container.error('Email is already taken.')
+
         if form_data['submitted'] and (form_data['password'] != form_data['password2']):
             msg_container.error('Passwords do not match, please try again.')
 

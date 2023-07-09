@@ -58,6 +58,13 @@ class Auth:
             return str(rows[0][0])
         return None
 
+    def is_mail_exists(self, username:str):
+        # Execute query.
+        get_mail = f"SELECT email FROM users WHERE username = '{username}' LIMIT 1;"
+        if rows := self.run_query(get_mail):
+            return str(rows[0][0])
+        return None
+
     def add_user(self, username:str, password:str, email:str):
         # Execute query.
         add_user = f"INSERT INTO users (\"username\", \"password\", \"email\", \"role\") VALUES (,%s,%s,%s);"
