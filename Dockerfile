@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     software-properties-common \
     git \
     && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
 RUN pip3 install -r requirements.txt
 
