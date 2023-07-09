@@ -18,9 +18,10 @@ class LoginApp(HydraHeadApp):
     def __init__(self, title = '', **kwargs):
         self.__dict__.update(kwargs)
         self.title = title
+        self.auth = AuthSingleton().get_instance()
 
     def check_auto_login(self):
-        auto_login, user_id, reason = AuthSingleton().get_instance().can_auto_login()
+        auto_login, user_id, reason = self.auth.can_auto_login()
         return auto_login, user_id, reason
 
     def run(self) -> None:
@@ -32,7 +33,7 @@ class LoginApp(HydraHeadApp):
 
         if auto_login:
             print("Auto login detected of user_id: ", user_id)
-            self.redirect_after_login(user_id, AuthSingleton().get_instance().get_username_from_id(user_id))
+            self.redirect_after_login(user_id, self.auth.get_username_from_id(user_id))
 
         st.markdown("<h1 style='text-align: center;'>Login to ChatbotX 💫</h1>", unsafe_allow_html=True)
 
@@ -87,6 +88,9 @@ class LoginApp(HydraHeadApp):
         # Seed the sandbox if not already done
         self.seed_sandbox(access_level, username)
 
+        # Init the user data
+        self.auth.init_userdata(access_level)
+
         #Do the kick to the home page
         self.do_redirect()
 
@@ -97,7 +101,7 @@ class LoginApp(HydraHeadApp):
         if access_level > 0:
             with msg_container:
                 # Add user sesssion
-                AuthSingleton().get_instance().add_user_session(access_level)
+                self.auth.add_user_session(access_level)
                 with st.spinner("✔️ Login successful, redirecting.."):
                     time.sleep(2)
                     self.redirect_after_login(access_level, form_data['username'])
@@ -110,7 +114,7 @@ class LoginApp(HydraHeadApp):
 
     def _check_login(self, login_data) -> int:
         #this method returns a value indicating the success of verifying the login details provided and the permission level, 1 for default access, 0 no access etc.
-        if AuthSingleton().get_instance().check_user(login_data['username'], login_data['password']):
+        if self.auth.check_user(login_data['username'], login_data['password']):
             user_id = AuthSingleton().get_instance().get_user_id(login_data['username'], login_data['password'])
             return user_id
         return -1
