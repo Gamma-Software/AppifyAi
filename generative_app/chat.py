@@ -140,6 +140,7 @@ class ChatBot:
                 user_message_placeholder.markdown(instruction)
                 self.apply_command(command, assistant_message_placeholder)
                 self.add_message("assistant", command.value[1])
+                self.save_chat_history_to_database()
             else:
                 # If its not a command, process the instruction
                 user_message_placeholder.markdown(instruction)
@@ -168,7 +169,7 @@ class ChatBot:
                         st.session_state.chat_history.append((instruction, explanation))
                         self.add_message("assistant", message)
                         self.prune_chat_history()
-                        self.save_chat_history()
+                        self.save_chat_history_to_database()
 
     def prune_chat_history(self):
         # Make sure that the buffer history is not filled with too many messages (max 3)
@@ -176,5 +177,5 @@ class ChatBot:
             # Take the last 3 messages
             st.session_state.chat_history = st.session_state.chat_history[-3:]
 
-    def save_chat_history(self):
+    def save_chat_history_to_database(self):
         AuthSingleton().get_instance().set_message_history(self.user_id,  st.session_state.messages)
