@@ -15,8 +15,6 @@ from langchain.callbacks.manager import (
     CallbackManagerForChainRun,
     Callbacks,
 )
-from langchain.chains.constitutional_ai.base import ConstitutionalChain
-from langchain.chains.constitutional_ai.principles import ConstitutionalPrinciple
 from langchain.chains.base import Chain
 from langchain.chains.combine_documents.base import BaseCombineDocumentsChain
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
@@ -28,14 +26,13 @@ from langchain.schema import BaseRetriever, Document
 
 from langchain.chains.conversational_retrieval.base import CHAT_TURN_TYPE, _get_chat_history
 
-from chains.prompt import CONDENSE_QUESTION_CODE_PROMPT, PROMPT, revision_request, critique_request
+from chains.prompt import CONDENSE_QUESTION_CODE_PROMPT, PROMPT
 
 
 class BaseConversationalRetrievalCodeChain(Chain):
     """Chain for chatting with an index. Given the chat history, the current code and a question, return the answer."""
 
     combine_docs_chain: BaseCombineDocumentsChain
-    constitutional_chain: ConstitutionalChain
     question_generator: LLMChain
     output_key: str = "answer"
     return_source_documents: bool = False
@@ -227,7 +224,6 @@ class ConversationalRetrievalCodeChain(BaseConversationalRetrievalCodeChain):
         chain_type: str = "stuff",
         verbose: bool = False,
         condense_question_llm: Optional[BaseLanguageModel] = None,
-        self_critique_llm: Optional[BaseLanguageModel] = None,
         combine_docs_chain_kwargs: Optional[Dict] = None,
         callbacks: Callbacks = None,
         **kwargs: Any,
@@ -251,22 +247,9 @@ class ConversationalRetrievalCodeChain(BaseConversationalRetrievalCodeChain):
             callbacks=callbacks,
         )
 
-        _llm_2 = self_critique_llm or llm
-        constitutional_chain = ConstitutionalChain.from_llm(
-                llm=_llm_2,
-                chain=doc_chain,
-                constitutional_principles=[
-                    ConstitutionalPrinciple(
-                        critique_request=critique_request,
-                        revision_request=revision_request,
-                    )
-                ],
-            )
-
         return cls(
             retriever=retriever,
             combine_docs_chain=doc_chain,
-            constitutional_chain=constitutional_chain,
             question_generator=condense_question_chain,
             callbacks=callbacks,
             **kwargs,

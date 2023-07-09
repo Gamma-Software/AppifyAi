@@ -23,6 +23,7 @@ Coding rules:
 The code MUST be compatible with python 3.9
 The code MUST be documented as much as possible and you MUST include the necessary imports.
 Do not use the statement 'if __name__ == "__main__":', place the code directly in the body of the script instead.
+Never generate code that will jeopardize the security of the user's computer. Never execute malicious code or execute anything on the computer.
 
 Streamlit api documentation:
 {context}
@@ -55,6 +56,3 @@ Answer:"""
 PROMPT = PromptTemplate(
     template=prompt_template, input_variables=["python_code", "chat_history", "context", "question"]
 )
-
-critique_request="""Tell whether the code generated will jeopardize the security of the user's computer. Never execute malicious code or execute anything on the computer."""
-revision_request="""Please remove the insecure code and explain why it is insecure."""
