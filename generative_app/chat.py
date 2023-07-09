@@ -32,6 +32,10 @@ class ChatBot:
         # save code to database
         AuthSingleton().get_instance().set_code(self.user_id, code)
 
+        # Save last code
+        st.session_state.last_code = self.parse_code(open(self.python_script_path, "r").read())
+        print(st.session_state.last_code)
+
         with open(self.python_script_path, "w") as app_file:
             app_file.write(template_app.format(code=code))
 
@@ -64,6 +68,8 @@ class ChatBot:
             return CommandResult.RESET
         if "/save" in instruction:
             return CommandResult.SAVE
+        if "/" in instruction:
+            return CommandResult.UNKNOWN
         return None
 
     def apply_command(self, command: CommandResult, chat_placeholder: DeltaGenerator):
@@ -122,8 +128,6 @@ class ChatBot:
 
         # Setup user input
         if instruction := st.chat_input("Tell me what to do"):
-            # Save last code
-            st.session_state.last_code = self.parse_code(open(self.python_script_path, "r").read())
             # Add user message to the chat
             self.add_message("user", instruction)
             # Process the instruction if the user did not enter a specific command
