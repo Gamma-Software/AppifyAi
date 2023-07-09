@@ -23,3 +23,6 @@ extra-streamlit-components
 scrypt
 passlib
 pycryptodome
+opencv-python
+pillow
+tensorflow
