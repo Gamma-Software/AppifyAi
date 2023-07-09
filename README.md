@@ -123,7 +123,10 @@ The chatbot will interpret these instructions, generate the corresponding Python
 - [x] Add a chatbot
 - [x] Add a sandbox page for the bot to play with
 - [x] Add commands to /undo, /reset, /save
-- [ ] Embed in vector stores the up to date documentation of Streamlit https://github.com/streamlit/docs/tree/main/content and Langchain (and other libraries)
+- [x] Embed in vector stores the up to date documentation of Streamlit https://github.com/streamlit/docs/tree/main/content and Langchain (and other libraries)
+- [x] Create login and register pages
+- [x] Crypt the user password
+- [x] Add prompt tries
 - [ ] Add a voice assistant (text to speech and speech to text)
 - [ ] Add a page to show the documentation of the app
 - [ ] Automate the installation of more libraries
