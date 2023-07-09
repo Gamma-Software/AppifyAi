@@ -81,6 +81,7 @@ class Auth:
         # Check if the user already has a session.
         if self.get_user_session(user_id):
             # Remove the user session before anything.
+            print("User already has a session. Removing it.")
             self.remove_user_session(user_id)
 
         session_token = generate_user_session_token()
@@ -92,6 +93,7 @@ class Auth:
 
         # Set cookie. The expiration should be 10 minutes from now.
         self.cookies.set('user_token', session_token, expires_at=expires_at)
+        print("User session added.")
 
     def extend_user_session(self, user_id:int, user_token:str):
         auto_login = self.can_auto_login()

@@ -108,6 +108,9 @@ class ChatBot:
         st.session_state.messages.update({f"message_{idx}": {"role": role, "content": content}})
 
     def setup(self):
+        # Save last code
+        st.session_state["last_code"] = self.auth.get_code(self.user_id)
+
         if "openai_api_key" not in st.session_state and self.check_tries_exceeded():
             st.warning("You have exceeded the number of tries, please input your OpenAI API key to continue")
             if openai_api_key := st.text_input("OpenAI API key"):
@@ -138,9 +141,6 @@ class ChatBot:
 
         if "tries" not in st.session_state:
             st.session_state.tries = self.auth.get_tries(self.user_id)
-
-        # Save last code
-        st.session_state["last_code"] = self.parse_code(open(self.python_script_path, "r").read())
 
         self.setup_chat()
 
