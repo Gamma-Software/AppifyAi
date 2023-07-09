@@ -104,7 +104,7 @@ class ChatBot:
                 I will generate the Streamlit App in the Generate App tab (Find it in the sidebar menu)"""
                 },
         }
-        self.save_chat_history()
+        self.save_chat_history_to_database()
         st.session_state.chat_history = []
         self.apply_code("import streamlit as st\nst.write('Hello')")
         st.experimental_rerun()
