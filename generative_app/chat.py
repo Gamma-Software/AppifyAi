@@ -22,6 +22,7 @@ class ChatBot:
         self.background_tasks = set()
         self.user_id = user_id
         self.username = username
+        self.auth = AuthSingleton().get_instance()
 
     def apply_code(self, code:str):
         if code is None:
@@ -30,7 +31,7 @@ class ChatBot:
         code = re.sub(r"^", " " * 8, code, flags=re.MULTILINE)
 
         # save code to database
-        AuthSingleton().get_instance().set_code(self.user_id, code)
+        self.auth.set_code(self.user_id, code)
 
         with open(self.python_script_path, "w") as app_file:
             app_file.write(template_app.format(code=code))
@@ -109,7 +110,7 @@ class ChatBot:
     def setup(self):
         # If this is the first time the chatbot is launched reset it and the code
         # Add saved messages
-        st.session_state.messages = AuthSingleton().get_instance().get_message_history(self.user_id)
+        st.session_state.messages = self.auth.get_message_history(self.user_id)
 
         if st.session_state.messages:
             for _, message in st.session_state.messages.items():
@@ -121,11 +122,24 @@ class ChatBot:
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
 
+        if "tries" not in st.session_state:
+            st.session_state.tries = self.auth.get_tries(self.user_id)
+
         # Save last code
         st.session_state["last_code"] = self.parse_code(open(self.python_script_path, "r").read())
 
+        print(st.session_state[openai_api_key])
+        if "openai_api_key" not in st.session_state and self.check_tries_exceeded():
+            st.warning("You have exceeded the number of tries, please input your OpenAI API key to continue")
+            if openai_api_key := st.text_input("OpenAI API key"):
+                st.session_state.openai_api_key = openai_api_key
+                st.experimental_rerun()
+        else:
+            self.setup_chat()
+
+    def setup_chat(self):
         # Setup user input
-        if instruction := st.chat_input("Tell me what to do"):
+        if instruction := st.chat_input(f"Tell me what to do, or ask me a question"):
             # Add user message to the chat
             self.add_message("user", instruction)
             # Process the instruction if the user did not enter a specific command
@@ -143,9 +157,12 @@ class ChatBot:
                 with assistant_message_placeholder:
                     current_assistant_message_placeholder = st.empty()
                     #chain = llm.llm_chain(current_assistant_message_placeholder)
-                    chain = llm.load_conversation_chain(current_assistant_message_placeholder)
+                    if "openai_api_key" in st.session_state:
+                        chain = llm.load_conversation_chain(current_assistant_message_placeholder, st.session_state.openai_api_key)
+                    else:
+                        chain = llm.load_conversation_chain(current_assistant_message_placeholder)
                     message = ""
-                    current_assistant_message_placeholder.info("⌛Processing")
+                    current_assistant_message_placeholder.info("⌛Processing... Please keep this page open until the end of my response.")
 
                     # Wait for the response of the LLM and display a loading message in the meantime
                     try:
@@ -161,11 +178,19 @@ class ChatBot:
                             message = f"```python\n{code}\n```\n"
                             self.apply_code(code)
                         message += f"{explanation}"
-                        current_assistant_message_placeholder.markdown(message)
+                        st.session_state.tries = self.auth.increment_tries(self.user_id)
+                        container = current_assistant_message_placeholder.container()
+                        container.markdown(message)
+                        container.info(f"You have {5 - st.session_state.tries} tries left.")
                         st.session_state.chat_history.append((instruction, explanation))
                         self.add_message("assistant", message)
                         self.prune_chat_history()
                         self.save_chat_history_to_database()
+
+    def check_tries_exceeded(self) -> bool:
+        if self.auth.get_tries(self.user_id) < 5:
+            return False
+        return True
 
     def prune_chat_history(self):
         # Make sure that the buffer history is not filled with too many messages (max 3)
@@ -174,4 +199,4 @@ class ChatBot:
             st.session_state.chat_history = st.session_state.chat_history[-3:]
 
     def save_chat_history_to_database(self):
-        AuthSingleton().get_instance().set_message_history(self.user_id,  st.session_state.messages)
+        self.auth.set_message_history(self.user_id,  st.session_state.messages)

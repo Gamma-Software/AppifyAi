@@ -13,7 +13,7 @@ import streamlit as st
 
 #Only need to set these here as we are add controls outside of Hydralit, to customise a run Hydralit!
 st.set_page_config(
-    #page_title="ChatbotX",
+    page_title="ChatbotX",
     #page_icon="🤖",
     layout="wide",
     initial_sidebar_state=sidebar.sidebar_init_state,

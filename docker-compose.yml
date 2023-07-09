@@ -11,6 +11,7 @@ services:
       - docker.env
     volumes:
       - ./docker_entrypoint/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - auth_db:/var/lib/postgresql/data
 
   adminer:
     image: adminer
@@ -30,3 +31,4 @@ services:
 
 volumes:
   sandboxes:
+  auth_db:
