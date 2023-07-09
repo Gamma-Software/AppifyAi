@@ -32,10 +32,6 @@ class ChatBot:
         # save code to database
         AuthSingleton().get_instance().set_code(self.user_id, code)
 
-        # Save last code
-        st.session_state.last_code = self.parse_code(open(self.python_script_path, "r").read())
-        print(st.session_state.last_code)
-
         with open(self.python_script_path, "w") as app_file:
             app_file.write(template_app.format(code=code))
 
@@ -45,10 +41,8 @@ class ChatBot:
         python_code = None
         pattern = r"#---start\n(.*?)#---end"
         python_code_match = re.search(pattern, code, re.DOTALL)
-        print("code2:", python_code_match)
         if python_code_match:
             python_code = python_code_match.group(1)
-            print("code", python_code)
             if python_code == "None":
                 python_code = None
         # Remove the 8 space indentation
@@ -85,7 +79,6 @@ class ChatBot:
         if command == CommandResult.SAVE:
             chat_placeholder.info("Download the file by clicking on the button below.\nYou can then run it with `streamlit run streamlit_app.py`")
             code = self.parse_code(open(self.python_script_path, "r").read())
-            print(code)
             chat_placeholder.download_button(label="Download app", file_name= "streamlit_app.py",
                                              mime='text/x-python', data=code)
 
@@ -127,6 +120,9 @@ class ChatBot:
 
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
+
+        # Save last code
+        st.session_state["last_code"] = self.parse_code(open(self.python_script_path, "r").read())
 
         # Setup user input
         if instruction := st.chat_input("Tell me what to do"):
