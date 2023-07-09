@@ -65,7 +65,6 @@ if __name__ == '__main__':
 
     #check user access level to determine what should be shown on the menu
     user_access_level, username = app.check_access()
-    print('User {} has access level {}'.format(username, user_access_level))
 
     #we can inject a method to be called everytime a user logs out
     #---------------------------------------------------------------------
