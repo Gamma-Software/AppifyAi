@@ -19,11 +19,9 @@ class LoginApp(HydraHeadApp):
         self.__dict__.update(kwargs)
         self.title = title
 
-    def check_auto_login(self) -> bool:
+    def check_auto_login(self):
         auto_login, user_id = AuthSingleton().get_instance().can_auto_login()
-        if auto_login:
-            print("Auto login detected of user_id: ", user_id)
-            self.redirect_after_login(user_id, AuthSingleton().get_instance().get_username_from_id(user_id))
+        return auto_login, user_id
 
     def run(self) -> None:
         """
@@ -31,7 +29,13 @@ class LoginApp(HydraHeadApp):
         """
 
         # Check if the user is already logged in
-        #self.check_auto_login()
+        auto_login, user_id = self.check_auto_login()
+
+        if auto_login:
+            print("Auto login detected of user_id: ", user_id)
+            self.redirect_after_login(user_id, AuthSingleton().get_instance().get_username_from_id(user_id))
+            return
+
 
         st.markdown("<h1 style='text-align: center;'>Login to ChatbotX 💫</h1>", unsafe_allow_html=True)
 

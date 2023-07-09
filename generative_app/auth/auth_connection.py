@@ -32,7 +32,6 @@ class Auth:
             cur.execute(query, insert)
             self.conn.commit()
             count = cur.rowcount
-            print(count, "Record inserted successfully into mobile table")
 
     def check_user(self, username:str, password:str):
         # Execute query.
