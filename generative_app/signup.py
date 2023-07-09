@@ -100,7 +100,6 @@ class SignUpApp(HydraHeadApp):
         else:
             with st.spinner("now redirecting to login...."):
                 level = self._save_signup(form_data)
-                self.seed_sandbox(level, form_data['username'])
                 time.sleep(2)
 
                 #access control uses an int value to allow for levels of permission that can be set for each user, this can then be checked within each app seperately.
