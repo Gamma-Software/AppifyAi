@@ -7,7 +7,7 @@ from chatbotx import ChatBotApp
 from load_app import LoadingApp
 import sidebar
 
-from auth.auth_connection import Auth
+from auth.auth_connection import AuthSingleton
 
 import streamlit as st
 
@@ -50,28 +50,30 @@ if __name__ == '__main__':
     )
 
     # Authentication instance
-    auth = Auth()
+    #auth = Auth()
 
     #we want to have secure access for this HydraApp, so we provide a login application
     #optional logout label, can be blank for something nicer!
-    app.add_app("Login page", LoginApp(title='Login', auth=auth), is_home=True, is_login=True)
+    app.add_app("Logout", LoginApp(title='Login'), is_home=True, is_login=True)
 
     #we have added a sign-up app to demonstrate the ability to run an unsecure app
     #only 1 unsecure app is allowed
-    app.add_app("Signup", icon="🛰️", app=SignUpApp(title='Signup', auth=auth), is_unsecure=True)
+    app.add_app("Signup", icon="🛰️", app=SignUpApp(title='Signup'), is_unsecure=True)
 
     #specify a custom loading app for a custom transition between apps, this includes a nice custom spinner
     app.add_loader_app(LoadingApp(delay=1))
 
     #check user access level to determine what should be shown on the menu
     user_access_level, username = app.check_access()
+    print('User {} has access level {}'.format(username, user_access_level))
 
     #we can inject a method to be called everytime a user logs out
     #---------------------------------------------------------------------
     @app.logout_callback
     def mylogout_cb():
         if user_access_level:
-            auth.remove_user_session(user_access_level)
+            print('Remove user session of user {} with access level {}'.format(username, user_access_level))
+            AuthSingleton().get_instance().remove_user_session(user_access_level)
     #---------------------------------------------------------------------
 
     #we can inject a method to be called everytime a user logs in
@@ -91,11 +93,10 @@ if __name__ == '__main__':
         sandbox_app = [item for item in APPS if item[0] == "_".join([username, str(user_access_level)])]
         if len(sandbox_app) == 0:
             raise ValueError("No sandbox found for user {} with access level {}".format(username, user_access_level))
-        title = "Generated App"
+        title =  f"{username} - Generated App"
         _, path_to_script, app_to_add = sandbox_app[0]
 
         #add all your application classes here
-        print(path_to_script)
         app.add_app("ChatbotX", icon="💬", app=ChatBotApp(title="ChatbotX", generative_app_path=path_to_script))
 
         #add all your application classes here
@@ -105,9 +106,7 @@ if __name__ == '__main__':
         }
         complex_nav.update({title: [title]})
     else:
-        complex_nav = {
-            'ChatbotX': ['ChatbotX'],
-        }
+        complex_nav = {}
 
 
     #and finally just the entire app and all the children.

@@ -10,7 +10,6 @@ def generate_user_session_token() -> str:
     return str(uuid.uuid4())
 
 class Auth:
-
     def __init__(self, expiration_time=10):
         self.conn = self.init_connection()
         self.cookies = cookie_manager.CookieManager()
@@ -167,4 +166,11 @@ class Auth:
             # Execute query to update.
             insert_messages = "INSERT INTO userdata (\"user_id\", \"message_history\") VALUES (%s,%s);"
             self.insert_query(insert_messages, (user_id, json.dumps(message_history)))
+
+class AuthSingleton:
+    __instance = None
+    def get_instance(self) -> Auth:
+        if AuthSingleton.__instance is None :
+            AuthSingleton.__instance = Auth()
+        return AuthSingleton.__instance
 

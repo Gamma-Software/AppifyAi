@@ -20,12 +20,12 @@ class ChatBotApp(HydraHeadApp):
 
 
     def run(self) -> None:
-        user_id, _ = self.check_access()
+        user_id, username = self.check_access()
 
         sidebar.setup()
 
         #if time_sandbox.setup():
-        chat = ChatBot(user_id, self.generative_app_path)
+        chat = ChatBot(user_id, username, self.generative_app_path)
         chat.setup()
 
         st.markdown('<div id="input-container-placeholder"></div>', unsafe_allow_html=True)
