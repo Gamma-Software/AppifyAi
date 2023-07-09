@@ -6,7 +6,7 @@ from streamlit.delta_generator import DeltaGenerator
 from llm import parse
 import llm
 import asyncio
-from auth.auth_connection import Auth
+from auth.auth_connection import AuthSingleton
 from templates.template_app import template_app
 
 class CommandResult(enum.Enum):
@@ -17,11 +17,11 @@ class CommandResult(enum.Enum):
     SAVE = [4, "Code saved"]
 
 class ChatBot:
-    def __init__(self, user_id: int,python_script_path: str):
+    def __init__(self, user_id: int, username:str, python_script_path: str):
         self.python_script_path = python_script_path
         self.background_tasks = set()
-        self.auth = Auth()
         self.user_id = user_id
+        self.username = username
 
     def apply_code(self, code:str):
         if code is None:
@@ -30,7 +30,7 @@ class ChatBot:
         code = re.sub(r"^", " " * 8, code, flags=re.MULTILINE)
 
         # save code to database
-        self.auth.set_code(self.user_id, code)
+        AuthSingleton().get_instance().set_code(self.user_id, code)
 
         with open(self.python_script_path, "w") as app_file:
             app_file.write(template_app.format(code=code))
@@ -85,8 +85,8 @@ class ChatBot:
         st.session_state["messages"] = {
             "message_0":
                 {"role": "assistant",
-                "content": """
-                Hello! I'm 🤖ChatbotX designed to help you create a Streamlit App.
+                "content": f"""
+                Hello {self.username}! I'm 🤖ChatbotX designed to help you create a Streamlit App.
 
                 here are the few commands to control me:
                 /undo: undo the last instruction
@@ -108,7 +108,7 @@ class ChatBot:
     def setup(self):
         # If this is the first time the chatbot is launched reset it and the code
         # Add saved messages
-        st.session_state.messages = self.auth.get_message_history(self.user_id)
+        st.session_state.messages = AuthSingleton().get_instance().get_message_history(self.user_id)
         if st.session_state.messages:
             for _, message in st.session_state.messages.items():
                 with st.chat_message(message["role"]):
@@ -170,4 +170,4 @@ class ChatBot:
             st.session_state.chat_history = st.session_state.chat_history[-3:]
 
     def save_chat_history(self):
-        self.auth.set_message_history(self.user_id,  st.session_state.messages)
+        AuthSingleton().get_instance().set_message_history(self.user_id,  st.session_state.messages)

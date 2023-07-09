@@ -3,7 +3,7 @@ from typing import Dict, Union
 import shutil
 from pathlib import Path
 import streamlit as st
-from auth.auth_connection import Auth, generate_user_session_token
+from auth.auth_connection import AuthSingleton, generate_user_session_token
 from hydralit import HydraHeadApp
 from streamlit.delta_generator import DeltaGenerator
 
@@ -15,16 +15,15 @@ class LoginApp(HydraHeadApp):
 
     """
 
-    def __init__(self, auth: Auth, title = '', **kwargs):
+    def __init__(self, title = '', **kwargs):
         self.__dict__.update(kwargs)
         self.title = title
-        self.auth = auth
 
     def check_auto_login(self) -> bool:
-        auto_login, user_id = self.auth.can_auto_login()
+        auto_login, user_id = AuthSingleton().get_instance().can_auto_login()
         if auto_login:
             print("Auto login detected of user_id: ", user_id)
-            self.redirect_after_login(user_id, self.auth.get_username_from_id(user_id))
+            self.redirect_after_login(user_id, AuthSingleton().get_instance().get_username_from_id(user_id))
 
     def run(self) -> None:
         """
@@ -32,7 +31,7 @@ class LoginApp(HydraHeadApp):
         """
 
         # Check if the user is already logged in
-        self.check_auto_login()
+        #self.check_auto_login()
 
         st.markdown("<h1 style='text-align: center;'>Login to ChatbotX 💫</h1>", unsafe_allow_html=True)
 
@@ -94,7 +93,7 @@ class LoginApp(HydraHeadApp):
             with msg_container:
                 st.success(f"✔️ Login success")
                 # Add user sesssion
-                self.auth.add_user_session(access_level)
+                AuthSingleton().get_instance().add_user_session(access_level)
                 time.sleep(1)
                 with st.spinner("now redirecting to application...."):
                     time.sleep(1)
@@ -110,8 +109,8 @@ class LoginApp(HydraHeadApp):
         #this method returns a value indicating the success of verifying the login details provided and the permission level, 1 for default access, 0 no access etc.
         if login_data['username'] == 'joe' or login_data['password'] == 'joe':
             return 1
-        if self.auth.check_user(login_data['username'], login_data['password']):
-            return self.auth.get_user_id(login_data['username'], login_data['password'])
+        if AuthSingleton().get_instance().check_user(login_data['username'], login_data['password']):
+            return AuthSingleton().get_instance().get_user_id(login_data['username'], login_data['password'])
         return -1
 
     def seed_sandbox(self, level, username):
