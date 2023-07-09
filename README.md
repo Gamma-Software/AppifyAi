@@ -32,6 +32,8 @@ https://github.com/Gamma-Software/ChatbotX/assets/6960910/d34206e1-90cf-4408-b7c
 
 https://github.com/Gamma-Software/ChatbotX/assets/6960910/0360af37-23c7-49e1-8794-1d035435a13f
 
+https://github.com/Gamma-Software/ChatbotX/assets/6960910/b6addffd-023d-4252-8a40-54259ce88f6b
+
 Here is a simple conversation with the chatbot:
 ![Simple conversation](simple_conversation.png)
 
