@@ -108,6 +108,13 @@ class ChatBot:
         st.session_state.messages.update({f"message_{idx}": {"role": role, "content": content}})
 
     def setup(self):
+        if "openai_api_key" not in st.session_state and self.check_tries_exceeded():
+            st.warning("You have exceeded the number of tries, please input your OpenAI API key to continue")
+            if openai_api_key := st.text_input("OpenAI API key"):
+                st.session_state.openai_api_key = openai_api_key
+                st.experimental_rerun()
+            return
+
         # If this is the first time the chatbot is launched reset it and the code
         # Add saved messages
         st.session_state.messages = self.auth.get_message_history(self.user_id)
@@ -128,18 +135,14 @@ class ChatBot:
         # Save last code
         st.session_state["last_code"] = self.parse_code(open(self.python_script_path, "r").read())
 
-        print(st.session_state[openai_api_key])
-        if "openai_api_key" not in st.session_state and self.check_tries_exceeded():
-            st.warning("You have exceeded the number of tries, please input your OpenAI API key to continue")
-            if openai_api_key := st.text_input("OpenAI API key"):
-                st.session_state.openai_api_key = openai_api_key
-                st.experimental_rerun()
-        else:
-            self.setup_chat()
+        self.setup_chat()
 
     def setup_chat(self):
         # Setup user input
         if instruction := st.chat_input(f"Tell me what to do, or ask me a question"):
+            tries_left = 5 - st.session_state.tries
+            if tries_left <= 0:
+                st.experimental_rerun()
             # Add user message to the chat
             self.add_message("user", instruction)
             # Process the instruction if the user did not enter a specific command
@@ -178,10 +181,17 @@ class ChatBot:
                             message = f"```python\n{code}\n```\n"
                             self.apply_code(code)
                         message += f"{explanation}"
-                        st.session_state.tries = self.auth.increment_tries(self.user_id)
                         container = current_assistant_message_placeholder.container()
                         container.markdown(message)
-                        container.info(f"You have {5 - st.session_state.tries} tries left.")
+                        if "openai_api_key" not in st.session_state:
+                            st.session_state.tries = self.auth.increment_tries(self.user_id)
+                            tries_left = 5 - st.session_state.tries
+                            if tries_left == 0:
+                                container.error("You have 0 try left.")
+                            elif tries_left == 1:
+                                container.warning("You have 1 try left.")
+                            else:
+                                container.info(f"You have {tries_left} tries left.")
                         st.session_state.chat_history.append((instruction, explanation))
                         self.add_message("assistant", message)
                         self.prune_chat_history()
