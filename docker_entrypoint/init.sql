@@ -22,15 +22,8 @@ CREATE TABLE UserSessions (
 -- Create the UserData table
 CREATE TABLE UserData (
   user_id INT NOT NULL,
-  source_code TEXT NOT NULL,
+  source_code TEXT,
   message_history JSONB,
+  tries INT NOT NULL DEFAULT 0,
   FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
-
--- Add a random user
-INSERT INTO Users (username, password, email, role)
-VALUES ('joe', 'joe', 'john.doe@example.com', 'guest');
-
--- Add a user session
---INSERT INTO UserSessions (user_id, session_token)
---VALUES (1, 'abc123xyz');

@@ -165,6 +165,22 @@ class Auth:
             insert_code = "INSERT INTO userdata (\"user_id\", \"source_code\") VALUES (%s,%s);"
             self.insert_query(insert_code, (user_id, code))
 
+    def get_tries(self, user_id:int) -> int:
+        tries_query = f"SELECT tries FROM userdata WHERE user_id = '{user_id}' LIMIT 1;"
+        tries_result = self.run_query(tries_query)
+        if tries_result:
+            return int(tries_result[0][0])
+        raise None
+
+    def increment_tries(self, user_id:int) -> int:
+        # Check if user_id exists and get tries
+        current_tries = self.get_tries(user_id)
+        if current_tries is not None:
+            current_tries += 1
+            # Execute query to update
+            update_code = "UPDATE userdata SET tries = %s WHERE user_id = %s;"
+            self.insert_query(update_code, [current_tries, user_id])
+        return current_tries
 
     def set_message_history(self, user_id:int, message_history: Dict) -> str:
         # Check if user_id exists.
