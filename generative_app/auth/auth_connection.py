@@ -182,6 +182,6 @@ class AuthSingleton:
     __instance = None
     def get_instance(self) -> Auth:
         if AuthSingleton.__instance is None :
-            AuthSingleton.__instance = Auth(1)
+            AuthSingleton.__instance = Auth(20)
         return AuthSingleton.__instance
 
