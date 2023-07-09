@@ -42,7 +42,7 @@ The current python code you must update is the following:
 ```
 Use the streamlit built in functions in priority. If the user ask to use a specific library, you can use it. If he need to install the python module give the shell command to install it.
 The code MUST be documented as much as possible and you MUST include the necessary imports.
-Do not use the statement 'if __name__ == "__main__":'
+Do not use the statement 'if __name__ == "__main__":', place the code directly in the body of the script instead.
 
 Write your anwser in the following format:
 ```python
