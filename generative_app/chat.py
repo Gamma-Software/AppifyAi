@@ -161,7 +161,7 @@ class ChatBot:
             assistant_message_placeholder = st.chat_message("assistant")
 
             if command := self.check_commands(instruction):
-                user_message_placeholder.markdown(instruction)
+                user_message_placeholder.write(instruction)
                 self.apply_command(command, assistant_message_placeholder)
                 self.add_message("assistant", command.value[1])
                 self.save_chat_history_to_database()
