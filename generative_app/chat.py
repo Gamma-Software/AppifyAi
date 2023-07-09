@@ -73,6 +73,8 @@ class ChatBot:
         return None
 
     def apply_command(self, command: CommandResult, chat_placeholder: DeltaGenerator):
+        if command == CommandResult.UNKNOWN:
+            chat_placeholder.error("Command unknown")
         if command == CommandResult.NOTUNDO:
             chat_placeholder.error("Nothing to undo")
         if command == CommandResult.UNDO:
