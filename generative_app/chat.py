@@ -113,6 +113,10 @@ class ChatBot:
             if openai_api_key := st.text_input("OpenAI API key"):
                 st.session_state.openai_api_key = openai_api_key
                 st.experimental_rerun()
+            st.subheader("You can still download the app by clicking on the button below\nYou can then run it with `streamlit run streamlit_app.py`")
+            code = self.parse_code(open(self.python_script_path, "r").read())
+            st.download_button(label="Download app", file_name= "streamlit_app.py",
+                                             mime='text/x-python', data=code)
             return
 
         # If this is the first time the chatbot is launched reset it and the code
