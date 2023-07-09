@@ -204,15 +204,15 @@ def load_conversation_chain(message_placeholder: DeltaGenerator, openai_api_key:
     if openai_api_key is None:
         openai_api_key = st.secrets["openai_api_key"]
     llm = ChatOpenAI(model_name=model_name, temperature=0, openai_api_key=openai_api_key,
-                 max_tokens=2000, streaming=True, callbacks=[Handler(message_placeholder)])  # 'ada' 'gpt-3.5-turbo' 'gpt-4',
-    condense_question_llm = OpenAI(model_name=model_name, temperature=0,
-                                   openai_api_key=openai_api_key,
-                                   max_tokens=2000)  # 'ada' 'gpt-3.5-turbo' 'gpt-4',
+                     streaming=True, callbacks=[Handler(message_placeholder)])
+    condense_question_llm = OpenAI(temperature=0,openai_api_key=openai_api_key)
+    critique_llm = OpenAI(temperature=0, openai_api_key=openai_api_key,verbose=True)
     retriever = doc_retriever.load_streamlit_doc_retriever()
     qa_over_streamlit_code = ConversationalRetrievalCodeChain.from_llm(llm=llm, retriever=retriever,
                                                                        condense_question_llm=condense_question_llm,
                                                                        return_source_documents=True,
-                                                                       max_tokens_limit=2000,
+                                                                       self_critique_llm=critique_llm,
+                                                                       return_revision_request=True,
                                                                        verbose=False)
     return qa_over_streamlit_code
 
