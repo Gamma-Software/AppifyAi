@@ -109,6 +109,7 @@ class ChatBot:
         # If this is the first time the chatbot is launched reset it and the code
         # Add saved messages
         st.session_state.messages = AuthSingleton().get_instance().get_message_history(self.user_id)
+
         if st.session_state.messages:
             for _, message in st.session_state.messages.items():
                 with st.chat_message(message["role"]):
