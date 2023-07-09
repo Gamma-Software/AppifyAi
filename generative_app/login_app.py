@@ -3,7 +3,7 @@ from typing import Dict, Union
 import shutil
 from pathlib import Path
 import streamlit as st
-from auth.auth_connection import AuthSingleton, generate_user_session_token
+from auth.auth_connection import AuthSingleton
 from hydralit import HydraHeadApp
 from streamlit.delta_generator import DeltaGenerator
 
@@ -93,14 +93,13 @@ class LoginApp(HydraHeadApp):
 
     def _do_login(self, form_data, msg_container) -> None:
         access_level = self._check_login(form_data)
+        print("Access level: ", access_level)
         if access_level > 0:
             with msg_container:
-                st.success(f"✔️ Login success")
                 # Add user sesssion
                 AuthSingleton().get_instance().add_user_session(access_level)
-                time.sleep(1)
-                with st.spinner("now redirecting to application...."):
-                    time.sleep(1)
+                with st.spinner("✔️ Login successful, redirecting.."):
+                    time.sleep(2)
                     self.redirect_after_login(access_level, form_data['username'])
         else:
             self.session_state.allow_access = 0
