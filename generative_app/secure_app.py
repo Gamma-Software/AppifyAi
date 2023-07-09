@@ -89,11 +89,15 @@ if __name__ == '__main__':
     # completely optional, but if you have too many entries, you can make it nicer by using accordian menus
     if user_access_level > 0:
         from sandboxes import APPS
-        sandbox_app = [item for item in APPS if item[0] == "_".join([username, str(user_access_level)])]
-        if len(sandbox_app) == 0:
-            raise ValueError("No sandbox found for user {} with access level {}".format(username, user_access_level))
+        sandboxe_name = "_".join([username, str(user_access_level)])
+        #sandbox_app = [item for item in APPS if item[0] == sandboxe_name]
+        #if len(sandbox_app) == 0:
+        #    raise ValueError("No sandbox found for user {} with access level {}".format(username, user_access_level))
+        #_, path_to_script, app_to_add = sandbox_app[0]
         title =  f"{username} - Generated App"
-        _, path_to_script, app_to_add = sandbox_app[0]
+        import importlib
+        app_to_add = importlib.import_module(f"sandboxes.{sandboxe_name}").App("Generated App")
+        path_to_script = f"generative_app/sandboxes/{sandboxe_name}.py"
 
         #add all your application classes here
         app.add_app("ChatbotX", icon="💬", app=ChatBotApp(title="ChatbotX", generative_app_path=path_to_script))
