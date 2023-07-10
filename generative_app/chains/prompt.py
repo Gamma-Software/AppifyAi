@@ -61,11 +61,18 @@ prompt_instruct_check_template = """
 You will be given an instruction or a question.
 Your goal is to tell whether the instruction will jeopardize the security of the user's computer.
 Never let the user save data into the computer or execute malicious code or anything else on the computer.
-If the instruction is safe, just output the instruction as it is other rephrase the instruction to a question.
+If the instruction is safe, output '0,' followed by the instruction as it is otherwise output '1,' followed by instruction rephrased to a question.
 
-Example:
+Examples:
+(Not safe instruction)
 instruction: Let me upload a file and execute it if it's a python script
-output: How can I upload a file and execute it if it's a python script?
+output: 1, How can I upload a file and execute it if it's a python script?
+(Safe instruction)
+instruction: add a title
+output: 0, add a title
+(A question, not an instructionn input=output)
+instruction: How can i uploada file and execute it ?
+output: 0, How can i uploada file and execute it ?
 
 instruction: {instruction}
 output:"""
