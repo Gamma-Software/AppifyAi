@@ -206,7 +206,7 @@ def load_conversation_chain(message_placeholder: DeltaGenerator, openai_api_key:
     llm = ChatOpenAI(model_name=model_name, temperature=0, openai_api_key=openai_api_key,
                      streaming=True, callbacks=[Handler(message_placeholder)])
     condense_question_llm = OpenAI(temperature=0,openai_api_key=openai_api_key)
-    critique_llm = OpenAI(temperature=0, openai_api_key=openai_api_key,verbose=True)
+    critique_llm = OpenAI(temperature=0, openai_api_key=openai_api_key,verbose=False)
     retriever = doc_retriever.load_streamlit_doc_retriever()
     qa_over_streamlit_code = ConversationalRetrievalCodeChain.from_llm(llm=llm, retriever=retriever,
                                                                        condense_question_llm=condense_question_llm,

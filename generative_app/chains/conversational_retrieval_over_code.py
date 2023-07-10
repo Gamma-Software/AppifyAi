@@ -24,6 +24,7 @@ from langchain.chains.llm import LLMChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts.base import BasePromptTemplate
 from langchain.schema import BaseRetriever, Document
+from langchain.output_parsers import CommaSeparatedListOutputParser
 
 from langchain.chains.conversational_retrieval.base import CHAT_TURN_TYPE, _get_chat_history
 
@@ -85,8 +86,7 @@ class BaseConversationalRetrievalCodeChain(Chain):
     ) -> Dict[str, Any]:
         _run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
         request = inputs["question"]
-        revised_request = self.constitutional_chain.run(instruction=request)
-        print(revised_request)
+        revised_request = CommaSeparatedListOutputParser().parse(self.constitutional_chain.run(instruction=request))
         new_request = self.question_generator.run(
             question=revised_request, callbacks=_run_manager.get_child()
         )
@@ -113,7 +113,7 @@ class BaseConversationalRetrievalCodeChain(Chain):
         if self.return_generated_question:
             output["generated_question"] = new_request
         if self.return_revision_request:
-            output["revision_request"] = revised_request != request
+            output["revision_request"] = revised_request[0]
         return output
 
     @abstractmethod
@@ -133,9 +133,10 @@ class BaseConversationalRetrievalCodeChain(Chain):
     ) -> Dict[str, Any]:
         _run_manager = run_manager or AsyncCallbackManagerForChainRun.get_noop_manager()
         request = inputs["question"]
-        revised_request = await self.constitutional_chain.arun(instruction=request)
+        revised_request_unparsed = await self.constitutional_chain.arun(instruction=request)
+        revised_request = CommaSeparatedListOutputParser().parse(revised_request_unparsed)
         new_request = await self.question_generator.arun(
-            question=revised_request, callbacks=_run_manager.get_child()
+            question=revised_request[1], callbacks=_run_manager.get_child()
         )
         accepts_run_manager = (
             "run_manager" in inspect.signature(self._aget_docs).parameters
@@ -160,6 +161,8 @@ class BaseConversationalRetrievalCodeChain(Chain):
             output["source_documents"] = docs
         if self.return_generated_question:
             output["generated_question"] = new_request
+        if self.return_revision_request:
+            output["revision_request"] = revised_request[0]
         return output
 
     def save(self, file_path: Union[Path, str]) -> None:

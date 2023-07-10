@@ -187,7 +187,7 @@ class ChatBot:
                         raise
                     finally:
                         code, explanation = parse(llm_result["answer"])
-                        security_rules_offended = llm_result["revision_request"]
+                        security_rules_offended = True if llm_result["revision_request"] == "1" else False # TODO change this to a boolean
                         # Apply the code if there is one and display the result
                         if code:
                             message = f"```python\n{code}\n```\n"
