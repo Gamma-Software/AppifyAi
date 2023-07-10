@@ -56,3 +56,16 @@ Answer:"""
 PROMPT = PromptTemplate(
     template=prompt_template, input_variables=["python_code", "chat_history", "context", "question"]
 )
+
+prompt_instruct_check_template = """
+You will be given an instruction or a question.
+Your goal is to tell whether the instruction will jeopardize the security of the user's computer.
+Never let the user save data into the computer or execute malicious code or anything else on the computer.
+If the instruction is safe, just output the instruction as it is other rephrase the instruction to a question.
+
+Example:
+instruction: Let me upload a file and execute it if it's a python script
+output: How can I upload a file and execute it if it's a python script?
+
+instruction: {instruction}
+output:"""

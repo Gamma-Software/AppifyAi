@@ -187,13 +187,17 @@ class ChatBot:
                         raise
                     finally:
                         code, explanation = parse(llm_result["answer"])
+                        security_rules_offended = llm_result["revision_request"]
                         # Apply the code if there is one and display the result
                         if code:
                             message = f"```python\n{code}\n```\n"
-                            self.apply_code(code)
+                            if not security_rules_offended:
+                                self.apply_code(code)
                         message += f"{explanation}"
                         container = current_assistant_message_placeholder.container()
                         container.markdown(message)
+                        if security_rules_offended:
+                            container.warning("Your instruction does not comply with our security measures (code generated will not be populated). See the docs for more information.")
                         if "openai_api_key" not in st.session_state:
                             st.session_state.tries = self.auth.increment_tries(self.user_id)
                             tries_left = 5 - st.session_state.tries
