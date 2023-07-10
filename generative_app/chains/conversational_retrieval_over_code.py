@@ -15,6 +15,7 @@ from langchain.callbacks.manager import (
     CallbackManagerForChainRun,
     Callbacks,
 )
+from langchain.prompts.prompt import PromptTemplate
 from langchain.chains.base import Chain
 from langchain.chains.combine_documents.base import BaseCombineDocumentsChain
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
@@ -26,7 +27,7 @@ from langchain.schema import BaseRetriever, Document
 
 from langchain.chains.conversational_retrieval.base import CHAT_TURN_TYPE, _get_chat_history
 
-from chains.prompt import CONDENSE_QUESTION_CODE_PROMPT, PROMPT
+from chains.prompt import CONDENSE_QUESTION_CODE_PROMPT, PROMPT, prompt_instruct_check_template
 
 
 class BaseConversationalRetrievalCodeChain(Chain):
@@ -34,9 +35,11 @@ class BaseConversationalRetrievalCodeChain(Chain):
 
     combine_docs_chain: BaseCombineDocumentsChain
     question_generator: LLMChain
+    constitutional_chain: LLMChain
     output_key: str = "answer"
     return_source_documents: bool = False
     return_generated_question: bool = False
+    return_revision_request: bool = False
     get_chat_history: Optional[Callable[[CHAT_TURN_TYPE], str]] = None
     """Return the source documents."""
 
@@ -81,23 +84,25 @@ class BaseConversationalRetrievalCodeChain(Chain):
         run_manager: Optional[CallbackManagerForChainRun] = None,
     ) -> Dict[str, Any]:
         _run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
-        question = inputs["question"]
-        get_chat_history = self.get_chat_history or _get_chat_history
-        chat_history_str = get_chat_history(inputs["chat_history"])
-        callbacks = _run_manager.get_child()
-        new_question = self.question_generator.run(
-            question=question, callbacks=callbacks
+        request = inputs["question"]
+        revised_request = self.constitutional_chain.run(instruction=request)
+        print(revised_request)
+        new_request = self.question_generator.run(
+            question=revised_request, callbacks=_run_manager.get_child()
         )
         accepts_run_manager = (
             "run_manager" in inspect.signature(self._get_docs).parameters
         )
         if accepts_run_manager:
-            docs = self._get_docs(new_question, inputs, run_manager=_run_manager)
+            docs = self._get_docs(new_request, inputs, run_manager=_run_manager)
         else:
-            docs = self._get_docs(new_question, inputs)  # type: ignore[call-arg]
+            docs = self._get_docs(new_request, inputs)  # type: ignore[call-arg]
         new_inputs = inputs.copy()
+        new_inputs["question"] = new_request # Apply the revised question to the input
         # Remove any mentions of streamlit or python from the question
-        new_question = new_question.replace("streamlit", "").replace("python", "")
+        new_request = new_request.replace("streamlit", "").replace("python", "")
+        get_chat_history = self.get_chat_history or _get_chat_history
+        chat_history_str = get_chat_history(inputs["chat_history"])
         new_inputs["chat_history"] = chat_history_str
         answer = self.combine_docs_chain.run(
             input_documents=docs, callbacks=_run_manager.get_child(), **new_inputs
@@ -106,7 +111,9 @@ class BaseConversationalRetrievalCodeChain(Chain):
         if self.return_source_documents:
             output["source_documents"] = docs
         if self.return_generated_question:
-            output["generated_question"] = new_question
+            output["generated_question"] = new_request
+        if self.return_revision_request:
+            output["revision_request"] = revised_request != request
         return output
 
     @abstractmethod
@@ -125,24 +132,25 @@ class BaseConversationalRetrievalCodeChain(Chain):
         run_manager: Optional[AsyncCallbackManagerForChainRun] = None,
     ) -> Dict[str, Any]:
         _run_manager = run_manager or AsyncCallbackManagerForChainRun.get_noop_manager()
-        question = inputs["question"]
-        get_chat_history = self.get_chat_history or _get_chat_history
-        chat_history_str = get_chat_history(inputs["chat_history"])
-        callbacks = _run_manager.get_child()
-        new_question = await self.question_generator.arun(
-            question=question, callbacks=callbacks
+        request = inputs["question"]
+        revised_request = await self.constitutional_chain.arun(instruction=request)
+        new_request = await self.question_generator.arun(
+            question=revised_request, callbacks=_run_manager.get_child()
         )
         accepts_run_manager = (
             "run_manager" in inspect.signature(self._aget_docs).parameters
         )
         if accepts_run_manager:
-            docs = await self._aget_docs(new_question, inputs, run_manager=_run_manager)
+            docs = await self._aget_docs(new_request, inputs, run_manager=_run_manager)
         else:
-            docs = await self._aget_docs(new_question, inputs)  # type: ignore[call-arg]
+            docs = await self._aget_docs(new_request, inputs)  # type: ignore[call-arg]
 
         new_inputs = inputs.copy()
+        new_inputs["question"] = new_request # Apply the revised question to the input
         # Remove any mentions of streamlit or python from the question
-        new_question = new_question.replace("streamlit", "").replace("python", "")
+        new_request = new_request.replace("streamlit", "").replace("python", "")
+        get_chat_history = self.get_chat_history or _get_chat_history
+        chat_history_str = get_chat_history(inputs["chat_history"])
         new_inputs["chat_history"] = chat_history_str
         answer = await self.combine_docs_chain.arun(
             input_documents=docs, callbacks=_run_manager.get_child(), **new_inputs
@@ -151,7 +159,7 @@ class BaseConversationalRetrievalCodeChain(Chain):
         if self.return_source_documents:
             output["source_documents"] = docs
         if self.return_generated_question:
-            output["generated_question"] = new_question
+            output["generated_question"] = new_request
         return output
 
     def save(self, file_path: Union[Path, str]) -> None:
@@ -221,6 +229,7 @@ class ConversationalRetrievalCodeChain(BaseConversationalRetrievalCodeChain):
         chain_type: str = "stuff",
         verbose: bool = False,
         condense_question_llm: Optional[BaseLanguageModel] = None,
+        self_critique_llm: Optional[BaseLanguageModel] = None,
         combine_docs_chain_kwargs: Optional[Dict] = None,
         callbacks: Callbacks = None,
         **kwargs: Any,
@@ -244,9 +253,13 @@ class ConversationalRetrievalCodeChain(BaseConversationalRetrievalCodeChain):
             callbacks=callbacks,
         )
 
+        _llm_2 = self_critique_llm or llm
+        check_human_instruction_chain = LLMChain(llm=_llm_2, prompt=PromptTemplate.from_template(prompt_instruct_check_template))
+
         return cls(
             retriever=retriever,
             combine_docs_chain=doc_chain,
+            constitutional_chain=check_human_instruction_chain,
             question_generator=condense_question_chain,
             callbacks=callbacks,
             **kwargs,
