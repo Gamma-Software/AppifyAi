@@ -37,6 +37,9 @@ https://github.com/Gamma-Software/ChatbotX/assets/6960910/b6addffd-023d-4252-8a4
 Here is a simple conversation with the chatbot:
 ![Simple conversation](simple_conversation.png)
 
+When you enter instructions that may compromise the application security, the chatbot will warn you and not apply the generated code:
+![Security Compromised](security_compomised.png)
+
 ## Why using ChatbotX ?
 
 - Creativity and Flexibility: You can express your ideas in a natural way and the chatbot will generate the corresponding code. You can also ask him to be creative and let you surprise.
@@ -129,6 +132,7 @@ The chatbot will interpret these instructions, generate the corresponding Python
 - [x] Create login and register pages
 - [x] Crypt the user password
 - [x] Add prompt tries
+- [x] Security measures check of inputs
 - [ ] Add a voice assistant (text to speech and speech to text)
 - [ ] Add a page to show the documentation of the app
 - [ ] Automate the installation of more libraries
