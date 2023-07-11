@@ -26,3 +26,4 @@ pycryptodome
 opencv-python
 pillow
 tensorflow
+streamlit-folium
