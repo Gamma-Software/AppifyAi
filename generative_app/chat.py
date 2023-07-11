@@ -209,7 +209,6 @@ class ChatBot:
                                 container.info(f"You have {tries_left} tries left.")
                         st.session_state.chat_history.append((instruction, explanation))
                         self.add_message("assistant", message)
-                        self.prune_chat_history()
                         self.save_chat_history_to_database()
 
     def check_tries_exceeded(self) -> bool:
