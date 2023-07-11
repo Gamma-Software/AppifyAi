@@ -53,7 +53,7 @@ class ChatBot:
 
 
     @staticmethod
-    def check_commands(instruction) -> CommandResult or None:
+    def check_commands(instruction:str) -> CommandResult or None:
         if "/undo" in instruction:
             if "last_code" not in st.session_state:
                 return CommandResult.NOTUNDO
@@ -63,7 +63,7 @@ class ChatBot:
             return CommandResult.RESET
         if "/save" in instruction:
             return CommandResult.SAVE
-        if "/" in instruction:
+        if instruction.startswith("/"):
             return CommandResult.UNKNOWN
         return None
 
