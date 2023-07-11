@@ -86,9 +86,8 @@ class BaseConversationalRetrievalCodeChain(Chain):
     ) -> Dict[str, Any]:
         _run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
         request = inputs["question"]
-        revised_request = CommaSeparatedListOutputParser().parse(self.constitutional_chain.run(instruction=request))
         new_request = self.question_generator.run(
-            question=revised_request, callbacks=_run_manager.get_child()
+            question=request, callbacks=_run_manager.get_child()
         )
         accepts_run_manager = (
             "run_manager" in inspect.signature(self._get_docs).parameters
@@ -107,13 +106,17 @@ class BaseConversationalRetrievalCodeChain(Chain):
         answer = self.combine_docs_chain.run(
             input_documents=docs, callbacks=_run_manager.get_child(), **new_inputs
         )
+
+        # Run check code
+        is_code_not_safe = self.constitutional_chain.run(code=request)
+
         output: Dict[str, Any] = {self.output_key: answer}
         if self.return_source_documents:
             output["source_documents"] = docs
         if self.return_generated_question:
             output["generated_question"] = new_request
         if self.return_revision_request:
-            output["revision_request"] = revised_request[0]
+            output["revision_request"] = is_code_not_safe
         return output
 
     @abstractmethod
@@ -133,10 +136,8 @@ class BaseConversationalRetrievalCodeChain(Chain):
     ) -> Dict[str, Any]:
         _run_manager = run_manager or AsyncCallbackManagerForChainRun.get_noop_manager()
         request = inputs["question"]
-        revised_request_unparsed = await self.constitutional_chain.arun(instruction=request)
-        revised_request = CommaSeparatedListOutputParser().parse(revised_request_unparsed)
         new_request = await self.question_generator.arun(
-            question=revised_request[1], callbacks=_run_manager.get_child()
+            question=request, callbacks=_run_manager.get_child()
         )
         accepts_run_manager = (
             "run_manager" in inspect.signature(self._aget_docs).parameters
@@ -156,13 +157,17 @@ class BaseConversationalRetrievalCodeChain(Chain):
         answer = await self.combine_docs_chain.arun(
             input_documents=docs, callbacks=_run_manager.get_child(), **new_inputs
         )
+
+        # Run check code
+        is_code_not_safe = self.constitutional_chain.arun(code=request)
+
         output: Dict[str, Any] = {self.output_key: answer}
         if self.return_source_documents:
             output["source_documents"] = docs
         if self.return_generated_question:
             output["generated_question"] = new_request
         if self.return_revision_request:
-            output["revision_request"] = revised_request[0]
+            output["revision_request"] = is_code_not_safe
         return output
 
     def save(self, file_path: Union[Path, str]) -> None:
@@ -257,12 +262,12 @@ class ConversationalRetrievalCodeChain(BaseConversationalRetrievalCodeChain):
         )
 
         _llm_2 = self_critique_llm or llm
-        check_human_instruction_chain = LLMChain(llm=_llm_2, prompt=PromptTemplate.from_template(prompt_instruct_check_template))
+        check_code_chain = LLMChain(llm=_llm_2, prompt=PromptTemplate.from_template(prompt_instruct_check_template))
 
         return cls(
             retriever=retriever,
             combine_docs_chain=doc_chain,
-            constitutional_chain=check_human_instruction_chain,
+            constitutional_chain=check_code_chain,
             question_generator=condense_question_chain,
             callbacks=callbacks,
             **kwargs,
