@@ -122,8 +122,6 @@ class BaseConversationalRetrievalCodeChain(Chain):
         if code is not None:
             # Run check code
             is_code_not_safe = self.constitutional_chain.run(code=code)
-
-        print(code, type(code))
         output: Dict[str, Any] = {self.output_key[0]: code, self.output_key[1]: expl}
         if self.return_source_documents:
             output["source_documents"] = docs

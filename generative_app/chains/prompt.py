@@ -74,13 +74,13 @@ Answer:
 ```python
 None
 ```
-I'm fine, thanks for asking. But that's not the point of this exercise. I'm here to help you create a Streamlit application.
+I'm fine, thanks for asking. But that's not the point of this exercise. I'm here to help you create a Streamlit application. Just ask me a question or give me an instruction so I can create a Streamlit application for you.
 Question: Tell me a joke
 Answer:
 ```python
 None
 ```
-That's not the point of this exercise. Please refocus, I'm here to help you create a Streamlit application.
+That's not the point of this exercise. Please refocus, I'm here to help you create a Streamlit application. Just ask me a question or give me an instruction so I can create a Streamlit application for you.
 
 
 Question: {question}
