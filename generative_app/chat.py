@@ -189,7 +189,7 @@ class ChatBot:
                         explanation = llm_result["explanation"]
                         security_rules_offended = True if llm_result["revision_request"] == "1" else False # TODO change this to a boolean
                         # Apply the code if there is one and display the result
-                        if code:
+                        if code is not None:
                             message = f"```python\n{code}\n```\n"
                             if not security_rules_offended:
                                 self.apply_code(code)
