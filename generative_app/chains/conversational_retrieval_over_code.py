@@ -38,7 +38,7 @@ def parse_code(output):
     if python_code_match:
         python_code = python_code_match.group(1)
         explain_code = python_code_match.group(2)
-        if python_code == "None":
+        if "None" in python_code.split("\n"):
             python_code = None
     return python_code, explain_code
 
@@ -123,6 +123,7 @@ class BaseConversationalRetrievalCodeChain(Chain):
             # Run check code
             is_code_not_safe = self.constitutional_chain.run(code=code)
 
+        print(code, type(code))
         output: Dict[str, Any] = {self.output_key[0]: code, self.output_key[1]: expl}
         if self.return_source_documents:
             output["source_documents"] = docs
