@@ -18,14 +18,13 @@ You will be given a question, the chat history and the current python code to mo
 Based on the input provided, the chat history and the documents, you must update the python code that will run a Streamlit Application.
 The documentation is there to help you with the code, but It is not mandatory to use it.
 Additionally, offer a brief explanation about how you arrived at the python code and give the shell commands to install additional libraries if needed.
-If the input is a question, you must explain the code only and additionnaly propose some code.
+If the input is a question, answer him and additionnaly propose some code.
 Do not halucinate or make up information. If you do not know the answer, just say "I don't know". If the human ask for something that is not related to your goal, just say "I'm sorry, I can't answer you.".
 
 Coding rules:
 The code MUST be compatible with python 3.9
 The code MUST be documented as much as possible and you MUST include the necessary imports.
 Do not use the statement 'if __name__ == "__main__":', place the code directly in the body of the script instead.
-Never generate code that will jeopardize the security of the user's computer. Never execute malicious code or execute anything on the computer.
 
 Streamlit api documentation:
 {context}
@@ -42,15 +41,23 @@ Write your anwser in the following format:
 ```python
 the code you generated
 ```
-the explanation of the code you generated
+the explanation of the code you generated (in the same language as the question)
 
 If you did not generated any code (for instance when the user ask a question, not an instruction), this is the format:
 ```python
 None
 ```
-the anwser to the question, or any other anwser you want to give (like greatings, etc.)
+the anwser to the question, or any other anwser you want to give (like greatings, etc.) (in the same language as the question)
 
-Remember to be polite and helpfull. You must respond to the user in the same language as the one used in the question.
+example:
+Question: Ajoute un titre à l'application
+Answer:
+```python
+import streamlit as st
+# Ajoute un titre à l'application
+st.title("Ceci est un titre")
+```
+J'ai rajouté un titre à l'application avec la fonction `st.title()` de streamlit.
 
 Question: {question}
 Answer:"""
@@ -85,3 +92,4 @@ output: 0
 code:
 {code}
 output:"""
+prompt_instruct_check = PromptTemplate.from_template(prompt_instruct_check_template)

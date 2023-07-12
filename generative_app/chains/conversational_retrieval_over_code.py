@@ -1,6 +1,7 @@
 """Chain for chatting with a vector database."""
 from __future__ import annotations
 
+import re
 import inspect
 import warnings
 from abc import abstractmethod
@@ -15,29 +16,39 @@ from langchain.callbacks.manager import (
     CallbackManagerForChainRun,
     Callbacks,
 )
-from langchain.prompts.prompt import PromptTemplate
 from langchain.chains.base import Chain
 from langchain.chains.combine_documents.base import BaseCombineDocumentsChain
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
-from langchain.chains.conversational_retrieval.prompts import CONDENSE_QUESTION_PROMPT
 from langchain.chains.llm import LLMChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts.base import BasePromptTemplate
 from langchain.schema import BaseRetriever, Document
-from langchain.output_parsers import CommaSeparatedListOutputParser
 
 from langchain.chains.conversational_retrieval.base import CHAT_TURN_TYPE, _get_chat_history
 
-from chains.prompt import CONDENSE_QUESTION_CODE_PROMPT, PROMPT, prompt_instruct_check_template
+from chains.prompt import CONDENSE_QUESTION_CODE_PROMPT, PROMPT, prompt_instruct_check
 
+
+# Should create a generic parser for this
+def parse_code(output):
+    python_code = None
+    explain_code = None
+    pattern = r"```python(.*?)```(.*?)$"
+    python_code_match = re.search(pattern, output, re.DOTALL)
+    if python_code_match:
+        python_code = python_code_match.group(1)
+        explain_code = python_code_match.group(2)
+        if python_code == "None":
+            python_code = None
+    return python_code, explain_code
 
 class BaseConversationalRetrievalCodeChain(Chain):
     """Chain for chatting with an index. Given the chat history, the current code and a question, return the answer."""
 
     combine_docs_chain: BaseCombineDocumentsChain
     question_generator: LLMChain
+    output_key: List[str] = ["code", "explanation"]
     constitutional_chain: LLMChain
-    output_key: str = "answer"
     return_source_documents: bool = False
     return_generated_question: bool = False
     return_revision_request: bool = False
@@ -62,7 +73,7 @@ class BaseConversationalRetrievalCodeChain(Chain):
 
         :meta private:
         """
-        _output_keys = [self.output_key]
+        _output_keys = ["code", "explanation"]
         if self.return_source_documents:
             _output_keys = _output_keys + ["source_documents"]
         if self.return_generated_question:
@@ -97,7 +108,6 @@ class BaseConversationalRetrievalCodeChain(Chain):
         else:
             docs = self._get_docs(new_request, inputs)  # type: ignore[call-arg]
         new_inputs = inputs.copy()
-        new_inputs["question"] = new_request # Apply the revised question to the input
         # Remove any mentions of streamlit or python from the question
         new_request = new_request.replace("streamlit", "").replace("python", "")
         get_chat_history = self.get_chat_history or _get_chat_history
@@ -106,11 +116,14 @@ class BaseConversationalRetrievalCodeChain(Chain):
         answer = self.combine_docs_chain.run(
             input_documents=docs, callbacks=_run_manager.get_child(), **new_inputs
         )
+        code, expl = parse_code(answer)
 
-        # Run check code
-        is_code_not_safe = self.constitutional_chain.run(code=request)
+        is_code_not_safe = True
+        if code is not None:
+            # Run check code
+            is_code_not_safe = self.constitutional_chain.run(code=code)
 
-        output: Dict[str, Any] = {self.output_key: answer}
+        output: Dict[str, Any] = {self.output_key[0]: code, self.output_key[1]: expl}
         if self.return_source_documents:
             output["source_documents"] = docs
         if self.return_generated_question:
@@ -148,7 +161,6 @@ class BaseConversationalRetrievalCodeChain(Chain):
             docs = await self._aget_docs(new_request, inputs)  # type: ignore[call-arg]
 
         new_inputs = inputs.copy()
-        new_inputs["question"] = new_request # Apply the revised question to the input
         # Remove any mentions of streamlit or python from the question
         new_request = new_request.replace("streamlit", "").replace("python", "")
         get_chat_history = self.get_chat_history or _get_chat_history
@@ -157,11 +169,14 @@ class BaseConversationalRetrievalCodeChain(Chain):
         answer = await self.combine_docs_chain.arun(
             input_documents=docs, callbacks=_run_manager.get_child(), **new_inputs
         )
+        code, expl = parse_code(answer)
 
-        # Run check code
-        is_code_not_safe = self.constitutional_chain.arun(code=request)
+        is_code_not_safe = True
+        if code is not None:
+            # Run check code
+            is_code_not_safe = self.constitutional_chain.run(code=code)
 
-        output: Dict[str, Any] = {self.output_key: answer}
+        output: Dict[str, Any] = {self.output_key[0]: code, self.output_key[1]: expl}
         if self.return_source_documents:
             output["source_documents"] = docs
         if self.return_generated_question:
@@ -262,7 +277,7 @@ class ConversationalRetrievalCodeChain(BaseConversationalRetrievalCodeChain):
         )
 
         _llm_2 = self_critique_llm or llm
-        check_code_chain = LLMChain(llm=_llm_2, prompt=PromptTemplate.from_template(prompt_instruct_check_template))
+        check_code_chain = LLMChain(llm=_llm_2, prompt=prompt_instruct_check)
 
         return cls(
             retriever=retriever,

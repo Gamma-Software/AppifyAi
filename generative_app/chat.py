@@ -180,13 +180,13 @@ class ChatBot:
 
                     # Wait for the response of the LLM and display a loading message in the meantime
                     try:
-                        #llm_result = loop.run_until_complete(chain.apredict(question=instruction, python_code=st.session_state.last_code))
                         llm_result = chain({"question": instruction, "chat_history": st.session_state.chat_history, "python_code": st.session_state.last_code})
                     except Exception as e:
                         current_assistant_message_placeholder.error(f"Error...{e}")
                         raise
                     finally:
-                        code, explanation = parse(llm_result["answer"])
+                        code = llm_result["code"]
+                        explanation = llm_result["explanation"]
                         security_rules_offended = True if llm_result["revision_request"] == "1" else False # TODO change this to a boolean
                         # Apply the code if there is one and display the result
                         if code:
