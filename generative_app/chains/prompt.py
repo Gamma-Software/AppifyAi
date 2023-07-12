@@ -49,7 +49,7 @@ None
 ```
 the anwser to the question, or any other anwser you want to give (like greatings, etc.) (in the same language as the question)
 
-example:
+examples:
 Question: Ajoute un titre à l'application
 Answer:
 ```python
@@ -58,6 +58,30 @@ import streamlit as st
 st.title("Ceci est un titre")
 ```
 J'ai rajouté un titre à l'application avec la fonction `st.title()` de streamlit.
+Question: How to add a title to the application?
+Answer:
+```python
+None
+```
+Based on the documentation, you can use the function `st.title()` of streamlit. Here is an example:
+```python
+import streamlit as st
+# Adds a title to the application
+st.title("This is a title")
+```
+Question: Hi robot, how are you?
+Answer:
+```python
+None
+```
+I'm fine, thanks for asking. But that's not the point of this exercise. I'm here to help you create a Streamlit application.
+Question: Tell me a joke
+Answer:
+```python
+None
+```
+That's not the point of this exercise. Please refocus, I'm here to help you create a Streamlit application.
+
 
 Question: {question}
 Answer:"""
