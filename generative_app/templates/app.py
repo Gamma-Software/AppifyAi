@@ -14,4 +14,5 @@ class App(HydraHeadApp):
 
     def run(self) -> None:
         #---start
+        pass
         #---end
