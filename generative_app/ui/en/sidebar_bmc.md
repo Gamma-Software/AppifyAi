@@ -1,1 +1,1 @@
-<p style='text-align:center'>Scan the QR code or click the link bellow to support the project</p><a href='https://www.buymeacoffee.com/valentinrudloff'><p style='text-align:center'>Buy me a coffee ☕</p></a>
+<p style='text-align:center'>Scan the QR code or click <a href="https://www.buymeacoffee.com/valentinrudloff" target="_blank">here</a> to support the project</p>

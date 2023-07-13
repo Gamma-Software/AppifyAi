@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+from PIL import Image
 
 sidebar_init_state = "auto"
 
@@ -30,13 +31,14 @@ def setup():
 
             st.markdown(sidebar_content, unsafe_allow_html=True)
 
-            _, c2, _ = st.columns([0.5, 1, 0.5])
-            c2.image(os.path.join(os.getcwd(), f"generative_app/ui/bmc_qr.png"))
+            _, c2, _ = st.columns([1, 1, 1])
+            c2.image(os.path.join(os.getcwd(), f"generative_app/ui/bmc_qr.png"), use_column_width=True)
 
             with open(os.path.join(os.getcwd(), f"generative_app/ui/{st.session_state.lang}/sidebar_bmc.md"), "r") as sidebar_file:
                 sidebar_content = sidebar_file.read()
             st.markdown(sidebar_content, unsafe_allow_html=True)
             st.divider()
+
 
             with open(os.path.join(os.getcwd(), f"generative_app/ui/{st.session_state.lang}/sidebar_dev_advice.md"), "r") as sidebar_file:
                 sidebar_content = sidebar_file.read()
