@@ -44,7 +44,7 @@ def remove_entrypoint(code):
     modified_lines = []
     entrypoint_found = False
     for line in lines:
-        if line.strip() == 'if __name__ == "__main__":':
+        if line.strip() == 'if __name__ == "__main__":' or line.strip() == 'if __name__ == \'__main__\':':
             entrypoint_found = True
         elif entrypoint_found:
             modified_lines.append(line.lstrip())
@@ -52,6 +52,7 @@ def remove_entrypoint(code):
             modified_lines.append(line)
 
     modified_code = '\n'.join(modified_lines)
+    modified_code = modified_code.rstrip()
     return modified_code
 
 class BaseConversationalRetrievalCodeChain(Chain):
@@ -158,12 +159,14 @@ class BaseConversationalRetrievalCodeChain(Chain):
             # Run check code
             is_code_not_safe = True if self.constitutional_chain.run(code=code) == "1" else False
             if not is_code_not_safe:
+                print(code)
+                code = remove_entrypoint(code)
+                print(code)
                 # Check if imports are missing
                 code_checked = self.missing_imports_chain.run(code=code)
                 code_checked = None if code_checked == "None" else code_checked
                 if code_checked is not None:
                     code = code_checked
-                code = remove_entrypoint(code)
 
         output: Dict[str, Any] = {self.output_key[0]: code, self.output_key[1]: expl}
         if self.return_source_documents:
@@ -224,12 +227,12 @@ class BaseConversationalRetrievalCodeChain(Chain):
             is_code_not_safe = True if await self.constitutional_chain.arun(code=code) == "1" else False
             # Check if imports are missing
             if not is_code_not_safe:
+                code = remove_entrypoint(code)
                 # Check if imports are missing
                 code_checked = self.missing_imports_chain.run(code=code)
                 code_checked = None if code_checked == "None" else code_checked
                 if code_checked is not None:
                     code = code_checked
-                code = remove_entrypoint(code)
 
         output: Dict[str, Any] = {self.output_key[0]: code, self.output_key[1]: expl}
         if self.return_source_documents:
