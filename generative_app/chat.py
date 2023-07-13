@@ -115,8 +115,7 @@ class ChatBot:
             st.subheader("You can still download the app by clicking on the button below\nYou can then run it with `streamlit run streamlit_app.py`")
             code = self.parse_code(open(self.python_script_path, "r").read())
             if code:
-                st.download_button(label="Download app", file_name= "streamlit_app.py",
-                                                mime='text/x-python', data=code)
+                st.download_button(label="Download app", file_name= "streamlit_app.py", mime='text/x-python', data=code)
             else:
                 st.warning("No code to download")
             return
