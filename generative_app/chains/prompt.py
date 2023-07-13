@@ -24,7 +24,6 @@ Do not halucinate or make up information. If you do not know the answer, just sa
 Coding rules:
 The code MUST be documented as much as possible.
 DO NOT forget to import the libraries you need, especially streamlit and numpy.
-Place the code directly in the body of the script.
 
 Streamlit api documentation:
 {context}
