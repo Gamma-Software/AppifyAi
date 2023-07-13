@@ -27,3 +27,6 @@ opencv-python
 pillow
 tensorflow
 streamlit-folium
+opencv-python
+scikit-image
+pyzbar
