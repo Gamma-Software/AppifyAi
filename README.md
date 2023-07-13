@@ -35,10 +35,10 @@ https://github.com/Gamma-Software/ChatbotX/assets/6960910/0360af37-23c7-49e1-879
 https://github.com/Gamma-Software/ChatbotX/assets/6960910/b6addffd-023d-4252-8a40-54259ce88f6b
 
 Here is a simple conversation with the chatbot:
-![Simple conversation](simple_conversation.png)
+![Simple conversation](demo/simple_conversation.png)
 
 When you enter instructions that may compromise the application security, the chatbot will warn you and not apply the generated code:
-![Security Compromised](security_compomised.png)
+![Security Compromised](demo/security_compomised.png)
 
 ## Why using ChatbotX ?
 
