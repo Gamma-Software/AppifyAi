@@ -1,7 +1,3 @@
-# ChatbotX
-
-Welcome to ChatbotX, an innovative project that brings together the power of natural language processing and dynamic web application generation. ChatbotX is your personal assistant that can transform your instructions into fully functional and interactive web applications with just a conversation.
-
 ## Instructions Examples
 
 Tell ChatbotX the following instructions:
@@ -20,6 +16,10 @@ Upload files and display charts:
 Useful apps:
 - "Ask to enter a first date and a second date input and display the number of days between them. Add a title and some explanation text accordingly before the date inputs."
 - "Ask to enter a first date and a second date input and display the number of business days between them. Add a title and some explanation text accordingly before the date inputs. Be creative with the explanation text and add some emojis."
+- create an app that detect faces
+- create an app that calculate he BMI from a weight and a height input, then add a select box to select the unit of the weight and height (kg, lbs, cm, inch), then add some text explaining the BMI and what it means, then add the formula in latex finally add a chart that display the BMI of the user and the average BMI of the population
+- create an app that calculate the similarity between two images
+- create an app that reads barcode
 
 Webscraping:
 - "Webscrap this site (https://fr.wikipedia.org/wiki/Blog) and display all the 'mw-headline' classes"
