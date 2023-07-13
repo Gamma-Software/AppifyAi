@@ -29,7 +29,5 @@ class ChatBotApp(HydraHeadApp):
         chat = ChatBot(user_id, username, self.generative_app_path)
         chat.setup()
 
-        st.markdown('<div id="input-container-placeholder"></div>', unsafe_allow_html=True)
-
 if __name__ == '__main__':
     ChatBotApp().run()
