@@ -5,7 +5,7 @@ import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 from llm import parse
 import llm
-import asyncio
+import ui.chat_init as chat_init
 from auth.auth_connection import AuthSingleton
 from templates.template_app import template_app
 
@@ -54,14 +54,14 @@ class ChatBot:
 
     @staticmethod
     def check_commands(instruction:str) -> CommandResult or None:
-        if "/undo" in instruction:
+        if instruction.startswith("/undo"):
             if "last_code" not in st.session_state:
                 return CommandResult.NOTUNDO
             else:
                 return CommandResult.UNDO
-        if "/reset" in instruction:
+        if instruction.startswith("/reset"):
             return CommandResult.RESET
-        if "/save" in instruction:
+        if instruction.startswith("/save"):
             return CommandResult.SAVE
         if instruction.startswith("/"):
             return CommandResult.UNKNOWN
@@ -74,9 +74,13 @@ class ChatBot:
             chat_placeholder.error("Nothing to undo")
         if command == CommandResult.UNDO:
             self.apply_code(st.session_state.last_code)
-            chat_placeholder.info("Code reverted")
+            st.session_state.chat_history = st.session_state.chat_history[:-1]
+            chat_placeholder.info("Code reverted. Last instruction ignored by the bot.")
         if command == CommandResult.RESET:
-            self.reset_chat()
+            with st.spinner("Resetting..."):
+                self.reset_chat()
+                chat_placeholder.info("Code resetted")
+                st.experimental_rerun()
         if command == CommandResult.SAVE:
             chat_placeholder.info("Download the file by clicking on the button below.\nYou can then run it with `streamlit run streamlit_app.py`")
             code = self.parse_code(open(self.python_script_path, "r").read())
@@ -84,27 +88,10 @@ class ChatBot:
                                              mime='text/x-python', data=code)
 
     def reset_chat(self):
-        st.session_state["messages"] = {
-            "message_0":
-                {"role": "assistant",
-                "content": f"""
-                Hello {self.username}! I'm 🤖ChatbotX designed to help you create a Streamlit App.
-
-                here are the few commands to control me:
-
-                /undo: undo the last instruction
-
-                /reset: reset the app
-
-                /save: save the streamlit script in an independant app
-
-                I will generate the Streamlit App in the Generate App tab (Find it in the sidebar menu)"""
-                },
-        }
+        st.session_state["messages"] = chat_init.message_en if st.session_state.lang == "en" else chat_init.message_fr
         self.save_chat_history_to_database()
         st.session_state.chat_history = []
-        self.apply_code("import streamlit as st\nst.write('Hello')")
-        st.experimental_rerun()
+        self.apply_code("import streamlit as st\nst.title('This space is the sandbox.')")
 
     def add_message(self, role: str, content: str):
         idx = len(st.session_state.messages)
@@ -176,40 +163,40 @@ class ChatBot:
                     else:
                         chain = llm.load_conversation_chain(current_assistant_message_placeholder)
                     message = ""
-                    current_assistant_message_placeholder.info("⌛Processing... Please keep this page open until the end of my response.")
 
-                    # Wait for the response of the LLM and display a loading message in the meantime
-                    try:
-                        llm_result = chain({"question": instruction, "chat_history": st.session_state.chat_history, "python_code": st.session_state.last_code})
-                    except Exception as e:
-                        current_assistant_message_placeholder.error(f"Error...{e}")
-                        raise
-                    finally:
-                        code = llm_result["code"]
-                        explanation = llm_result["explanation"]
-                        security_rules_offended = True if llm_result["revision_request"] == "1" else False # TODO change this to a boolean
-                        # Apply the code if there is one and display the result
-                        if code is not None:
-                            message = f"```python\n{code}\n```\n"
-                            if not security_rules_offended:
-                                self.apply_code(code)
-                        message += f"{explanation}"
-                        container = current_assistant_message_placeholder.container()
-                        container.markdown(message)
-                        if security_rules_offended:
-                            container.warning("Your instruction does not comply with our security measures (code generated will not be populated). See the docs for more information.")
-                        if "openai_api_key" not in st.session_state:
-                            st.session_state.tries = self.auth.increment_tries(self.user_id)
-                            tries_left = 5 - st.session_state.tries
-                            if tries_left == 0:
-                                container.error("You have 0 try left.")
-                            elif tries_left == 1:
-                                container.warning("You have 1 try left.")
-                            else:
-                                container.info(f"You have {tries_left} tries left.")
-                        st.session_state.chat_history.append((instruction, explanation))
-                        self.add_message("assistant", message)
-                        self.save_chat_history_to_database()
+                    with st.spinner("⌛Processing... Please keep this page open until the end of my response."):
+                        # Wait for the response of the LLM and display a loading message in the meantime
+                        try:
+                            llm_result = chain({"question": instruction, "chat_history": st.session_state.chat_history, "python_code": st.session_state.last_code})
+                        except Exception as e:
+                            current_assistant_message_placeholder.error(f"Error...{e}")
+                            raise
+
+                    code = llm_result["code"]
+                    explanation = llm_result["explanation"]
+                    security_rules_offended = llm_result["revision_request"]
+                    # Apply the code if there is one and display the result
+                    if code is not None:
+                        message = f"```python\n{code}\n```\n"
+                        if not security_rules_offended:
+                            self.apply_code(code)
+                    message += f"{explanation}"
+                    container = current_assistant_message_placeholder.container()
+                    container.markdown(message)
+                    if security_rules_offended:
+                        container.warning("Your instruction does not comply with our security measures (code generated will not be populated). See the docs for more information.")
+                    if "openai_api_key" not in st.session_state:
+                        st.session_state.tries = self.auth.increment_tries(self.user_id)
+                        tries_left = 5 - st.session_state.tries
+                        if tries_left == 0:
+                            container.error("You have 0 try left.")
+                        elif tries_left == 1:
+                            container.warning("You have 1 try left.")
+                        else:
+                            container.info(f"You have {tries_left} tries left.")
+                    st.session_state.chat_history.append((instruction, explanation))
+                    self.add_message("assistant", message)
+                    self.save_chat_history_to_database()
 
     def check_tries_exceeded(self) -> bool:
         tries = self.auth.get_tries(self.user_id)

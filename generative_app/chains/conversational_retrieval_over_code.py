@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 import inspect
-import warnings
+from textwrap import dedent
 from abc import abstractmethod
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
@@ -26,7 +26,7 @@ from langchain.schema import BaseRetriever, Document
 
 from langchain.chains.conversational_retrieval.base import CHAT_TURN_TYPE, _get_chat_history
 
-from chains.prompt import CONDENSE_QUESTION_CODE_PROMPT, PROMPT, prompt_instruct_check
+from chains.prompt import CONDENSE_QUESTION_CODE_PROMPT, PROMPT, prompt_instruct_check, prompt_missing_imports_check
 
 
 # Should create a generic parser for this
@@ -42,13 +42,29 @@ def parse_code(output):
             python_code = None
     return python_code, explain_code
 
+def remove_entrypoint(code):
+    lines = code.split('\n')
+    modified_lines = []
+    entrypoint_found = False
+    for line in lines:
+        if line.strip() == 'if __name__ == "__main__":':
+            entrypoint_found = True
+        elif entrypoint_found:
+            modified_lines.append(line.lstrip())
+        else:
+            modified_lines.append(line)
+
+    modified_code = '\n'.join(modified_lines)
+    return modified_code
+
 class BaseConversationalRetrievalCodeChain(Chain):
     """Chain for chatting with an index. Given the chat history, the current code and a question, return the answer."""
 
     combine_docs_chain: BaseCombineDocumentsChain
     question_generator: LLMChain
-    output_key: List[str] = ["code", "explanation"]
     constitutional_chain: LLMChain
+    missing_imports_chain: LLMChain
+    output_key: List[str] = ["code", "explanation"]
     return_source_documents: bool = False
     return_generated_question: bool = False
     return_revision_request: bool = False
@@ -79,6 +95,20 @@ class BaseConversationalRetrievalCodeChain(Chain):
         if self.return_generated_question:
             _output_keys = _output_keys + ["generated_question"]
         return _output_keys
+
+    def removes_entrypoint(self, code:str) -> str:
+        code_to_return = code
+        entrypoint = "if __name__ == '__main__':"
+        if entrypoint in code:
+            pattern = entrypoint + r"(.*?)$"
+            print(pattern)
+            python_code_match = re.search(pattern, code, re.DOTALL)
+            if python_code_match:
+                following_code = python_code_match.group(1)
+                if following_code:
+                    code_to_return.replace(entrypoint, "")
+                    code_to_return.replace(following_code, dedent(following_code))
+        return code_to_return
 
     @abstractmethod
     def _get_docs(
@@ -121,7 +151,16 @@ class BaseConversationalRetrievalCodeChain(Chain):
         is_code_not_safe = True
         if code is not None:
             # Run check code
-            is_code_not_safe = self.constitutional_chain.run(code=code)
+            is_code_not_safe = True if self.constitutional_chain.run(code=code) == "1" else False
+            print(is_code_not_safe)
+            if not is_code_not_safe:
+                # Check if imports are missing
+                code_checked = self.missing_imports_chain.run(code=code)
+                code_checked = None if code_checked == "None" else code_checked
+                if code_checked is not None:
+                    code = code_checked
+                code = remove_entrypoint(code)
+
         output: Dict[str, Any] = {self.output_key[0]: code, self.output_key[1]: expl}
         if self.return_source_documents:
             output["source_documents"] = docs
@@ -173,7 +212,15 @@ class BaseConversationalRetrievalCodeChain(Chain):
         is_code_not_safe = True
         if code is not None:
             # Run check code
-            is_code_not_safe = self.constitutional_chain.run(code=code)
+            is_code_not_safe = True if await self.constitutional_chain.arun(code=code) == "1" else False
+            # Check if imports are missing
+            if not is_code_not_safe:
+                # Check if imports are missing
+                code_checked = self.missing_imports_chain.run(code=code)
+                code_checked = None if code_checked == "None" else code_checked
+                if code_checked is not None:
+                    code = code_checked
+                code = remove_entrypoint(code)
 
         output: Dict[str, Any] = {self.output_key[0]: code, self.output_key[1]: expl}
         if self.return_source_documents:
@@ -252,6 +299,7 @@ class ConversationalRetrievalCodeChain(BaseConversationalRetrievalCodeChain):
         verbose: bool = False,
         condense_question_llm: Optional[BaseLanguageModel] = None,
         self_critique_llm: Optional[BaseLanguageModel] = None,
+        missing_imports_llm: Optional[BaseLanguageModel] = None,
         combine_docs_chain_kwargs: Optional[Dict] = None,
         callbacks: Callbacks = None,
         **kwargs: Any,
@@ -278,11 +326,15 @@ class ConversationalRetrievalCodeChain(BaseConversationalRetrievalCodeChain):
         _llm_2 = self_critique_llm or llm
         check_code_chain = LLMChain(llm=_llm_2, prompt=prompt_instruct_check)
 
+        _llm_3 = missing_imports_llm or llm
+        missing_imports_chain = LLMChain(llm=_llm_3, prompt=prompt_missing_imports_check)
+
         return cls(
             retriever=retriever,
             combine_docs_chain=doc_chain,
             constitutional_chain=check_code_chain,
             question_generator=condense_question_chain,
+            missing_imports_chain=missing_imports_chain,
             callbacks=callbacks,
             **kwargs,
         )

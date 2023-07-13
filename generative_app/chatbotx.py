@@ -1,4 +1,5 @@
 import os
+import time
 import streamlit as st
 import sidebar
 from hydralit import HydraHeadApp
