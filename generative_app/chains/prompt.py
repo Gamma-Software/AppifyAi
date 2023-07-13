@@ -22,9 +22,9 @@ If the input is a question, answer him and additionnaly propose some code.
 Do not halucinate or make up information. If you do not know the answer, just say "I don't know". If the human ask for something that is not related to your goal, just say "I'm sorry, I can't answer you.".
 
 Coding rules:
-The code MUST be compatible with python 3.9
-The code MUST be documented as much as possible and you MUST include the necessary imports.
-Do not use the statement 'if __name__ == "__main__":', place the code directly in the body of the script instead.
+The code MUST be documented as much as possible.
+DO NOT forget to import the libraries you need, especially streamlit and numpy.
+Place the code directly in the body of the script.
 
 Streamlit api documentation:
 {context}
@@ -54,8 +54,10 @@ Question: Ajoute un titre à l'application
 Answer:
 ```python
 import streamlit as st
-# Ajoute un titre à l'application
-st.title("Ceci est un titre")
+def add_title():
+    # Ajoute un titre à l'application
+    st.title("Ceci est un titre")
+add_title()
 ```
 J'ai rajouté un titre à l'application avec la fonction `st.title()` de streamlit.
 Question: How to add a title to the application?
@@ -117,3 +119,26 @@ code:
 {code}
 output:"""
 prompt_instruct_check = PromptTemplate.from_template(prompt_instruct_check_template)
+
+prompt_missing_imports_check_template = """
+You'll be given a python code. You must tell whether the code miss some imports and fix it if needed.
+return None if the code does not miss imports.
+
+Examples:
+code:```python
+np.random.randn(10)
+```
+output:```python
+import numpy as np
+np.random.randn(10)
+```
+code:```python
+import streamlit as st
+st.title("Hello world")
+```
+output:None
+
+code:
+{code}
+output:"""
+prompt_missing_imports_check = PromptTemplate.from_template(prompt_missing_imports_check_template)

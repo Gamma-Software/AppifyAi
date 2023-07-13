@@ -13,44 +13,20 @@ class LoadingApp(HydraHeadApp):
         self._loader = loader
 
     def run(self,app_target):
-
-        try:
-
-            se_loader_txt = """
-            <style>
-#rcorners1 {
-  border-radius: 25px;
-  background: grey;
-  color: #00000;
-  alignment: center;
-  opacity: 0.95;
-  padding: 20px;
-  width: 1920px;
-  height: 400px;
-  z-index: 9998;
-}
-#banner {
-  color: white;
-  vertical-align: text-top;
-  text-align: center;
-  z-index: 9999;
-}
-</style>
-<div id="rcorners1">
-<h1 id="banner">Now loading Sequency Denoising</h1>
-<br>
-</div>
-            """
-            app_title = ''
-            if hasattr(app_target,'title'):
-                app_title = app_target.title
+        app_title = ''
+        if hasattr(app_target,'title'):
+            app_title = app_target.title
 
             if app_title == 'ChatbotX':
-                app_target.run()
+                try:
+                    app_target.run()
+                except Exception as e:
+                    st.error('An error has occurred, please report it here https://github.com/Gamma-Software/ChatbotX/issues (add screenshot and error details)')
+                    st.error('Error details: {}'.format(e))
             else:
-                app_target.run()
-
-        except Exception as e:
-            st.image("./resources/failure.png",width=100,)
-            st.error('An error has occurred, someone will be punished for your inconvenience, we humbly request you try again.')
-            st.error('Error details: {}'.format(e))
+                try:
+                    app_target.run()
+                except Exception as e:
+                    st.error('An error has occurred, Error details: {}'.format(e))
+                    st.error('Please ask the bot to fix it. For instance, give him the following instruction: ')
+                    st.code('Fix this error: {}'.format(e))

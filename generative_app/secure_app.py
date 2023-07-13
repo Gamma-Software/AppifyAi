@@ -5,6 +5,7 @@ from login_app import LoginApp
 from signup import SignUpApp
 from chatbotx import ChatBotApp
 from load_app import LoadingApp
+from demo_app import DemoApp
 import sidebar
 
 from auth.auth_connection import AuthSingleton
@@ -61,6 +62,10 @@ if __name__ == '__main__':
     #optional logout label, can be blank for something nicer!
     app.add_app("Logout", LoginApp(title='Login'), is_home=True, is_login=True)
 
+    #we want to have secure access for this HydraApp, so we provide a login application
+    #optional logout label, can be blank for something nicer!
+    app.add_app("Demo", DemoApp(title='Demo'), icon="📜", is_unsecure=True)
+
     #we have added a sign-up app to demonstrate the ability to run an unsecure app
     #only 1 unsecure app is allowed
     app.add_app("Signup", icon="🛰️", app=SignUpApp(title='Signup'), is_unsecure=True)
@@ -113,8 +118,11 @@ if __name__ == '__main__':
             'ChatbotX': ['ChatbotX'],
         }
         complex_nav.update({title: [title]})
+        complex_nav.update({'Demo': ['Demo']})
     else:
-        complex_nav = {}
+        complex_nav = {
+            'Demo': ['Demo']
+        }
 
 
     #and finally just the entire app and all the children.
