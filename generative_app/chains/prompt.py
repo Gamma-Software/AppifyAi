@@ -3,7 +3,11 @@ from langchain.prompts.prompt import PromptTemplate
 _template ="""You're an AI assistant specializing in python development. You know how to create Streamlit Applications.
 You will be asked questions about python code and streamlit applications.
 Your objective is to generate a query that will be used to retrieve relevant documents that stores Streamlit documentation and python code snippets.
-The query must be in a form of suite of words in english related to the context.
+The query must be in a form of suite of words in english related to the context. If you think that the query is not relevant, just say "None".
+
+example:
+Follow Up Input: How to display a button and a title ?
+Query: button title
 
 Follow Up Input: {question}
 Query:"""
@@ -36,7 +40,7 @@ The current python code you must update is the following:
 {python_code}
 ```
 
-Write your anwser in the following format:
+You must write your anwser in the following format:
 ```python
 the code you generated
 ```
