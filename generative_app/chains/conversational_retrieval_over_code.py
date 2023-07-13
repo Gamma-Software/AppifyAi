@@ -33,13 +33,10 @@ from chains.prompt import CONDENSE_QUESTION_CODE_PROMPT, PROMPT, prompt_instruct
 def parse_code(output):
     python_code = None
     explain_code = None
-    pattern = r"```python(.*?)```(.*?)$"
+    pattern = r"(?P<code>```python(?P<python>.*?)```)?(?P<explanation>.*?)$"
     python_code_match = re.search(pattern, output, re.DOTALL)
-    if python_code_match:
-        python_code = python_code_match.group(1)
-        explain_code = python_code_match.group(2)
-        if "None" in python_code.split("\n"):
-            python_code = None
+    python_code = python_code_match.group("python")
+    explain_code = python_code_match.group("explanation")
     return python_code, explain_code
 
 def remove_entrypoint(code):
@@ -97,6 +94,8 @@ class BaseConversationalRetrievalCodeChain(Chain):
         return _output_keys
 
     def removes_entrypoint(self, code:str) -> str:
+        if code is None:
+            return code
         code_to_return = code
         entrypoint = "if __name__ == '__main__':"
         if entrypoint in code:
@@ -130,16 +129,22 @@ class BaseConversationalRetrievalCodeChain(Chain):
         new_request = self.question_generator.run(
             question=request, callbacks=_run_manager.get_child()
         )
+        new_request = None if "None" in new_request else new_request
         accepts_run_manager = (
             "run_manager" in inspect.signature(self._get_docs).parameters
         )
-        if accepts_run_manager:
-            docs = self._get_docs(new_request, inputs, run_manager=_run_manager)
+        if new_request is not None:
+            if accepts_run_manager:
+                docs = self._get_docs(new_request, inputs, run_manager=_run_manager)
+            else:
+                docs = self._get_docs(new_request, inputs)  # type: ignore[call-arg]
         else:
-            docs = self._get_docs(new_request, inputs)  # type: ignore[call-arg]
+            docs = []
+
         new_inputs = inputs.copy()
         # Remove any mentions of streamlit or python from the question
-        new_request = new_request.replace("streamlit", "").replace("python", "")
+        if new_request is not None:
+            new_request = new_request.replace("streamlit", "").replace("python", "")
         get_chat_history = self.get_chat_history or _get_chat_history
         chat_history_str = get_chat_history(inputs["chat_history"])
         new_inputs["chat_history"] = chat_history_str
@@ -148,11 +153,10 @@ class BaseConversationalRetrievalCodeChain(Chain):
         )
         code, expl = parse_code(answer)
 
-        is_code_not_safe = True
+        is_code_not_safe = False
         if code is not None:
             # Run check code
             is_code_not_safe = True if self.constitutional_chain.run(code=code) == "1" else False
-            print(is_code_not_safe)
             if not is_code_not_safe:
                 # Check if imports are missing
                 code_checked = self.missing_imports_chain.run(code=code)
@@ -190,17 +194,22 @@ class BaseConversationalRetrievalCodeChain(Chain):
         new_request = await self.question_generator.arun(
             question=request, callbacks=_run_manager.get_child()
         )
+        new_request = None if "None" in new_request else new_request
         accepts_run_manager = (
             "run_manager" in inspect.signature(self._aget_docs).parameters
         )
-        if accepts_run_manager:
-            docs = await self._aget_docs(new_request, inputs, run_manager=_run_manager)
+        if new_request is not None:
+            if accepts_run_manager:
+                docs = await self._aget_docs(new_request, inputs, run_manager=_run_manager)
+            else:
+                docs = await self._aget_docs(new_request, inputs)  # type: ignore[call-arg]
         else:
-            docs = await self._aget_docs(new_request, inputs)  # type: ignore[call-arg]
+            docs = []
 
         new_inputs = inputs.copy()
         # Remove any mentions of streamlit or python from the question
-        new_request = new_request.replace("streamlit", "").replace("python", "")
+        if new_request is not None:
+            new_request = new_request.replace("streamlit", "").replace("python", "")
         get_chat_history = self.get_chat_history or _get_chat_history
         chat_history_str = get_chat_history(inputs["chat_history"])
         new_inputs["chat_history"] = chat_history_str
