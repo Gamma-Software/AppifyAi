@@ -88,7 +88,13 @@ class ChatBot:
                                              mime='text/x-python', data=code)
 
     def reset_chat(self):
-        st.session_state["messages"] = chat_init.message_en if st.session_state.lang == "en" else chat_init.message_fr
+        st.session_state["messages"] = {
+            "message_0":
+                {
+                    "role": "assistant",
+                    "content": chat_init.message_en.format(self.username) if st.session_state.lang == "en" else chat_init.message_fr.format(self.username)
+                },
+        }
         self.save_chat_history_to_database()
         st.session_state.chat_history = []
         self.apply_code("import streamlit as st\nst.title('This space is the sandbox.')")
