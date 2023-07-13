@@ -92,7 +92,7 @@ class ChatBot:
             "message_0":
                 {
                     "role": "assistant",
-                    "content": chat_init.message_en.format(self.username) if st.session_state.lang == "en" else chat_init.message_fr.format(self.username)
+                    "content": chat_init.message_en.format(name=self.username) if st.session_state.lang == "en" else chat_init.message_fr.format(name=self.username)
                 },
         }
         self.save_chat_history_to_database()
