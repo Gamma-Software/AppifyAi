@@ -2,6 +2,8 @@
 .doc_db
 generative_app/sandboxes/**/*
 .streamlit/docker_secrets.toml
+.streamlit/secrets_cloud.toml
+.config
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
