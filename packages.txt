@@ -1,0 +1,8 @@
+build-essential
+curl
+software-properties-common
+git
+libzbar-dev
+ffmpeg
+libsm6
+libxext6
