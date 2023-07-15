@@ -124,10 +124,8 @@ class ChatBot:
     def setup(self):
         # Save last code
         st.session_state["last_code"] = self.auth.get_code(self.user_id)
-        self.end_of_trial()
-        return
 
-        if "openai_api_key" not in st.session_state and self.check_tries_exceeded():
+        if self.auth.get_user_role(self.user_id) == "guest" and self.check_tries_exceeded():
             self.end_of_trial()
             return
 
@@ -173,11 +171,7 @@ class ChatBot:
                 user_message_placeholder.markdown(instruction)
                 with assistant_message_placeholder:
                     current_assistant_message_placeholder = st.empty()
-                    #chain = llm.llm_chain(current_assistant_message_placeholder)
-                    if "openai_api_key" in st.session_state:
-                        chain = llm.load_conversation_chain(current_assistant_message_placeholder, st.session_state.openai_api_key)
-                    else:
-                        chain = llm.load_conversation_chain(current_assistant_message_placeholder)
+                    chain = llm.load_conversation_chain(current_assistant_message_placeholder, st.session_state.openai_api_key)
                     message = ""
 
                     with st.spinner("⌛Processing... Please keep this page open until the end of my response."):
