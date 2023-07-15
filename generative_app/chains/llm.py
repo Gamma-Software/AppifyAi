@@ -24,7 +24,7 @@ import re
 from streamlit.delta_generator import DeltaGenerator
 import streamlit as st
 
-import doc_retriever
+import chains.doc_retriever as doc_retriever
 from chains.conversational_retrieval_over_code import ConversationalRetrievalCodeChain
 
 
@@ -148,12 +148,9 @@ class Handler(BaseCallbackHandler):
         self.full_response = ""
         return super().on_chain_end(outputs, run_id=run_id, parent_run_id=parent_run_id, **kwargs)
 
-def load_conversation_chain(message_placeholder: DeltaGenerator, openai_api_key: str = None) -> ConversationalRetrievalCodeChain:
-    if st.secrets["openai_api_key"] is None:
-        st.error("OpenAI API key is missing! Please add it to your secrets.")
-        st.stop()
+def load_conversation_chain(message_placeholder: DeltaGenerator, openai_api_key: str) -> ConversationalRetrievalCodeChain:
     if openai_api_key is None:
-        openai_api_key = st.secrets["openai_api_key"]
+        raise ValueError("OpenAI API key is required to load the chain.")
     llm = ChatOpenAI(model_name="gpt-3.5-turbo-16k", temperature=0, openai_api_key=openai_api_key,
                      streaming=True, callbacks=[Handler(message_placeholder)])
     condense_question_llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key)
@@ -161,7 +158,7 @@ def load_conversation_chain(message_placeholder: DeltaGenerator, openai_api_key:
     missing_imports_llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key,verbose=False)
     retriever = doc_retriever.load_streamlit_doc_retriever(st.secrets["openai_api_key"],
                                                            chroma_server_host=st.secrets["chroma"]["host"],
-                                                           chroma_server_port=st.secrets["chroma"]["port"], 
+                                                           chroma_server_port=st.secrets["chroma"]["port"],
                                                            mode="docker")
     qa_over_streamlit_code = ConversationalRetrievalCodeChain.from_llm(llm=llm, retriever=retriever,
                                                                        condense_question_llm=condense_question_llm,

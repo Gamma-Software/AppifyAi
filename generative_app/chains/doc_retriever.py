@@ -44,6 +44,9 @@ def num_tokens_from_string(docs: List[Document], encoding_name: str) -> int:
     return num_tokens, max_tokens
 
 def load_streamlit_doc_retriever(openai_api_key: str, chroma_server_host="localhost", chroma_server_port="8000", mode="docker") -> VectorStoreRetriever:
+    if openai_api_key is None:
+        raise Exception("Please provide an OpenAI API key.")
+
     # Check if the Chroma database exists
     if mode == "local":
         if not os.path.exists(".doc_db/streamlit_chroma_db"):

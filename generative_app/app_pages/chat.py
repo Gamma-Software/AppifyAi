@@ -1,13 +1,11 @@
 import enum
 import re
-from langchain.chains import LLMChain
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
-from llm import parse
-import llm
-import ui.chat_init as chat_init
+import chains.llm as llm
 from auth.auth_connection import AuthSingleton
 from templates.template_app import template_app
+import ui.chat_init as chat_init
 from ui.end_trial import trial_title, thanks, pay, share, download, download_info, no_code
 
 class CommandResult(enum.Enum):
@@ -24,6 +22,7 @@ class ChatBot:
         self.user_id = user_id
         self.username = username
         self.auth = AuthSingleton().get_instance()
+        self.user_role = self.auth.get_user_role(self.user_id)
 
     def apply_code(self, code:str):
         if code is None:
@@ -124,10 +123,8 @@ class ChatBot:
     def setup(self):
         # Save last code
         st.session_state["last_code"] = self.auth.get_code(self.user_id)
-        self.end_of_trial()
-        return
 
-        if "openai_api_key" not in st.session_state and self.check_tries_exceeded():
+        if self.user_role == "guest" and self.check_tries_exceeded():
             self.end_of_trial()
             return
 
@@ -154,9 +151,10 @@ class ChatBot:
     def setup_chat(self):
         # Setup user input
         if instruction := st.chat_input(f"Tell me what to do, or ask me a question"):
-            tries_left = 5 - st.session_state.tries
-            if tries_left <= 0:
-                st.experimental_rerun()
+            if self.user_role == "guest":
+                tries_left = 5 - st.session_state.tries
+                if tries_left <= 0:
+                    st.experimental_rerun()
             # Add user message to the chat
             self.add_message("user", instruction)
             # Process the instruction if the user did not enter a specific command
@@ -173,11 +171,7 @@ class ChatBot:
                 user_message_placeholder.markdown(instruction)
                 with assistant_message_placeholder:
                     current_assistant_message_placeholder = st.empty()
-                    #chain = llm.llm_chain(current_assistant_message_placeholder)
-                    if "openai_api_key" in st.session_state:
-                        chain = llm.load_conversation_chain(current_assistant_message_placeholder, st.session_state.openai_api_key)
-                    else:
-                        chain = llm.load_conversation_chain(current_assistant_message_placeholder)
+                    chain = llm.load_conversation_chain(current_assistant_message_placeholder, st.session_state.openai_api_key)
                     message = ""
 
                     with st.spinner("⌛Processing... Please keep this page open until the end of my response."):
@@ -201,7 +195,7 @@ class ChatBot:
                     container.markdown(message)
                     if security_rules_offended:
                         container.warning("Your instruction does not comply with our security measures (code generated will not be populated). See the docs for more information.")
-                    if "openai_api_key" not in st.session_state:
+                    if self.user_role == "guest":
                         st.session_state.tries = self.auth.increment_tries(self.user_id)
                         tries_left = 5 - st.session_state.tries
                         if tries_left == 0:
