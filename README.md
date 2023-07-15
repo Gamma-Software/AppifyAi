@@ -161,6 +161,9 @@ The chatbot will interpret these instructions, generate the corresponding Python
 
 * [OpenAI LLM](https://openai.com) - Creating safe AGI that benefits all of humanity
 * [Langchain](https://github.com/hwchase17/langchain) - 🦜️🔗 LangChain ⚡ Building applications with LLMs through composability ⚡
+* [Streamlit](https://streamlit.io) - The fastest way to build and share data apps
+* [Python](https://www.python.org) - Python is a programming language that lets you work quickly and integrate systems more effectively.
+* [ChromaDB](https://docs.trychroma.com/) - Chroma is the open-source embedding database. Chroma makes it easy to build LLM apps by making knowledge, facts, and skills pluggable for LLMs.
 
 ## Contributing
 
