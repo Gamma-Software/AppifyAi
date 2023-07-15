@@ -51,9 +51,6 @@ def load_streamlit_doc_retriever(openai_api_key: str, chroma_server_host="localh
     if mode == "local":
         if not os.path.exists(".doc_db/streamlit_chroma_db"):
             raise Exception("The Chroma database for Streamlit does not exist. Please run the script `doc_retriever.py` to create it.")
-    if mode == "docker":
-        if not is_docker_container_running("chroma-server"):
-            exit(0)
 
     # load from disk
     if mode == "local":
@@ -98,9 +95,6 @@ def generate_retriever(openai_api_key: str, chroma_server_host="localhost", chro
             except KeyboardInterrupt:
                 print("Cancelled.")
                 exit(0)
-    if mode == "docker":
-        if not is_docker_container_running("chroma-server"):
-            exit(0)
 
 
     print("=== Clone the latest version of the Streamlit Doc repo...")
