@@ -1,5 +1,4 @@
 from hydralit import HydraApp
-import hydralit_components as hc
 
 from login_app import LoginApp
 from signup import SignUpApp
@@ -7,6 +6,7 @@ from chatbotx import ChatBotApp
 from load_app import LoadingApp
 from demo_app import DemoApp
 import sidebar
+from version import VERSION
 
 from auth.auth_connection import AuthSingleton
 
@@ -20,8 +20,8 @@ st.set_page_config(
     initial_sidebar_state=sidebar.sidebar_init_state,
     menu_items={
         "Report a bug": "https://github.com/Gamma-Software/ChatbotX/issues",
-        "About": """
-            # ChatbotX
+        "About": f"""
+            # ChatbotX - {VERSION}
             Transform conversations into stunning web apps. Dynamic code generation + intuitive interface. Unleash your creativity effortlessly. Use the power of GPT OpenAI LLM and Langchain.
 
             # Author
