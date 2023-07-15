@@ -80,6 +80,26 @@ class Auth:
         add_user = f"INSERT INTO users (\"username\", \"password\", \"email\", \"role\") VALUES (%s,%s,%s,%s);"
         self.insert_query(add_user, (username, crypt_password(password), email, 'guest'))
 
+    def get_user_role(self, user_id:int):
+        """ Get the user role from the database """
+        user_role = f"SELECT role FROM users WHERE user_id = '{user_id}' LIMIT 1;"
+        rows = self.run_query(user_role)
+        if rows:
+            if str(rows[0][0]) == "None":
+                return None
+            return str(rows[0][0])
+        return None
+
+    def get_openai_key(self, user_id:int):
+        """ Get the openai key from the database """
+        get_key = f"SELECT openai_key FROM userdata WHERE user_id = '{user_id}' LIMIT 1;"
+        rows = self.run_query(get_key)
+        if rows:
+            if str(rows[0][0]) == "None":
+                return None
+            return str(rows[0][0])
+        return None
+
     def get_user_session(self, user_id:str) -> bool:
         check_code = f"SELECT * FROM UserSessions WHERE user_id = '{user_id}' LIMIT 1;"
         if self.run_query(check_code):
@@ -143,7 +163,7 @@ class Auth:
                 return not token_expired, user_id, "User logged out due to inactivity." if token_expired else "User logged in."
         return False, None, "User session not found."
 
-    def get_code(self, user_id:int) -> str | None:
+    def get_code(self, user_id:int) -> Union[str, None]:
         # Execute query.
         check_code = f"SELECT source_code FROM UserData WHERE user_id = '{user_id}' LIMIT 1;"
         code = self.run_query(check_code)
@@ -151,7 +171,7 @@ class Auth:
             return code[0][0]
         return None
 
-    def get_message_history(self, user_id:int) -> Dict | None:
+    def get_message_history(self, user_id:int) -> Union[Dict, None]:
         # Execute query.
         check_code = f"SELECT message_history FROM userdata WHERE user_id = '{user_id}' LIMIT 1;"
         message_history = self.run_query(check_code)
