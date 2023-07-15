@@ -159,7 +159,10 @@ def load_conversation_chain(message_placeholder: DeltaGenerator, openai_api_key:
     condense_question_llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key)
     critique_llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key,verbose=False)
     missing_imports_llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key,verbose=False)
-    retriever = doc_retriever.load_streamlit_doc_retriever()
+    retriever = doc_retriever.load_streamlit_doc_retriever(st.secrets["openai_api_key"],
+                                                           chroma_server_host=st.secrets["chroma"]["host"],
+                                                           chroma_server_port=st.secrets["chroma"]["port"], 
+                                                           mode="docker")
     qa_over_streamlit_code = ConversationalRetrievalCodeChain.from_llm(llm=llm, retriever=retriever,
                                                                        condense_question_llm=condense_question_llm,
                                                                        return_source_documents=True,

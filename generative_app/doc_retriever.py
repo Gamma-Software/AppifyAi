@@ -12,12 +12,15 @@ from langchain.text_splitter import (
     RecursiveCharacterTextSplitter,
     Language,
 )
+from chromadb.utils import embedding_functions
 from langchain.document_loaders import DirectoryLoader
 from langchain.document_loaders import UnstructuredMarkdownLoader
+import chromadb
+import uuid
+from chromadb.config import Settings
 
 import shutil
 import os
-import git
 import sys
 import streamlit as st
 
@@ -40,38 +43,60 @@ def num_tokens_from_string(docs: List[Document], encoding_name: str) -> int:
         num_tokens += len(encoding.encode(doc.page_content))
     return num_tokens, max_tokens
 
-def load_streamlit_doc_retriever() -> VectorStoreRetriever:
+def load_streamlit_doc_retriever(openai_api_key: str, chroma_server_host="localhost", chroma_server_port="8000", mode="docker") -> VectorStoreRetriever:
     # Check if the Chroma database exists
-    if not os.path.exists(".doc_db/streamlit_chroma_db"):
-        raise Exception("The Chroma database for Streamlit does not exist. Please run the script `doc_retriever.py` to create it.")
+    if mode == "local":
+        if not os.path.exists(".doc_db/streamlit_chroma_db"):
+            raise Exception("The Chroma database for Streamlit does not exist. Please run the script `doc_retriever.py` to create it.")
+    if mode == "docker":
+        if not is_docker_container_running("chroma-server"):
+            exit(0)
 
     # load from disk
-    retriever = Chroma(persist_directory=".doc_db/streamlit_chroma_db",
-                       embedding_function=OpenAIEmbeddings(openai_api_key=st.secrets["openai_api_key"])).as_retriever()
+    if mode == "local":
+        retriever = Chroma(persist_directory=".doc_db/streamlit_chroma_db",
+                        embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key)).as_retriever()
+    if mode == "docker":
+        client = chromadb.Client(
+            Settings(
+                chroma_api_impl="rest",
+                chroma_server_host=chroma_server_host,
+                chroma_server_http_port=chroma_server_port,
+            )
+        )
+
+        # tell LangChain to use our client and collection name
+        retriever = Chroma(client=client, collection_name="streamlit_doc", embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key)).as_retriever()
+
     retriever.search_kwargs["distance_metric"] = "cos"
     retriever.search_kwargs["fetch_k"] = 4
     retriever.search_kwargs["maximal_marginal_relevance"] = True
     retriever.search_kwargs["k"] = 4
-
     return retriever
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("OpenAI API key is missing! Please add it in argument.")
-        exit(1)
-    openai_api_key = sys.argv[1]
+def is_docker_container_running(container_name: str) -> bool:
+    """Returns True if the Docker container is running, False otherwise."""
+    if os.system(f"docker ps | grep {container_name} > /dev/null") == 0:
+        return True
+    print(f"The Docker container {container_name} is not running. Please run `docker-compose up -d` to start it.")
+    return False
 
-    # Check if the Chroma database exists
-    if os.path.exists(".doc_db/streamlit_chroma_db"):
-        try:
-            choice = input("The Chroma database for Streamlit already exists. "
-                        "Press Yes to delete it and create a new one. Press Ctrl+C or enter anything else to cancel.")
-            if choice in ["y", "Y", "yes", "Yes", "YES"]:
-                shutil.rmtree(".doc_db/streamlit_chroma_db")
-            else:
-                raise KeyboardInterrupt
-        except KeyboardInterrupt:
-            print("Cancelled.")
+def generate_retriever(openai_api_key: str, chroma_server_host="localhost", chroma_server_port="8000", mode="docker"):
+    if mode == "local":
+        # Check if the Chroma database exists
+        if os.path.exists(".doc_db/streamlit_chroma_db"):
+            try:
+                choice = input("The Chroma database for Streamlit already exists. "
+                            "Press Yes to delete it and create a new one. Press Ctrl+C or enter anything else to cancel.")
+                if choice in ["y", "Y", "yes", "Yes", "YES"]:
+                    shutil.rmtree(".doc_db/streamlit_chroma_db")
+                else:
+                    raise KeyboardInterrupt
+            except KeyboardInterrupt:
+                print("Cancelled.")
+                exit(0)
+    if mode == "docker":
+        if not is_docker_container_running("chroma-server"):
             exit(0)
 
 
@@ -117,9 +142,40 @@ if __name__ == "__main__":
 
     print("=== Create embeddings and save them into Chroma Database for later use...")
     embeddings_model = OpenAIEmbeddings(openai_api_key=openai_api_key)
-    vectorstore = Chroma.from_documents(documents=steamlit_doc_splitted + streamlit_code_example_doc_splitted,embedding=embeddings_model, persist_directory=f".doc_db/streamlit_chroma_db")
-    vectorstore.persist()
+
+
+    docs = steamlit_doc_splitted + streamlit_code_example_doc_splitted
+    if mode == "local":
+        vectorstore = Chroma.from_documents(documents=docs,embedding=embeddings_model, persist_directory=f".doc_db/streamlit_chroma_db")
+        vectorstore.persist()
+    if mode == "docker":
+        openai_ef = embedding_functions.OpenAIEmbeddingFunction(
+            api_key=openai_api_key, # Replace with your own OpenAI API key
+            model_name="text-embedding-ada-002"
+        )
+        client = chromadb.Client(
+            Settings(
+                chroma_api_impl="rest",
+                chroma_server_host=chroma_server_host,
+                chroma_server_http_port=chroma_server_port,
+            )
+        )
+        print(client.heartbeat())
+        client.reset()  # resets the databas
+        collection = client.create_collection("streamlit_doc", embedding_function=openai_ef)
+        for doc in docs:
+            collection.add(
+                ids=[str(uuid.uuid1())], metadatas=doc.metadata, documents=doc.page_content
+            )
 
     print("=== Remove Streamlit codesource.")
     if os.path.exists("streamlit"):
         shutil.rmtree("streamlit")
+
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print("OpenAI API key is missing! Please add it in argument.")
+        print("Or you are missing the mode 'docker' or 'local'.")
+        exit(1)
+    openai_api_key = sys.argv[1]
+    generate_retriever(openai_api_key, mode=sys.argv[2])

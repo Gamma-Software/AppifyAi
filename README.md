@@ -93,6 +93,25 @@ You will end up with a Streamlit application with a subtitle with the text 'Hell
 
 If you want to reset the context, you can use the command `/reset` or `/undo` to undo the last action. You can also use `/save` to save the current generated app and download the script.
 
+#### Elements you can add
+
+Streamlit provides a lot of elements that you can add to your application. Here is a list of the elements you can add with the chatbot:
+- `title`: Display a title
+- `header`: Display a header
+- `subheader`: Display a subheader
+- `text`: Display a text
+- `markdown`: Display a markdown
+- `caption`: Display a caption
+- `code block`: Space to display a code
+- `latex`: Display a latex formula
+- `divider`: Divide elements horizontally
+
+**Interactive**
+- `button`: Display a button to interact with
+- `checkbox`: Display a checkbox to choose from a list
+
+See the documentation for more details: [Doc](https://docs.streamlit.io/library/api-reference)
+
 #### Usage Examples
 
 Tell ChatbotX the following instructions:
