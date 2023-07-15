@@ -17,7 +17,7 @@ from langchain.callbacks.base import AsyncCallbackHandler, BaseCallbackHandler
 
 import asyncio
 from uuid import UUID
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 import os
 import re
 
@@ -103,7 +103,7 @@ class Handler(BaseCallbackHandler):
         self.code_extracted = False
         self.full_response = ""
 
-    def on_chain_start(self, serialized: Dict[str, Any], inputs: Dict[str, Any], *, run_id: UUID, parent_run_id: UUID | None = None, tags: List[str] | None = None, **kwargs: Any) -> Any:
+    def on_chain_start(self, serialized: Dict[str, Any], inputs: Dict[str, Any], *, run_id: UUID, parent_run_id: Union[UUID, None] = None, tags: Union[List[str], None] = None, **kwargs: Any) -> Any:
         """Run when chain starts running."""
         return super().on_chain_start(serialized, inputs, run_id=run_id, parent_run_id=parent_run_id, tags=tags, **kwargs)
 
@@ -142,7 +142,7 @@ class Handler(BaseCallbackHandler):
                 self.message_placeholder.markdown(message + "▌")
         return super().on_llm_new_token(token, run_id=run_id, parent_run_id=parent_run_id, **kwargs)
 
-    def on_chain_end(self, outputs: Dict[str, Any], *, run_id: UUID, parent_run_id: UUID | None = None, **kwargs: Any) -> Any:
+    def on_chain_end(self, outputs: Dict[str, Any], *, run_id: UUID, parent_run_id: Union[UUID, None] = None, **kwargs: Any) -> Any:
         """Run when chain ends running."""
         self.code_extracted = False
         self.full_response = ""
