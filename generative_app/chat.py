@@ -8,6 +8,7 @@ import llm
 import ui.chat_init as chat_init
 from auth.auth_connection import AuthSingleton
 from templates.template_app import template_app
+from ui.end_trial import trial_title, thanks, pay, share, download, download_info, no_code
 
 class CommandResult(enum.Enum):
     UNKNOWN = [0, "Unknown command"]
@@ -103,21 +104,31 @@ class ChatBot:
         idx = len(st.session_state.messages)
         st.session_state.messages.update({f"message_{idx}": {"role": role, "content": content}})
 
+    def end_of_trial(self):
+        st.title(trial_title[1 if st.session_state.lang == "fr" else 0])
+        st.markdown(thanks[1 if st.session_state.lang == "fr" else 0])
+        st.success(pay[1 if st.session_state.lang == "fr" else 0])
+        st.markdown(share[1 if st.session_state.lang == "fr" else 0])
+        code = self.parse_code(open(self.python_script_path, "r").read())
+        if code:
+            st.header(download[1 if st.session_state.lang == "fr" else 0])
+            c1, c2 = st.columns([1, 0.5])
+            c1.markdown(download_info[1 if st.session_state.lang == "fr" else 0])
+            if c2.download_button(label=download[1 if st.session_state.lang == "fr" else 0], file_name= "streamlit_app.py", mime='text/x-python', data=code):
+                st.balloons()
+            # TODO add tutorial on how to deploy on web
+            # TODO download already compiled app (like .exe)
+        else:
+            st.warning(no_code[1 if st.session_state.lang == "fr" else 0])
+
     def setup(self):
         # Save last code
         st.session_state["last_code"] = self.auth.get_code(self.user_id)
+        self.end_of_trial()
+        return
 
         if "openai_api_key" not in st.session_state and self.check_tries_exceeded():
-            st.warning("You have exceeded the number of tries, please input your OpenAI API key to continue")
-            if openai_api_key := st.text_input("OpenAI API key"):
-                st.session_state.openai_api_key = openai_api_key
-                st.experimental_rerun()
-            st.subheader("You can still download the app by clicking on the button below\nYou can then run it with `streamlit run streamlit_app.py`")
-            code = self.parse_code(open(self.python_script_path, "r").read())
-            if code:
-                st.download_button(label="Download app", file_name= "streamlit_app.py", mime='text/x-python', data=code)
-            else:
-                st.warning("No code to download")
+            self.end_of_trial()
             return
 
 
