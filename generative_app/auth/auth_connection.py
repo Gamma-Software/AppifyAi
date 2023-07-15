@@ -6,24 +6,26 @@ import datetime
 import auth.cookie_manager as cookie_manager
 from typing import Dict, List, Any, Tuple, Union
 
+import streamlit as st
+from dataclasses import dataclass
 from auth.utils import crypt_password, is_password_ok
 
 def generate_user_session_token() -> str:
     return str(uuid.uuid4())
 
+@dataclass(frozen=True)
 class Auth:
-    def __init__(self, expiration_time=10):
-        self.conn = self.init_connection()
-        self.cookies = cookie_manager.CookieManager()
-        self.token_expiration_min = expiration_time
+    conn: psycopg2.extensions.connection
+    cookies: cookie_manager.CookieManager
+    token_expiration_min: int
 
     # Initialize connection.
     # Uses st.cache_resource to only run once.
-    def init_connection(self):
-        return psycopg2.connect(**st.secrets["postgres"])
+    @st.cache_resource
+    def init_connection(self, sql_secrets):
+        self.conn = psycopg2.connect(sql_secrets)
 
     # Perform query.
-    # Uses st.cache_data to only rerun when the query changes or after 10 min.
     def run_query(self, query):
         with self.conn.cursor() as cur:
             cur.execute(query)
@@ -43,6 +45,7 @@ class Auth:
             return is_password_ok(password, password_bytes[0][0])
         return False
 
+    st.cache_data
     def get_user_id(self, username:str, password:str) -> int:
         # Execute query.
         check_user = f"SELECT user_id, password FROM users WHERE username = '{username}' LIMIT 1;"
@@ -51,6 +54,7 @@ class Auth:
             return int(user_id)
         return -1
 
+    st.cache_data
     def get_username_from_id(self, user_id:int):
         # Execute query.
         get_username = f"SELECT username FROM users WHERE user_id = '{user_id}' LIMIT 1;"
@@ -80,6 +84,7 @@ class Auth:
         add_user = f"INSERT INTO users (\"username\", \"password\", \"email\", \"role\") VALUES (%s,%s,%s,%s);"
         self.insert_query(add_user, (username, crypt_password(password), email, 'guest'))
 
+    st.cache_data
     def get_user_role(self, user_id:int):
         """ Get the user role from the database """
         user_role = f"SELECT role FROM users WHERE user_id = '{user_id}' LIMIT 1;"
@@ -90,6 +95,7 @@ class Auth:
             return str(rows[0][0])
         return None
 
+    st.cache_data
     def get_openai_key(self, user_id:int):
         """ Get the openai key from the database """
         get_key = f"SELECT openai_key FROM userdata WHERE user_id = '{user_id}' LIMIT 1;"
@@ -229,6 +235,7 @@ class AuthSingleton:
     __instance = None
     def get_instance(self) -> Auth:
         if AuthSingleton.__instance is None :
-            AuthSingleton.__instance = Auth(20)
+            AuthSingleton.__instance = Auth(psycopg2.connect(**st.secrets["postgres"]), cookie_manager.CookieManager(), 20)
+            AuthSingleton.__instance.init_connection(**st.secrets["postgres"])
         return AuthSingleton.__instance
 
