@@ -130,17 +130,18 @@ class LoginApp(HydraHeadApp):
                 # Create the sandbox app
                 shutil.copyfile(src=template_sandbox_app, dst=sandbox_user_path)
                 print(f"Created sandbox app for {username} at {sandbox_user_path}")
-
-        # Check if the sandbox is not in error
-        try:
-            sandboxe_name = "_".join([username, str(level)])
-            import importlib
-            _ = importlib.import_module(f"sandboxes.{sandboxe_name}").App("Generated App")
-        except:
-            with st.spinner("Sandbox needs to be recreated..."):
-                time.sleep(2)
-                # Delete the sandbox file
-                os.remove(sandbox_user_path)
-                # Create the sandbox app
-                shutil.copyfile(src=template_sandbox_app, dst=sandbox_user_path)
-                print(f"Created sandbox app for {username} at {sandbox_user_path}")
+            else:
+                # Check if the sandbox is not in error
+                try:
+                    sandboxe_name = "_".join([username, str(level)])
+                    import importlib
+                    _ = importlib.import_module(f"sandboxes.{sandboxe_name}").App("Generated App")
+                except:
+                    with st.spinner("Sandbox needs to be recreated..."):
+                        time.sleep(2)
+                        # Delete the sandbox file
+                        if sandbox_user_path.exists():
+                            os.remove(sandbox_user_path)
+                        # Create the sandbox app
+                        shutil.copyfile(src=template_sandbox_app, dst=sandbox_user_path)
+                        print(f"Created sandbox app for {username} at {sandbox_user_path}")
