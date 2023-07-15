@@ -17,13 +17,7 @@ def generate_user_session_token() -> str:
 class Auth:
     conn: psycopg2.extensions.connection
     cookies: cookie_manager.CookieManager
-    token_expiration_min: int
-
-    # Initialize connection.
-    # Uses st.cache_resource to only run once.
-    @st.cache_resource
-    def init_connection(self, sql_secrets):
-        self.conn = psycopg2.connect(sql_secrets)
+    token_expiration_min: int = 20
 
     # Perform query.
     def run_query(self, query):
@@ -236,6 +230,5 @@ class AuthSingleton:
     def get_instance(self) -> Auth:
         if AuthSingleton.__instance is None :
             AuthSingleton.__instance = Auth(psycopg2.connect(**st.secrets["postgres"]), cookie_manager.CookieManager(), 20)
-            AuthSingleton.__instance.init_connection(**st.secrets["postgres"])
         return AuthSingleton.__instance
 
