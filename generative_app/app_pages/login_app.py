@@ -122,8 +122,8 @@ class LoginApp(HydraHeadApp):
 
     def seed_sandbox(self, level, username):
         # Check if the sandbox exists
-        sandboxes_path = Path(__file__).parent / 'sandboxes'
-        template_sandbox_app = Path(__file__).parent / 'templates' / 'app.py'
+        sandboxes_path = Path(__file__).parent.parent / 'sandboxes'
+        template_sandbox_app = Path(__file__).parent.parent / 'templates' / 'app.py'
         sandbox_user_path = sandboxes_path / f"{username}_{level}.py"
         if sandboxes_path.exists():
             if not sandbox_user_path.exists():
