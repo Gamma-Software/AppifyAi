@@ -163,7 +163,7 @@ class Auth:
                 return not token_expired, user_id, "User logged out due to inactivity." if token_expired else "User logged in."
         return False, None, "User session not found."
 
-    def get_code(self, user_id:int) -> str | None:
+    def get_code(self, user_id:int) -> Union[str, None]:
         # Execute query.
         check_code = f"SELECT source_code FROM UserData WHERE user_id = '{user_id}' LIMIT 1;"
         code = self.run_query(check_code)
@@ -171,7 +171,7 @@ class Auth:
             return code[0][0]
         return None
 
-    def get_message_history(self, user_id:int) -> Dict | None:
+    def get_message_history(self, user_id:int) -> Union[Dict, None]:
         # Execute query.
         check_code = f"SELECT message_history FROM userdata WHERE user_id = '{user_id}' LIMIT 1;"
         message_history = self.run_query(check_code)
