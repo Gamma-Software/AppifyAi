@@ -1,10 +1,10 @@
 from hydralit import HydraApp
 
-from login_app import LoginApp
-from signup import SignUpApp
-from chatbotx import ChatBotApp
-from load_app import LoadingApp
-from demo_app import DemoApp
+from app_pages.login_app import LoginApp
+from app_pages.signup import SignUpApp
+from app_pages.chatbotx import ChatBotApp
+from app_pages.load_app import LoadingApp
+from app_pages.demo_app import DemoApp
 import sidebar
 from version import VERSION
 

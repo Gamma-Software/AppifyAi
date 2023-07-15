@@ -24,7 +24,7 @@ import re
 from streamlit.delta_generator import DeltaGenerator
 import streamlit as st
 
-import doc_retriever
+import chains.doc_retriever as doc_retriever
 from chains.conversational_retrieval_over_code import ConversationalRetrievalCodeChain
 
 
