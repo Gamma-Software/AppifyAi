@@ -56,7 +56,7 @@ if __name__ == '__main__':
     )
 
     # Authentication instance
-    #auth = Auth()
+    auth = AuthSingleton().get_instance()
 
     #we want to have secure access for this HydraApp, so we provide a login application
     #optional logout label, can be blank for something nicer!
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     def mylogout_cb():
         if user_access_level:
             print('Remove user session of user {} with access level {}'.format(username, user_access_level))
-            AuthSingleton().get_instance().remove_user_session(user_access_level)
+            auth.remove_user_session(user_access_level)
     #---------------------------------------------------------------------
 
     #we can inject a method to be called everytime a user logs in

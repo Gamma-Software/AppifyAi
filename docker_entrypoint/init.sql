@@ -25,5 +25,6 @@ CREATE TABLE UserData (
   source_code TEXT,
   message_history JSONB,
   tries INT NOT NULL DEFAULT 0,
+  openai_key TEXT,
   FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
