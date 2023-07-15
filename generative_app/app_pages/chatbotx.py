@@ -4,7 +4,7 @@ import streamlit as st
 import sidebar
 from hydralit import HydraHeadApp
 
-from chat import ChatBot
+from app_pages.chat import ChatBot
 from auth.auth_connection import AuthSingleton
 
 
