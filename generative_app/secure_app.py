@@ -8,7 +8,11 @@ from app_pages.demo_app import DemoApp
 import sidebar
 from version import VERSION
 
+import re
+from utils.parser import parse_generated_code
+from templates.template_app import template_app
 from auth.auth_connection import AuthSingleton
+from utils.apply_code import apply_code_on_gen_app
 
 import streamlit as st
 
@@ -97,6 +101,7 @@ if __name__ == '__main__':
 
     # If the menu is cluttered, just rearrange it into sections!
     # completely optional, but if you have too many entries, you can make it nicer by using accordian menus
+    path_to_script = ""
     if user_access_level > 0:
         sandboxe_name = "_".join([username, str(user_access_level)])
         import importlib
@@ -127,9 +132,22 @@ if __name__ == '__main__':
     #print user movements and current login details used by Hydralit
     #---------------------------------------------------------------------
     # user_access_level, username = app.check_access()
-    # prev_app, curr_app = app.get_nav_transition()
-    # print(prev_app,'- >', curr_app)
+    prev_app, curr_app = app.get_nav_transition()
+    print(prev_app,'- >', curr_app)
+    if path_to_script != "":
+        if curr_app == f"{username} - Generated App":
+            #  Current code
+            with open(path_to_script, "r") as app_file:
+                current_code = parse_generated_code(app_file.read())
+
+            code_generated = auth.get_code(user_access_level)
+            if code_generated is not None:
+                if current_code.split() != code_generated.split():
+                    with st.spinner("Applying generated code..."):
+                        with open(path_to_script, "w") as app_file:
+                            # Indent code
+                            code_generated = re.sub(r"^", " " * 8, code_generated, flags=re.MULTILINE)
+                            app_file.write(template_app.format(code=code_generated))
     # print(int(user_access_level),'- >', username)
     # print('Other Nav after: ',app.session_state.other_nav_app)
     #---------------------------------------------------------------------
-

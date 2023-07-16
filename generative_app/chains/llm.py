@@ -2,7 +2,7 @@ import time
 import langchain
 from langchain.schema.messages import BaseMessage
 import streamlit as st
-langchain.debug = bool(st.secrets["langchain"]["debug"])
+langchain.debug = st.secrets["langchain"]["debug"]
 from langchain.prompts import PromptTemplate
 from langchain.prompts.prompt import PromptTemplate
 from langchain.chains import LLMChain
@@ -149,11 +149,11 @@ class Handler(BaseCallbackHandler):
         self.full_response = ""
         return super().on_chain_end(outputs, run_id=run_id, parent_run_id=parent_run_id, **kwargs)
 
-def load_conversation_chain(_message_placeholder: DeltaGenerator, openai_api_key: str) -> ConversationalRetrievalCodeChain:
+def load_conversation_chain(message_placeholder: DeltaGenerator, openai_api_key: str) -> ConversationalRetrievalCodeChain:
     if openai_api_key is None:
         raise ValueError("OpenAI API key is required to load the chain.")
     llm = ChatOpenAI(model_name="gpt-3.5-turbo-16k", temperature=0, openai_api_key=openai_api_key,
-                     streaming=True, callbacks=[Handler(_message_placeholder)])
+                     streaming=True, callbacks=[Handler(message_placeholder)])
     condense_question_llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key)
     critique_llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key,verbose=False)
     missing_imports_llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key,verbose=False)

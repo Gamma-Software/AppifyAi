@@ -168,7 +168,8 @@ class Auth:
         check_code = f"SELECT source_code FROM UserData WHERE user_id = '{user_id}' LIMIT 1;"
         code = self.run_query(check_code)
         if code:
-            return code[0][0]
+            code = code[0][0].replace("''", '"') # Replace back the " with ' to avoid SQL syntax error.
+            return code
         return None
 
     def get_message_history(self, user_id:int) -> Union[Dict, None]:
