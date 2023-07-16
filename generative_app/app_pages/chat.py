@@ -5,6 +5,7 @@ from streamlit.delta_generator import DeltaGenerator
 import chains.llm as llm
 from auth.auth_connection import AuthSingleton
 from templates.template_app import template_app
+from utils.parser import parse_generated_code
 import ui.chat_init as chat_init
 from ui.end_trial import trial_title, thanks, pay, share, download, download_info, no_code
 
@@ -27,30 +28,8 @@ class ChatBot:
     def apply_code(self, code:str):
         if code is None:
             return
-        # apply 8 space indentation
-        code = re.sub(r"^", " " * 8, code, flags=re.MULTILINE)
-
         # save code to database
         self.auth.set_code(self.user_id, code)
-
-        with open(self.python_script_path, "w") as app_file:
-            app_file.write(template_app.format(code=code))
-
-    @staticmethod
-    def parse_code(code:str):
-        from textwrap import dedent
-        python_code = None
-        pattern = r"#---start\n(.*?)#---end"
-        python_code_match = re.search(pattern, code, re.DOTALL)
-        if python_code_match:
-            python_code = python_code_match.group(1)
-            if python_code == "None":
-                python_code = None
-        # Remove the 8 space indentation
-        if python_code:
-            python_code = dedent(python_code)
-        return python_code
-
 
     @staticmethod
     def check_commands(instruction:str) -> CommandResult or None:
@@ -74,6 +53,7 @@ class ChatBot:
             chat_placeholder.error("Nothing to undo")
         if command == CommandResult.UNDO:
             self.apply_code(st.session_state.last_code)
+            st.session_state.messages = st.session_state.messages.popitem()
             st.session_state.chat_history = st.session_state.chat_history[:-1]
             chat_placeholder.info("Code reverted. Last instruction ignored by the bot.")
         if command == CommandResult.RESET:
@@ -83,7 +63,7 @@ class ChatBot:
                 st.experimental_rerun()
         if command == CommandResult.SAVE:
             chat_placeholder.info("Download the file by clicking on the button below.\nYou can then run it with `streamlit run streamlit_app.py`")
-            code = self.parse_code(open(self.python_script_path, "r").read())
+            code = parse_generated_code(open(self.python_script_path, "r").read())
             chat_placeholder.download_button(label="Download app", file_name= "streamlit_app.py",
                                              mime='text/x-python', data=code)
 
@@ -109,7 +89,7 @@ class ChatBot:
         st.markdown(thanks[1 if st.session_state.lang == "fr" else 0])
         st.success(pay[1 if st.session_state.lang == "fr" else 0])
         st.markdown(share[1 if st.session_state.lang == "fr" else 0])
-        code = self.parse_code(open(self.python_script_path, "r").read())
+        code = parse_generated_code(open(self.python_script_path, "r").read())
         if code:
             st.header(download[1 if st.session_state.lang == "fr" else 0])
             c1, c2 = st.columns([1, 0.5])
@@ -146,16 +126,12 @@ class ChatBot:
 
         if "tries" not in st.session_state:
             st.session_state.tries = self.auth.get_tries(self.user_id)
-
         self.setup_chat()
 
     def setup_chat(self):
         # Setup user input
         if instruction := st.chat_input(f"Tell me what to do, or ask me a question"):
-            # Add backslash for each quote and double quote
-            instruction = instruction.replace('"', '\\"').replace("'", "\\'").replace("`", "\\`")
             if self.user_role == "guest":
-                print("role guest")
                 tries_left = 5 - st.session_state.tries
                 if tries_left <= 0:
                     print("end of trial")

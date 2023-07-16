@@ -5,6 +5,7 @@ import shutil
 from pathlib import Path
 import streamlit as st
 from auth.auth_connection import AuthSingleton
+import ui.chat_init as chat_init
 from hydralit import HydraHeadApp
 from streamlit.delta_generator import DeltaGenerator
 
@@ -125,15 +126,17 @@ class LoginApp(HydraHeadApp):
         sandbox_user_path = sandboxes_path / f"{username}_{level}.py"
         if sandboxes_path.exists():
             if not sandbox_user_path.exists():
-                # Create the sandbox app
-                shutil.copyfile(src=template_sandbox_app, dst=sandbox_user_path)
-                print(f"Created sandbox app for {username} at {sandbox_user_path}")
+                with st.spinner("Creating sandbox..."):
+                    # Create the sandbox app
+                    shutil.copyfile(src=template_sandbox_app, dst=sandbox_user_path)
+                    print(f"Created sandbox app for {username} at {sandbox_user_path}")
             else:
                 # Check if the sandbox is not in error
                 try:
-                    sandboxe_name = "_".join([username, str(level)])
-                    import importlib
-                    _ = importlib.import_module(f"sandboxes.{sandboxe_name}").App("Generated App")
+                    with st.spinner("Importing sandbox..."):
+                        sandboxe_name = "_".join([username, str(level)])
+                        import importlib
+                        _ = importlib.import_module(f"sandboxes.{sandboxe_name}").App("Generated App")
                 except:
                     with st.spinner("Sandbox needs to be recreated..."):
                         time.sleep(2)
@@ -142,4 +145,23 @@ class LoginApp(HydraHeadApp):
                             os.remove(sandbox_user_path)
                         # Create the sandbox app
                         shutil.copyfile(src=template_sandbox_app, dst=sandbox_user_path)
-                        print(f"Created sandbox app for {username} at {sandbox_user_path}")
+
+                        # Reset chat and code
+                        if "messages" not in st.session_state:
+                            st.session_state["messages"] = []
+                        if "lang" not in st.session_state:
+                            st.session_state["lang"] = "en"
+                        st.session_state.messages = {
+                            "message_0":
+                                {
+                                    "role": "assistant",
+                                    "content": chat_init.message_en.format(name=username) if st.session_state.lang == "en" else chat_init.message_fr.format(name=username)
+                                },
+                        }
+                        if "chat_history" in st.session_state:
+                            st.session_state.chat_history = []
+                        self.auth.set_message_history(level,  st.session_state.messages)
+                        self.auth.set_code(level, "pass")
+
+    def reset_chat(self):
+        print("resetting chat")
