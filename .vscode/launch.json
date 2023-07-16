@@ -5,45 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Python:Streamlit",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "env": {"DEBUG": "true"}
-        },
-        {
-            "name": "Python: debugpy Remote Attach",
-            "type": "python",
-            "request": "attach",
-            "connect": {
-                "port": 8765,
-                "host": "127.0.0.1",
-            },
-            "justMyCode": false,
-            "redirectOutput": true,
-            "logToFile": true,
-            "pathMappings": [
-                {
-                    "localRoot": "${workspaceFolder}",
-                    "remoteRoot": "."
-                }
-            ]
-            // "debugAdapterPath": "${workspaceFolder}/src/debugpy/adapter",
-        },
-        {
-            "name": "Python: ptvsd Remote Attach",
-            "type": "python",
-            "request": "attach",
-            "port": 8765,
-            "host": "localhost",
-            "justMyCode": false,
-            "redirectOutput": true,
-            "pathMappings": [
-                {
-                    "localRoot": "${workspaceFolder}",
-                    "remoteRoot": "."
-                }
+            "module": "streamlit",
+            "args": [
+                 "run",
+                 "${file}",
+                 "--server.port",
+                 "8502"
             ]
         }
     ]
