@@ -88,6 +88,7 @@ class ChatBot:
                                              mime='text/x-python', data=code)
 
     def reset_chat(self):
+        print("resetting chat")
         st.session_state["messages"] = {
             "message_0":
                 {
@@ -97,7 +98,7 @@ class ChatBot:
         }
         self.save_chat_history_to_database()
         st.session_state.chat_history = []
-        self.apply_code("import streamlit as st\nst.title('This space is the sandbox.')")
+        self.apply_code("pass")
 
     def add_message(self, role: str, content: str):
         idx = len(st.session_state.messages)
@@ -151,9 +152,13 @@ class ChatBot:
     def setup_chat(self):
         # Setup user input
         if instruction := st.chat_input(f"Tell me what to do, or ask me a question"):
+            # Add backslash for each quote and double quote
+            instruction = instruction.replace('"', '\\"').replace("'", "\\'").replace("`", "\\`")
             if self.user_role == "guest":
+                print("role guest")
                 tries_left = 5 - st.session_state.tries
                 if tries_left <= 0:
+                    print("end of trial")
                     st.experimental_rerun()
             # Add user message to the chat
             self.add_message("user", instruction)
@@ -177,6 +182,7 @@ class ChatBot:
                     with st.spinner("⌛Processing... Please keep this page open until the end of my response."):
                         # Wait for the response of the LLM and display a loading message in the meantime
                         try:
+                            print("calling chain")
                             llm_result = chain({"question": instruction, "chat_history": st.session_state.chat_history, "python_code": st.session_state.last_code})
                         except Exception as e:
                             current_assistant_message_placeholder.error(f"Error...{e}")
@@ -221,4 +227,5 @@ class ChatBot:
             st.session_state.chat_history = st.session_state.chat_history[-3:]
 
     def save_chat_history_to_database(self):
+        print("saving chat history")
         self.auth.set_message_history(self.user_id,  st.session_state.messages)
