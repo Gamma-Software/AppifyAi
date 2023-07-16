@@ -74,7 +74,7 @@ openai_api_key = "your key here"
 2. Then run the following command to start the app:
 
 ```shell
-streamlit run generative_app/🏠ChatbotX.py
+streamlit run generative_app/core/secure_app.py
 ```
 
 3. Interact with the bot to generate the Streamlit App of your dreams !
