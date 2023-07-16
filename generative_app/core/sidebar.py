@@ -26,29 +26,29 @@ def setup():
             ('🇺🇸 en', '🇫🇷 fr'))[-2:]
 
         with placeholder:
-            with open(os.path.join(os.getcwd(), f"generative_app/ui/{st.session_state.lang}/sidebar_intro.md"), "r") as sidebar_file:
+            with open(os.path.join(os.getcwd(), f"generative_app/core/ui/{st.session_state.lang}/sidebar_intro.md"), "r") as sidebar_file:
                 sidebar_content = sidebar_file.read()
 
             st.markdown(sidebar_content, unsafe_allow_html=True)
 
             _, c2, _ = st.columns([1, 1, 1])
-            c2.image(os.path.join(os.getcwd(), f"generative_app/ui/bmc_qr.png"), use_column_width=True)
+            c2.image(os.path.join(os.getcwd(), f"generative_app/core/ui/bmc_qr.png"), use_column_width=True)
 
-            with open(os.path.join(os.getcwd(), f"generative_app/ui/{st.session_state.lang}/sidebar_bmc.md"), "r") as sidebar_file:
+            with open(os.path.join(os.getcwd(), f"generative_app/core/ui/{st.session_state.lang}/sidebar_bmc.md"), "r") as sidebar_file:
                 sidebar_content = sidebar_file.read()
             st.markdown(sidebar_content, unsafe_allow_html=True)
             st.divider()
 
 
-            with open(os.path.join(os.getcwd(), f"generative_app/ui/{st.session_state.lang}/sidebar_dev_advice.md"), "r") as sidebar_file:
+            with open(os.path.join(os.getcwd(), f"generative_app/core/ui/{st.session_state.lang}/sidebar_dev_advice.md"), "r") as sidebar_file:
                 sidebar_content = sidebar_file.read()
 
             with st.expander("👉 " + extract_markdown_title(sidebar_content)):
                 _, c, _ = st.columns([0.5, 1, 0.5])
-                c.image(os.path.join(os.getcwd(), f"generative_app/ui/profile.jpg"))
+                c.image(os.path.join(os.getcwd(), f"generative_app/core/ui/profile.jpg"))
                 st.markdown(sidebar_content, unsafe_allow_html=True)
 
-            with open(os.path.join(os.getcwd(), f"generative_app/ui/{st.session_state.lang}/sidebar_ex.md"), "r") as sidebar_file:
+            with open(os.path.join(os.getcwd(), f"generative_app/core/ui/{st.session_state.lang}/sidebar_ex.md"), "r") as sidebar_file:
                 sidebar_content = sidebar_file.read()
 
             with st.expander("👉 " + extract_markdown_title(sidebar_content)):
