@@ -1,7 +1,8 @@
 import time
 import langchain
 from langchain.schema.messages import BaseMessage
-langchain.debug = True
+import streamlit as st
+langchain.debug = bool(st.secrets["langchain"]["debug"])
 from langchain.prompts import PromptTemplate
 from langchain.prompts.prompt import PromptTemplate
 from langchain.chains import LLMChain
@@ -148,7 +149,6 @@ class Handler(BaseCallbackHandler):
         self.full_response = ""
         return super().on_chain_end(outputs, run_id=run_id, parent_run_id=parent_run_id, **kwargs)
 
-@st.cache_resource
 def load_conversation_chain(_message_placeholder: DeltaGenerator, openai_api_key: str) -> ConversationalRetrievalCodeChain:
     if openai_api_key is None:
         raise ValueError("OpenAI API key is required to load the chain.")
