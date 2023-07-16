@@ -38,11 +38,10 @@ class LoginApp(HydraHeadApp):
 
         st.markdown("<h1 style='text-align: center;'>Login to ChatbotX 💫</h1>", unsafe_allow_html=True)
 
-        c1,c2,c3, = st.columns([2,2,2])
+        _,c2,_ = st.columns([2,2,2])
 
         form_data, login_message_placeholder = self._create_login_form(c2)
 
-        print(reason)
         if reason == "User logged out due to inactivity.":
             login_message_placeholder.info(reason)
 
@@ -98,7 +97,6 @@ class LoginApp(HydraHeadApp):
 
     def _do_login(self, form_data, msg_container) -> None:
         access_level = self._check_login(form_data)
-        print("Access level: ", access_level)
         if access_level > 0:
             with msg_container:
                 # Add user sesssion
