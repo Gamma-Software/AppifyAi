@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 from typing import Dict, Union
 import shutil
@@ -135,8 +136,12 @@ class LoginApp(HydraHeadApp):
                 try:
                     with st.spinner("Importing sandbox..."):
                         sandboxe_name = "_".join([username, str(level)])
+
+                        path = os.path.join(os.getcwd(), 'generative_app', 'sandboxes', f"{sandboxe_name}.py")
+                        if path not in sys.path:
+                            sys.path.append(path)
                         import importlib
-                        _ = importlib.import_module(f"sandboxes.{sandboxe_name}").App("Generated App")
+                        _ = importlib.import_module(f"{sandboxe_name}", "../..").App("Generated App")
                 except:
                     with st.spinner("Sandbox needs to be recreated..."):
                         time.sleep(2)
