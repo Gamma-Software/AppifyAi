@@ -2,7 +2,8 @@ import time
 import streamlit as st
 from hydralit import HydraHeadApp
 from hydralit_components import HyLoader, Loaders
-
+import traceback
+import sys
 
 class LoadingApp(HydraHeadApp):
 
@@ -22,11 +23,12 @@ class LoadingApp(HydraHeadApp):
                     app_target.run()
                 except Exception as e:
                     st.error('An error has occurred, please report it here https://github.com/Gamma-Software/ChatbotX/issues (add screenshot and error details)')
-                    st.error('Error details: {}'.format(e))
+                    st.code(traceback.format_exc())
             else:
                 try:
                     app_target.run()
                 except Exception as e:
-                    st.error('An error has occurred, Error details: {}'.format(e))
-                    st.error('Please ask the bot to fix it. For instance, give him the following instruction: ')
-                    st.code('Fix this error: {}'.format(e))
+                    st.error('An error occured, please ask the bot to fix it. For instance, give him the following instruction: ')
+                    st.code('Fix this error: {}'.format(traceback.format_exception_only(e)[0]))
+                    with st.expander("Full Traceback"):
+                        st.code(traceback.format_exc())
