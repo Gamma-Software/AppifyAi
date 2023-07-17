@@ -26,7 +26,7 @@ class UserGuide(HydraHeadApp):
             st.header("This is a header")
             st.subheader("This is a subheader")
 
-        st.info()
+        st.info("Section is construction...")
 
 
         st.divider()
