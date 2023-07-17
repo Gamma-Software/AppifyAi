@@ -106,13 +106,13 @@ if __name__ == '__main__':
     if user_access_level > 0:
         sandboxe_name = "_".join([username, str(user_access_level)])
 
+        # Dynamically import the sandbox
         import importlib
         path_to_script = os.path.join(os.getcwd(), 'generative_app', 'sandboxes', f"{sandboxe_name}.py")
-
         spec = importlib.util.spec_from_file_location(f"{username}_{user_access_level}", path_to_script)
-        foo = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(foo)
-        app_to_add = foo.App("Generated App")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        app_to_add = module.App("Generated App")
 
         #if path not in sys.path:
         #    sys.path.append(path)
