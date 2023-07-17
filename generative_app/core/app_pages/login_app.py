@@ -136,7 +136,7 @@ class LoginApp(HydraHeadApp):
                 try:
                     with st.spinner("Importing sandbox..."):
                         import importlib
-                        spec = importlib.util.spec_from_file_location(f"{username}_{level}", sandbox_user_path.parent)
+                        spec = importlib.util.spec_from_file_location(f"{username}_{level}", sandbox_user_path)
                         module = importlib.util.module_from_spec(spec)
                         spec.loader.exec_module(module)
                 except FileNotFoundError:
