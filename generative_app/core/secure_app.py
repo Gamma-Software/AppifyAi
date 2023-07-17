@@ -4,7 +4,7 @@ from app_pages.login_app import LoginApp
 from app_pages.signup import SignUpApp
 from app_pages.chatbotx import ChatBotApp
 from app_pages.load_app import LoadingApp
-from app_pages.demo_app import DemoApp
+from app_pages.user_guide import UserGuide
 import sidebar
 from version import VERSION
 
@@ -66,16 +66,8 @@ if __name__ == '__main__':
     #we want to have secure access for this HydraApp, so we provide a login application
     #optional logout label, can be blank for something nicer!
     app.add_app("Logout", LoginApp(title='Login'), is_home=True, is_login=True)
-
-    #we want to have secure access for this HydraApp, so we provide a login application
-    #optional logout label, can be blank for something nicer!
-    app.add_app("Demo", DemoApp(title='Demo'), icon="📜", is_unsecure=True)
-
-    #we have added a sign-up app to demonstrate the ability to run an unsecure app
-    #only 1 unsecure app is allowed
+    app.add_app("User Guide", UserGuide(title='User Guide'), icon="📜", is_unsecure=True)
     app.add_app("Signup", icon="🛰️", app=SignUpApp(title='Signup'), is_unsecure=True)
-
-    #specify a custom loading app for a custom transition between apps, this includes a nice custom spinner
     app.add_loader_app(LoadingApp(delay=1))
 
     #check user access level to determine what should be shown on the menu
@@ -129,10 +121,10 @@ if __name__ == '__main__':
             'ChatbotX': ['ChatbotX'],
         }
         complex_nav.update({title: [title]})
-        complex_nav.update({'Demo': ['Demo']})
+        complex_nav.update({'User Guide': ['User Guide']})
     else:
         complex_nav = {
-            'Demo': ['Demo']
+            'User Guide': ['User Guide']
         }
 
 
