@@ -212,14 +212,17 @@ def load_chat_agent():
     agent_chain = initialize_agent(tools, llm, agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION, verbose=False, memory=memory)
     return agent_chain
 
+
+# https://regex101.com/r/fHlyKq/1
+parse_code_regex = r"(```python(.*?)```)?(.*?)$"
+
 def parse(output):
     python_code = None
     explain_code = None
-    pattern = r"```python(.*?)```(.*?)$"
-    python_code_match = re.search(pattern, output, re.DOTALL)
+    python_code_match = re.search(parse_code_regex, output, re.DOTALL)
     if python_code_match:
-        python_code = python_code_match.group(1)
-        explain_code = python_code_match.group(2)
+        python_code = python_code_match.group(2)
+        explain_code = python_code_match.group(3)
         if python_code == "None":
             python_code = None
     return python_code, explain_code
