@@ -7,6 +7,7 @@ from auth.auth_connection import AuthSingleton
 from templates.template_app import template_app
 from utils.parser import parse_generated_code
 import ui.chat_init as chat_init
+from chains.llm import parse
 from ui.end_trial import trial_title, thanks, pay, share, download, download_info, no_code
 
 class CommandResult(enum.Enum):
@@ -117,7 +118,15 @@ class ChatBot:
         if st.session_state.messages:
             for _, message in st.session_state.messages.items():
                 with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
+                    if message["role"] == "assistant":
+                        code, explanation = parse(message["content"])
+                        if code is not None:
+                            message = f"```python\n{code}\n```"
+                            ex = st.expander("Code")
+                            ex.code(code)
+                        st.markdown(explanation)
+                    else:
+                        st.markdown(message["content"])
         else:
             self.reset_chat()
 
@@ -169,12 +178,13 @@ class ChatBot:
                     security_rules_offended = llm_result["revision_request"]
                     # Apply the code if there is one and display the result
                     if code is not None:
-                        message = f"```python\n{code}\n```\n"
+                        message = f"```python\n{code}\n```"
                         if not security_rules_offended:
                             self.apply_code(code)
-                    message += f"{explanation}"
                     container = current_assistant_message_placeholder.container()
-                    container.markdown(message)
+                    ex = container.expander("Code")
+                    ex.code(code)
+                    container.markdown(explanation)
                     if security_rules_offended:
                         container.warning("Your instruction does not comply with our security measures (code generated will not be populated). See the docs for more information.")
                     if self.user_role == "guest":
