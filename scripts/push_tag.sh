@@ -7,9 +7,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Get the version (ex: 1.0.0) in the generative_app/version.py file that has the following format: VERSION="1.0.0"
+# Get the version (ex: 1.0.0) in the generative_app/core/version.py file that has the following format: VERSION="1.0.0"
 get_version() {
-    version=v$(grep -oP '(?<=VERSION=")[^"]*' generative_app/version.py)
+    version=v$(grep -oP '(?<=VERSION=")[^"]*' generative_app/core/version.py)
 }
 
 # Check if the version is not already tagged

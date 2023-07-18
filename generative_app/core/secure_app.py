@@ -6,9 +6,8 @@ from app_pages.chatbotx import ChatBotApp
 from app_pages.load_app import LoadingApp
 from app_pages.user_guide import UserGuide
 import sidebar
-from generative_app.version import VERSION
+from core.version import VERSION
 
-import sys
 import os
 import re
 from utils.parser import parse_generated_code
