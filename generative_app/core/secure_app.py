@@ -143,10 +143,8 @@ if __name__ == '__main__':
             #  Current code
             with open(path_to_script, "r") as app_file:
                 current_code = parse_current_app(app_file.read())
-            print(current_code)
 
             code_generated = auth.get_code(user_access_level)
-            print(code_generated)
             if code_generated is not None:
                 if current_code.split() != code_generated.split():
                     print("Applying generated code...")

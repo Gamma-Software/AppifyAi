@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- the undo was not removing the last discussion
 - At first start the chat was invisible
 - The explanation was not saved in the database
 
