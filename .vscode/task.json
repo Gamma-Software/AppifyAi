@@ -1,0 +1,25 @@
+{
+    "version": "1.0.0",
+    "tasks": [
+        {
+          "label": "Push tag",
+          "type": "shell",
+          "command": "./scripts/push_tag.sh",
+          "group": "git",
+          "presentation": {
+            "reveal": "always",
+            "panel": "new"
+          }
+        },
+        {
+          "label": "Deploy on server",
+          "type": "shell",
+          "command": "./scripts/build_deploy_update.sh",
+          "group": "deploy",
+          "presentation": {
+            "reveal": "always",
+            "panel": "new"
+          }
+        }
+    ]
+  }
