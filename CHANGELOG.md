@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Modified
 
+- Replaced the constitutional chain by a function to analyse code
 - Move the shell scripts to scripts folder
 
 ### Fixed
