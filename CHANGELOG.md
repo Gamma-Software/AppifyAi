@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Push tag script
 - tasks
+- Ideas to develop in readme
 
 ### Modified
 
@@ -18,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- At first start the chat was invisible
 - The explanation was not saved in the database
 
 ## [1.2.0] - 2023-07-18

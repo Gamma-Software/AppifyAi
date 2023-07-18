@@ -115,20 +115,19 @@ class ChatBot:
         # Add saved messages
         st.session_state.messages = self.auth.get_message_history(self.user_id)
 
-        if st.session_state.messages:
-            for _, message in st.session_state.messages.items():
-                with st.chat_message(message["role"]):
-                    if message["role"] == "assistant":
-                        code, explanation = parse(message["content"])
-                        if code is not None:
-                            message = f"```python\n{code}\n```"
-                            ex = st.expander("Code")
-                            ex.code(code)
-                        st.markdown(explanation)
-                    else:
-                        st.markdown(message["content"])
-        else:
+        if not st.session_state.messages:
             self.reset_chat()
+        for _, message in st.session_state.messages.items():
+            with st.chat_message(message["role"]):
+                if message["role"] == "assistant":
+                    code, explanation = parse(message["content"])
+                    if code is not None:
+                        message = f"```python\n{code}\n```"
+                        ex = st.expander("Code")
+                        ex.code(code)
+                    st.markdown(explanation)
+                else:
+                    st.markdown(message["content"])
 
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
