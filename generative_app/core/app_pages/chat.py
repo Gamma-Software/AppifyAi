@@ -5,7 +5,7 @@ from streamlit.delta_generator import DeltaGenerator
 import chains.llm as llm
 from auth.auth_connection import AuthSingleton
 from templates.template_app import template_app
-from utils.parser import parse_generated_code
+from utils.parser import parse_current_app
 import ui.chat_init as chat_init
 from chains.llm import parse
 from ui.end_trial import trial_title, thanks, pay, share, download, download_info, no_code
@@ -90,7 +90,7 @@ class ChatBot:
         st.markdown(thanks[1 if st.session_state.lang == "fr" else 0])
         st.success(pay[1 if st.session_state.lang == "fr" else 0])
         st.markdown(share[1 if st.session_state.lang == "fr" else 0])
-        code = parse_generated_code(open(self.python_script_path, "r").read())
+        code = parse_current_app(open(self.python_script_path, "r").read())
         if code:
             st.header(download[1 if st.session_state.lang == "fr" else 0])
             c1, c2 = st.columns([1, 0.5])

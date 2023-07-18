@@ -1,6 +1,6 @@
 import re
 
-def parse_generated_code(code:str):
+def parse_current_app(code:str):
     from textwrap import dedent
     python_code = None
     pattern = r"#---start\n(.*?)#---end"
