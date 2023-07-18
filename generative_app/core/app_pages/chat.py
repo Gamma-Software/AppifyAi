@@ -35,7 +35,10 @@ class ChatBot:
     @staticmethod
     def check_commands(instruction:str) -> CommandResult or None:
         if instruction.startswith("/undo"):
-            if "last_code" not in st.session_state:
+            if "messages" not in st.session_state:
+                return CommandResult.NOTUNDO
+            elif len(st.session_state["messages"]) <= 2:
+                # If only the greetings of the bot and the current command is there we cannot undo
                 return CommandResult.NOTUNDO
             else:
                 return CommandResult.UNDO
@@ -54,17 +57,26 @@ class ChatBot:
             chat_placeholder.error("Nothing to undo")
         if command == CommandResult.UNDO:
             self.apply_code(st.session_state.last_code)
-            st.session_state.messages = st.session_state.messages.popitem()
-            st.session_state.chat_history = st.session_state.chat_history[:-1]
-            chat_placeholder.info("Code reverted. Last instruction ignored by the bot.")
+            # remove the last 4 keys
+            if len(st.session_state.messages) > 1:
+                for _ in range(min(len(st.session_state.messages), 3)):
+                    st.session_state.messages.popitem()
+                self.save_chat_history_to_database()
+            if "chat_history" in st.session_state:
+                if len(st.session_state.chat_history) > 0:
+                    st.session_state.chat_history = st.session_state.chat_history[:-1]
+            st.experimental_rerun()
         if command == CommandResult.RESET:
             with st.spinner("Resetting..."):
                 self.reset_chat()
                 chat_placeholder.info("Code resetted")
                 st.experimental_rerun()
         if command == CommandResult.SAVE:
+            code = parse_current_app(open(self.python_script_path, "r").read())
+            if code is None or code == "pass\n":
+                chat_placeholder.error("No code to save")
+                return
             chat_placeholder.info("Download the file by clicking on the button below.\nYou can then run it with `streamlit run streamlit_app.py`")
-            code = parse_generated_code(open(self.python_script_path, "r").read())
             chat_placeholder.download_button(label="Download app", file_name= "streamlit_app.py",
                                              mime='text/x-python', data=code)
 
