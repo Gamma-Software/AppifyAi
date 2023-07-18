@@ -78,10 +78,7 @@ class Auth:
         add_user = f"INSERT INTO users (\"username\", \"password\", \"email\", \"role\") VALUES (%s,%s,%s,%s);"
         self.insert_query(add_user, (username, crypt_password(password), email, 'guest'))
 
-<<<<<<< HEAD:generative_app/auth/auth_connection.py
-=======
     st.cache_data
->>>>>>> develop:generative_app/core/auth/auth_connection.py
     def get_user_role(self, user_id:int):
         """ Get the user role from the database """
         user_role = f"SELECT role FROM users WHERE user_id = '{user_id}' LIMIT 1;"
@@ -92,10 +89,7 @@ class Auth:
             return str(rows[0][0])
         return None
 
-<<<<<<< HEAD:generative_app/auth/auth_connection.py
-=======
     st.cache_data
->>>>>>> develop:generative_app/core/auth/auth_connection.py
     def get_openai_key(self, user_id:int):
         """ Get the openai key from the database """
         get_key = f"SELECT openai_key FROM userdata WHERE user_id = '{user_id}' LIMIT 1;"

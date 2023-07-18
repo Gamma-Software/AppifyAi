@@ -5,10 +5,7 @@ from streamlit.delta_generator import DeltaGenerator
 import chains.llm as llm
 from auth.auth_connection import AuthSingleton
 from templates.template_app import template_app
-<<<<<<< HEAD:generative_app/app_pages/chat.py
-=======
 from utils.parser import parse_generated_code
->>>>>>> develop:generative_app/core/app_pages/chat.py
 import ui.chat_init as chat_init
 from chains.llm import parse
 from ui.end_trial import trial_title, thanks, pay, share, download, download_info, no_code
@@ -146,10 +143,7 @@ class ChatBot:
             if self.user_role == "guest":
                 tries_left = 5 - st.session_state.tries
                 if tries_left <= 0:
-<<<<<<< HEAD:generative_app/app_pages/chat.py
-=======
                     print("end of trial")
->>>>>>> develop:generative_app/core/app_pages/chat.py
                     st.experimental_rerun()
             # Add user message to the chat
             self.add_message("user", instruction)
