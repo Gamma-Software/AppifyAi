@@ -168,7 +168,13 @@ class Auth:
         check_code = f"SELECT source_code FROM UserData WHERE user_id = '{user_id}' LIMIT 1;"
         code = self.run_query(check_code)
         if code:
-            code = code[0][0].replace("''", '"') # Replace back the " with ' to avoid SQL syntax error.
+            if len(code) > 1:
+                if len(code[0]) > 1:
+                    code = code[0][0].replace("''", '"') # Replace back the " with ' to avoid SQL syntax error.
+                else:
+                    code = None
+            else:
+                code = None
             return code
         return None
 
