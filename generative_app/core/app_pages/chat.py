@@ -181,6 +181,7 @@ class ChatBot:
                         message = f"```python\n{code}\n```"
                         if not security_rules_offended:
                             self.apply_code(code)
+                    message += explanation
                     container = current_assistant_message_placeholder.container()
                     ex = container.expander("Code")
                     ex.code(code)
