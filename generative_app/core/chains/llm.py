@@ -27,7 +27,7 @@ import streamlit as st
 
 import chains.doc_retriever as doc_retriever
 from chains.conversational_retrieval_over_code import ConversationalRetrievalCodeChain
-
+from chains.parser import parse_code
 
 python_script = os.path.join(os.getcwd() , "langchain" ,"generated_script.py")
 
@@ -71,22 +71,20 @@ class AsyncHandler(AsyncCallbackHandler):
 
             if self.code_block and self.full_response.count("`") == 6:
                 # We have a full code block, print it now
-                self.message_placeholder.markdown(self.full_response)
+                code, explanation = parse_code(self.full_response)
+                container = self.message_placeholder.container()
+                ex = container.expander("Code")
+                ex.code(code)
+                container.markdown(explanation)
                 self.code_block = False
                 self.code_extracted = True
 
         if self.code_extracted:
-            message = ""
-            code, explain = parse(self.full_response)
-
-            if code:
-                message = f"```python\n{code}\n```\n"
-            if explain:
-                message += f"{explain}"
-
-            if message != "":
-                # Add a blinking cursor to simulate typing
-                self.message_placeholder.markdown(message + "▌")
+            code, explanation = parse_code(self.full_response)
+            container = self.message_placeholder.container()
+            ex = container.expander("Code")
+            ex.code(code)
+            container.markdown(explanation + "▌")
 
     async def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:
         """Run when chain ends running."""
@@ -155,7 +153,6 @@ def load_conversation_chain(message_placeholder: DeltaGenerator, openai_api_key:
     llm = ChatOpenAI(model_name="gpt-3.5-turbo-16k", temperature=0, openai_api_key=openai_api_key,
                      streaming=True, callbacks=[Handler(message_placeholder)])
     condense_question_llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key)
-    critique_llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key,verbose=False)
     missing_imports_llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key,verbose=False)
     retriever = doc_retriever.load_streamlit_doc_retriever(st.secrets["openai_api_key"],
                                                            chroma_server_host=st.secrets["chroma"]["host"],
@@ -164,7 +161,6 @@ def load_conversation_chain(message_placeholder: DeltaGenerator, openai_api_key:
     qa_over_streamlit_code = ConversationalRetrievalCodeChain.from_llm(llm=llm, retriever=retriever,
                                                                        condense_question_llm=condense_question_llm,
                                                                        return_source_documents=True,
-                                                                       self_critique_llm=critique_llm,
                                                                        missing_imports_llm=missing_imports_llm,
                                                                        return_revision_request=True,
                                                                        verbose=False)

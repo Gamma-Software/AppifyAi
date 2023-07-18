@@ -27,16 +27,7 @@ from langchain.chains.conversational_retrieval.base import CHAT_TURN_TYPE, _get_
 
 from chains.prompt import CONDENSE_QUESTION_CODE_PROMPT, PROMPT, prompt_missing_imports_check
 from utils.security import analyze_security
-
-# Should create a generic parser for this
-def parse_code(output):
-    python_code = None
-    explain_code = None
-    pattern = r"(?P<code>```python(?P<python>.*?)```)?(?P<explanation>.*?)$"
-    python_code_match = re.search(pattern, output, re.DOTALL)
-    python_code = python_code_match.group("python")
-    explain_code = python_code_match.group("explanation")
-    return python_code, explain_code
+from chains.parser import parse_code
 
 def remove_entrypoint(code):
     lines = code.split('\n')
