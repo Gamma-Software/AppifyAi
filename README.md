@@ -152,6 +152,12 @@ The chatbot will interpret these instructions, generate the corresponding Python
 - [x] Crypt the user password
 - [x] Add prompt tries
 - [x] Security measures check of inputs
+- [ ] Be able to undo multiple instrutions
+- [ ] Do a tutorial on how to use the bot and iteract with it
+- [ ] Compile the generated code into a executable binary for cross platform compatibility
+- [ ] Add page when we can build the app together with the chatbot
+- [ ] Add page where we can instruct the bot to build the app and see the changes live
+- [ ] Add command to upload a file in order to use it in the generated app (and the bot will know that the file exists and have its filepath)
 - [ ] Add a voice assistant (text to speech and speech to text)
 - [ ] Add a page to show the documentation of the app
 - [ ] Automate the installation of more libraries
