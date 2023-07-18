@@ -3,12 +3,11 @@ from __future__ import annotations
 
 import re
 import inspect
-from textwrap import dedent
 from abc import abstractmethod
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
-from pydantic import Extra, Field, root_validator
+from pydantic import Extra
 
 from langchain.base_language import BaseLanguageModel
 from langchain.callbacks.manager import (
@@ -26,18 +25,9 @@ from langchain.schema import BaseRetriever, Document
 
 from langchain.chains.conversational_retrieval.base import CHAT_TURN_TYPE, _get_chat_history
 
-from chains.prompt import CONDENSE_QUESTION_CODE_PROMPT, PROMPT, prompt_instruct_check, prompt_missing_imports_check
-
-
-# Should create a generic parser for this
-def parse_code(output):
-    python_code = None
-    explain_code = None
-    pattern = r"(?P<code>```python(?P<python>.*?)```)?(?P<explanation>.*?)$"
-    python_code_match = re.search(pattern, output, re.DOTALL)
-    python_code = python_code_match.group("python")
-    explain_code = python_code_match.group("explanation")
-    return python_code, explain_code
+from chains.prompt import CONDENSE_QUESTION_CODE_PROMPT, PROMPT, prompt_missing_imports_check
+from utils.security import analyze_security
+from chains.parser import parse_code
 
 def remove_entrypoint(code):
     lines = code.split('\n')
@@ -60,7 +50,6 @@ class BaseConversationalRetrievalCodeChain(Chain):
 
     combine_docs_chain: BaseCombineDocumentsChain
     question_generator: LLMChain
-    constitutional_chain: LLMChain
     missing_imports_chain: LLMChain
     output_key: List[str] = ["code", "explanation"]
     return_source_documents: bool = False
@@ -93,21 +82,6 @@ class BaseConversationalRetrievalCodeChain(Chain):
         if self.return_generated_question:
             _output_keys = _output_keys + ["generated_question"]
         return _output_keys
-
-    def removes_entrypoint(self, code:str) -> str:
-        if code is None:
-            return code
-        code_to_return = code
-        entrypoint = "if __name__ == '__main__':"
-        if entrypoint in code:
-            pattern = entrypoint + r"(.*?)$"
-            python_code_match = re.search(pattern, code, re.DOTALL)
-            if python_code_match:
-                following_code = python_code_match.group(1)
-                if following_code:
-                    code_to_return.replace(entrypoint, "")
-                    code_to_return.replace(following_code, dedent(following_code))
-        return code_to_return
 
     @abstractmethod
     def _get_docs(
@@ -156,7 +130,7 @@ class BaseConversationalRetrievalCodeChain(Chain):
         is_code_not_safe = False
         if code is not None:
             # Run check code
-            is_code_not_safe = True if self.constitutional_chain.run(code=code) == "1" else False
+            is_code_not_safe = analyze_security(code)
             if not is_code_not_safe:
                 code = remove_entrypoint(code)
                 # Check if imports are missing
@@ -221,7 +195,7 @@ class BaseConversationalRetrievalCodeChain(Chain):
         is_code_not_safe = True
         if code is not None:
             # Run check code
-            is_code_not_safe = True if await self.constitutional_chain.arun(code=code) == "1" else False
+            is_code_not_safe = analyze_security(code)
             # Check if imports are missing
             if not is_code_not_safe:
                 code = remove_entrypoint(code)
@@ -307,7 +281,6 @@ class ConversationalRetrievalCodeChain(BaseConversationalRetrievalCodeChain):
         chain_type: str = "stuff",
         verbose: bool = False,
         condense_question_llm: Optional[BaseLanguageModel] = None,
-        self_critique_llm: Optional[BaseLanguageModel] = None,
         missing_imports_llm: Optional[BaseLanguageModel] = None,
         combine_docs_chain_kwargs: Optional[Dict] = None,
         callbacks: Callbacks = None,
@@ -332,16 +305,12 @@ class ConversationalRetrievalCodeChain(BaseConversationalRetrievalCodeChain):
             callbacks=callbacks,
         )
 
-        _llm_2 = self_critique_llm or llm
-        check_code_chain = LLMChain(llm=_llm_2, prompt=prompt_instruct_check)
-
         _llm_3 = missing_imports_llm or llm
         missing_imports_chain = LLMChain(llm=_llm_3, prompt=prompt_missing_imports_check)
 
         return cls(
             retriever=retriever,
             combine_docs_chain=doc_chain,
-            constitutional_chain=check_code_chain,
             question_generator=condense_question_chain,
             missing_imports_chain=missing_imports_chain,
             callbacks=callbacks,

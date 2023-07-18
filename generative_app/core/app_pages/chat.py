@@ -5,7 +5,7 @@ from streamlit.delta_generator import DeltaGenerator
 import chains.llm as llm
 from auth.auth_connection import AuthSingleton
 from templates.template_app import template_app
-from utils.parser import parse_generated_code
+from utils.parser import parse_current_app
 import ui.chat_init as chat_init
 from chains.llm import parse
 from ui.end_trial import trial_title, thanks, pay, share, download, download_info, no_code
@@ -35,7 +35,10 @@ class ChatBot:
     @staticmethod
     def check_commands(instruction:str) -> CommandResult or None:
         if instruction.startswith("/undo"):
-            if "last_code" not in st.session_state:
+            if "messages" not in st.session_state:
+                return CommandResult.NOTUNDO
+            elif len(st.session_state["messages"]) <= 2:
+                # If only the greetings of the bot and the current command is there we cannot undo
                 return CommandResult.NOTUNDO
             else:
                 return CommandResult.UNDO
@@ -54,17 +57,26 @@ class ChatBot:
             chat_placeholder.error("Nothing to undo")
         if command == CommandResult.UNDO:
             self.apply_code(st.session_state.last_code)
-            st.session_state.messages = st.session_state.messages.popitem()
-            st.session_state.chat_history = st.session_state.chat_history[:-1]
-            chat_placeholder.info("Code reverted. Last instruction ignored by the bot.")
+            # remove the last 4 keys
+            if len(st.session_state.messages) > 1:
+                for _ in range(min(len(st.session_state.messages), 3)):
+                    st.session_state.messages.popitem()
+                self.save_chat_history_to_database()
+            if "chat_history" in st.session_state:
+                if len(st.session_state.chat_history) > 0:
+                    st.session_state.chat_history = st.session_state.chat_history[:-1]
+            st.experimental_rerun()
         if command == CommandResult.RESET:
             with st.spinner("Resetting..."):
                 self.reset_chat()
                 chat_placeholder.info("Code resetted")
                 st.experimental_rerun()
         if command == CommandResult.SAVE:
+            code = parse_current_app(open(self.python_script_path, "r").read())
+            if code is None or code == "pass\n":
+                chat_placeholder.error("No code to save")
+                return
             chat_placeholder.info("Download the file by clicking on the button below.\nYou can then run it with `streamlit run streamlit_app.py`")
-            code = parse_generated_code(open(self.python_script_path, "r").read())
             chat_placeholder.download_button(label="Download app", file_name= "streamlit_app.py",
                                              mime='text/x-python', data=code)
 
@@ -90,7 +102,7 @@ class ChatBot:
         st.markdown(thanks[1 if st.session_state.lang == "fr" else 0])
         st.success(pay[1 if st.session_state.lang == "fr" else 0])
         st.markdown(share[1 if st.session_state.lang == "fr" else 0])
-        code = parse_generated_code(open(self.python_script_path, "r").read())
+        code = parse_current_app(open(self.python_script_path, "r").read())
         if code:
             st.header(download[1 if st.session_state.lang == "fr" else 0])
             c1, c2 = st.columns([1, 0.5])
@@ -115,20 +127,19 @@ class ChatBot:
         # Add saved messages
         st.session_state.messages = self.auth.get_message_history(self.user_id)
 
-        if st.session_state.messages:
-            for _, message in st.session_state.messages.items():
-                with st.chat_message(message["role"]):
-                    if message["role"] == "assistant":
-                        code, explanation = parse(message["content"])
-                        if code is not None:
-                            message = f"```python\n{code}\n```"
-                            ex = st.expander("Code")
-                            ex.code(code)
-                        st.markdown(explanation)
-                    else:
-                        st.markdown(message["content"])
-        else:
+        if not st.session_state.messages:
             self.reset_chat()
+        for _, message in st.session_state.messages.items():
+            with st.chat_message(message["role"]):
+                if message["role"] == "assistant":
+                    code, explanation = parse(message["content"])
+                    if code is not None:
+                        message = f"```python\n{code}\n```"
+                        ex = st.expander("Code")
+                        ex.code(code)
+                    st.markdown(explanation)
+                else:
+                    st.markdown(message["content"])
 
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
@@ -181,6 +192,7 @@ class ChatBot:
                         message = f"```python\n{code}\n```"
                         if not security_rules_offended:
                             self.apply_code(code)
+                    message += explanation
                     container = current_assistant_message_placeholder.container()
                     ex = container.expander("Code")
                     ex.code(code)

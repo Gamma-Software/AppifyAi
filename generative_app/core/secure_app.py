@@ -8,10 +8,9 @@ from app_pages.user_guide import UserGuide
 import sidebar
 from version import VERSION
 
-import sys
 import os
 import re
-from utils.parser import parse_generated_code
+from utils.parser import parse_current_app
 from templates.template_app import template_app
 from auth.auth_connection import AuthSingleton
 
@@ -143,7 +142,7 @@ if __name__ == '__main__':
         if curr_app == f"{username} - Generated App":
             #  Current code
             with open(path_to_script, "r") as app_file:
-                current_code = parse_generated_code(app_file.read())
+                current_code = parse_current_app(app_file.read())
 
             code_generated = auth.get_code(user_access_level)
             if code_generated is not None:
