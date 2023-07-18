@@ -152,6 +152,7 @@ The chatbot will interpret these instructions, generate the corresponding Python
 - [x] Crypt the user password
 - [x] Add prompt tries
 - [x] Security measures check of inputs
+- [ ] Add welcome page
 - [ ] Be able to undo multiple instrutions
 - [ ] Add admin administration
 - [ ] Do a tutorial on how to use the bot and iteract with it

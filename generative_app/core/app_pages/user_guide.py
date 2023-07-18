@@ -18,21 +18,19 @@ class UserGuide(HydraHeadApp):
         self.title = title
 
     def run(self) -> None:
-        st.markdown("<h1 style='text-align: center;'>User Guide</h1>", unsafe_allow_html=True)
-        st.write("This page showcase the elements ChatbotX can display. It will help you better interact with the bot by using the correct words it'll understand.")
+        user_guide_tab, demo_tab = st.tabs(["User Guide", "Demonstrations"])
+        with user_guide_tab:
+            st.write("This page showcase the elements ChatbotX can display. It will help you better interact with the bot by using the correct words it'll understand.")
 
+            with st.expander("Text elements"):
+                st.header("This is a header")
+                st.subheader("This is a subheader")
 
-        with st.expander("Text elements"):
-            st.header("This is a header")
-            st.subheader("This is a subheader")
+            st.info("Section is construction...")
 
-        st.info("Section is construction...")
-
-
-        st.divider()
-        with st.expander("Video demo interacting with ChatbotX"):
-            # Check if the user is already logged in
-            st.title("Camera input demo")
-            st.video("demo/camera_input_demo.mov")
-            st.title("Data stats")
-            st.video("demo/complex_example.mov")
+        with demo_tab:
+            with st.expander("Camera input demo"):
+                # Check if the user is already logged in
+                st.video("demo/camera_input_demo.mov")
+            with st.expander("Data stats"):
+                st.video("demo/complex_example.mov")
