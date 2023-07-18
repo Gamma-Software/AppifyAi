@@ -1,6 +1,7 @@
 .streamlit/secrets.toml
 .doc_db
 generative_app/sandboxes/**/*
+!generative_app/sandboxes/__init__.py
 .streamlit/docker_secrets.toml
 .streamlit/secrets_cloud.toml
 .config

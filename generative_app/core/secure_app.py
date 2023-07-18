@@ -8,6 +8,11 @@ from app_pages.demo_app import DemoApp
 import sidebar
 from version import VERSION
 
+import sys
+import os
+import re
+from utils.parser import parse_generated_code
+from templates.template_app import template_app
 from auth.auth_connection import AuthSingleton
 
 import streamlit as st
@@ -97,12 +102,23 @@ if __name__ == '__main__':
 
     # If the menu is cluttered, just rearrange it into sections!
     # completely optional, but if you have too many entries, you can make it nicer by using accordian menus
+    path_to_script = ""
     if user_access_level > 0:
         sandboxe_name = "_".join([username, str(user_access_level)])
+
         import importlib
+        path_to_script = os.path.join(os.getcwd(), 'generative_app', 'sandboxes', f"{sandboxe_name}.py")
+
+        spec = importlib.util.spec_from_file_location(f"{username}_{user_access_level}", path_to_script)
+        foo = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(foo)
+        app_to_add = foo.App("Generated App")
+
+        #if path not in sys.path:
+        #    sys.path.append(path)
+        #print(sys.path)
         title =  f"{username} - Generated App"
-        app_to_add = importlib.import_module(f"sandboxes.{sandboxe_name}").App("Generated App")
-        path_to_script = f"generative_app/sandboxes/{sandboxe_name}.py"
+        #app_to_add = importlib.import_module(f"{sandboxe_name}", "../..").App("Generated App")
 
         #add all your application classes here
         app.add_app("ChatbotX", icon="💬", app=ChatBotApp(title="ChatbotX", generative_app_path=path_to_script))
@@ -127,9 +143,26 @@ if __name__ == '__main__':
     #print user movements and current login details used by Hydralit
     #---------------------------------------------------------------------
     # user_access_level, username = app.check_access()
-    # prev_app, curr_app = app.get_nav_transition()
-    # print(prev_app,'- >', curr_app)
     # print(int(user_access_level),'- >', username)
+
+    prev_app, curr_app = app.get_nav_transition()
+    print(prev_app,'- >', curr_app)
+    if path_to_script != "":
+        if curr_app == f"{username} - Generated App":
+            #  Current code
+            with open(path_to_script, "r") as app_file:
+                current_code = parse_generated_code(app_file.read())
+
+            code_generated = auth.get_code(user_access_level)
+            if code_generated is not None:
+                if current_code.split() != code_generated.split():
+                    print("Applying generated code...")
+                    with st.spinner("Applying generated code..."):
+                        with open(path_to_script, "w") as app_file:
+                            # Indent code
+                            code_generated = re.sub(r"^", " " * 8, code_generated, flags=re.MULTILINE)
+                            app_file.write(template_app.format(code=code_generated))
+                        # Reload app
+                        st.experimental_rerun()
     # print('Other Nav after: ',app.session_state.other_nav_app)
     #---------------------------------------------------------------------
-
