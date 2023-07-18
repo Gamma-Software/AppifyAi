@@ -175,4 +175,6 @@ if __name__ == "__main__":
         print("Or you are missing the mode 'docker' or 'local'.")
         exit(1)
     openai_api_key = sys.argv[1]
-    generate_retriever(openai_api_key, mode=sys.argv[2])
+    generate_retriever(openai_api_key, mode=sys.argv[2],
+                       chroma_server_host=st.secrets["chroma"]["host"],
+                       chroma_server_port=st.secrets["chroma"]["port"])

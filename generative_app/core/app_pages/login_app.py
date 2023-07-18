@@ -122,7 +122,7 @@ class LoginApp(HydraHeadApp):
 
     def seed_sandbox(self, level, username):
         # Check if the sandbox exists
-        sandboxes_path = Path(__file__).parent.parent / 'sandboxes'
+        sandboxes_path = Path(__file__).parent.parent.parent / 'sandboxes'
         template_sandbox_app = Path(__file__).parent.parent / 'templates' / 'app.py'
         sandbox_user_path = sandboxes_path / f"{username}_{level}.py"
         if sandboxes_path.exists():
@@ -135,14 +135,11 @@ class LoginApp(HydraHeadApp):
                 # Check if the sandbox is not in error
                 try:
                     with st.spinner("Importing sandbox..."):
-                        sandboxe_name = "_".join([username, str(level)])
-
-                        path = os.path.join(os.getcwd(), 'generative_app', 'sandboxes', f"{sandboxe_name}.py")
-                        if path not in sys.path:
-                            sys.path.append(path)
                         import importlib
-                        _ = importlib.import_module(f"{sandboxe_name}", "../..").App("Generated App")
-                except:
+                        spec = importlib.util.spec_from_file_location(f"{username}_{level}", sandbox_user_path)
+                        module = importlib.util.module_from_spec(spec)
+                        spec.loader.exec_module(module)
+                except FileNotFoundError:
                     with st.spinner("Sandbox needs to be recreated..."):
                         time.sleep(2)
                         # Delete the sandbox file
