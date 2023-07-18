@@ -153,6 +153,7 @@ The chatbot will interpret these instructions, generate the corresponding Python
 - [x] Add prompt tries
 - [x] Security measures check of inputs
 - [ ] Be able to undo multiple instrutions
+- [ ] Add admin administration
 - [ ] Do a tutorial on how to use the bot and iteract with it
 - [ ] Compile the generated code into a executable binary for cross platform compatibility
 - [ ] Add page when we can build the app together with the chatbot
