@@ -154,6 +154,8 @@ The chatbot will interpret these instructions, generate the corresponding Python
 - [x] Add prompt tries
 - [x] Security measures check of inputs
 - [x] Add welcome page
+- [ ] Do a pylint check on the generated app and give it to the bot to fix some errors
+- [ ] Add an agent that can better interact with the user
 - [ ] Be able to undo multiple instrutions
 - [ ] Add admin administration
 - [ ] Do a tutorial on how to use the bot and iteract with it
