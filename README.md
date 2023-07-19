@@ -157,6 +157,7 @@ The chatbot will interpret these instructions, generate the corresponding Python
 - [ ] Be able to undo multiple instrutions
 - [ ] Add admin administration
 - [ ] Do a tutorial on how to use the bot and iteract with it
+- [ ] Do a tutorial on how to serve the generated app (locally and on a server)
 - [ ] Compile the generated code into a executable binary for cross platform compatibility
 - [ ] Add page when we can build the app together with the chatbot
 - [ ] Add page where we can instruct the bot to build the app and see the changes live
