@@ -33,6 +33,9 @@ class About(HydraHeadApp):
             st.markdown(about)
 
         with demo_tab:
+            with st.expander("Simple conversation"):
+                st.write("This is a simple conversation showcasing the bot history capabilities. The bot understands the context of the conversation and can better interact with you and what you are thinking.")
+                st.image("demo/simple_conversation.png")
             with st.expander("Camera input demo"):
                 # Check if the user is already logged in
                 st.video("demo/camera_input_demo.mov")
