@@ -156,6 +156,8 @@ The chatbot will interpret these instructions, generate the corresponding Python
 - [x] Add welcome page
 - [ ] Do a pylint check on the generated app and give it to the bot to fix some errors
 - [ ] Add an agent that can better interact with the user
+  - [ ] Implement code snippets for the bot to reuse it
+  - [ ] Give the bot the possibility to check out the streamlit discussion space for ideas
 - [ ] Be able to undo multiple instrutions
 - [ ] Add admin administration
 - [ ] Do a tutorial on how to use the bot and iteract with it
