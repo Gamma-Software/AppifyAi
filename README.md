@@ -149,10 +149,11 @@ The chatbot will interpret these instructions, generate the corresponding Python
 - [x] Add commands to /undo, /reset, /save
 - [x] Embed in vector stores the up to date documentation of Streamlit https://github.com/streamlit/docs/tree/main/content and Langchain (and other libraries)
 - [x] Create login and register pages
+- [x] Dockerize it all
 - [x] Crypt the user password
 - [x] Add prompt tries
 - [x] Security measures check of inputs
-- [ ] Add welcome page
+- [x] Add welcome page
 - [ ] Be able to undo multiple instrutions
 - [ ] Add admin administration
 - [ ] Do a tutorial on how to use the bot and iteract with it
@@ -161,7 +162,6 @@ The chatbot will interpret these instructions, generate the corresponding Python
 - [ ] Add page where we can instruct the bot to build the app and see the changes live
 - [ ] Add command to upload a file in order to use it in the generated app (and the bot will know that the file exists and have its filepath)
 - [ ] Add a voice assistant (text to speech and speech to text)
-- [ ] Add a page to show the documentation of the app
 - [ ] Automate the installation of more libraries
 - [ ] Check confusing instructions and give the chatbot the possibility to improve the instruction of the user and he will need to valide the new instruction.
 
