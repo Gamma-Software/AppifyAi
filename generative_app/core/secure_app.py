@@ -2,6 +2,7 @@ from hydralit import HydraApp
 
 from app_pages.login_app import LoginApp
 from app_pages.signup import SignUpApp
+from app_pages.about import About
 from app_pages.chatbotx import ChatBotApp
 from app_pages.load_app import LoadingApp
 from app_pages.user_guide import UserGuide
@@ -64,6 +65,7 @@ if __name__ == '__main__':
 
     #we want to have secure access for this HydraApp, so we provide a login application
     #optional logout label, can be blank for something nicer!
+    app.add_app("About", About(title='About'), is_unsecure=True)
     app.add_app("Logout", LoginApp(title='Login'), is_home=True, is_login=True)
     app.add_app("User Guide", UserGuide(title='User Guide'), icon="📜", is_unsecure=True)
     app.add_app("Signup", icon="🛰️", app=SignUpApp(title='Signup'), is_unsecure=True)
@@ -94,7 +96,11 @@ if __name__ == '__main__':
     # If the menu is cluttered, just rearrange it into sections!
     # completely optional, but if you have too many entries, you can make it nicer by using accordian menus
     path_to_script = ""
-    if user_access_level > 0:
+    if user_access_level == 1:
+        complex_nav = {
+            'About': ['About']
+        }
+    elif user_access_level > 0:
         sandboxe_name = "_".join([username, str(user_access_level)])
 
         # Dynamically import the sandbox

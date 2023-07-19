@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Catch phrase at first
 - secrets for tries
 - Now you can quickly login and signup when enter is pressed
+- About page
 
 ## [1.3.0] - 2023-07-19
 

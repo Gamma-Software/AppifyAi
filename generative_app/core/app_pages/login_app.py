@@ -40,7 +40,7 @@ class LoginApp(HydraHeadApp):
             self.redirect_after_login(user_id, self.auth.get_username_from_id(user_id))
 
         st.markdown("<h1 style='text-align: center;'>Login to ChatbotX</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center;'>Empower Your Ideas, Build Web Apps with ChatbotX</p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center;'>Your Personal Assistant for Web Application Development</p>", unsafe_allow_html=True)
 
         _,c2,_ = st.columns([2,2,2])
         c2.divider()
@@ -100,6 +100,13 @@ class LoginApp(HydraHeadApp):
         if parent_container.button('Sign Up',key='signupbtn'):
             # set access level to a negative number to allow a kick to the unsecure_app set in the parent
             self.set_access(-1, 'guest')
+
+            #Do the kick to the signup app
+            self.do_redirect()
+
+        if parent_container.button('What is ChatbotX ?'):
+            # set access level to a negative number to allow a kick to the unsecure_app set in the parent
+            self.set_access(1, 'guest')
 
             #Do the kick to the signup app
             self.do_redirect()

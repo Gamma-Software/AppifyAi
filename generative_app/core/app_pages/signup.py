@@ -26,7 +26,7 @@ class SignUpApp(HydraHeadApp):
 
         """
 
-        st.markdown("<h1 style='text-align: center;'>Signup to ChatbotX💫</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center;'>Signup to ChatbotX</h1>", unsafe_allow_html=True)
 
         pretty_btn = """
         <style>
