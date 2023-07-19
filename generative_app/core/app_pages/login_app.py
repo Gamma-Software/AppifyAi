@@ -9,6 +9,7 @@ from auth.auth_connection import AuthSingleton
 import ui.chat_init as chat_init
 from hydralit import HydraHeadApp
 from streamlit.delta_generator import DeltaGenerator
+import streamlit.components.v1 as components
 
 
 class LoginApp(HydraHeadApp):
@@ -71,6 +72,26 @@ class LoginApp(HydraHeadApp):
         form_state['username'] = login_form.text_input('Username')
         form_state['password'] = login_form.text_input('Password',type="password")
         form_state['submitted'] = login_form.form_submit_button('Login')
+
+        # Add the javascript to submit the form on enter
+        components.html(
+            """
+        <script>
+        const doc = window.parent.document;
+        buttons = Array.from(doc.querySelectorAll('button[kind=secondaryFormSubmit]'));
+        const submit = buttons.find(el => el.innerText === 'Login');
+
+        doc.addEventListener('keydown', function(e) {
+            switch (e.keyCode) {
+                case 13: // (37 = enter)
+                    submit.click();
+            }
+        });
+        </script>
+        """,
+            height=0,
+            width=0,
+        )
 
         #parent_container.markdown("<p style='text-align: center;'>Guest login -> joe & joe</p>", unsafe_allow_html=True)
 

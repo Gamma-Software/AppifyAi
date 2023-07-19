@@ -5,6 +5,7 @@ from typing import Dict
 from auth.auth_connection import AuthSingleton
 import streamlit as st
 from hydralit import HydraHeadApp
+import streamlit.components.v1 as components
 
 
 class SignUpApp(HydraHeadApp):
@@ -68,6 +69,27 @@ class SignUpApp(HydraHeadApp):
         form_state['password2'] = login_form.text_input('Confirm Password',type="password")
         form_state['email'] = login_form.text_input('email')
         form_state['submitted'] = login_form.form_submit_button('Sign Up')
+
+
+        # Add the javascript to submit the form on enter
+        components.html(
+            """
+        <script>
+        const doc = window.parent.document;
+        buttons = Array.from(doc.querySelectorAll('button[kind=secondaryFormSubmit]'));
+        const submit = buttons.find(el => el.innerText === 'Login');
+
+        doc.addEventListener('keydown', function(e) {
+            switch (e.keyCode) {
+                case 13: // (37 = enter)
+                    submit.click();
+            }
+        });
+        </script>
+        """,
+            height=0,
+            width=0,
+        )
 
         if parent_container.button('Login',key='loginbtn'):
             # set access level to a negative number to allow a kick to the unsecure_app set in the parent
