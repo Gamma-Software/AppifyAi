@@ -152,7 +152,7 @@ class ChatBot:
         # Setup user input
         if instruction := st.chat_input(f"Tell me what to do, or ask me a question"):
             if self.user_role == "guest":
-                tries_left = 5 - st.session_state.tries
+                tries_left = st.secrets["tries"] - st.session_state.tries
                 if tries_left <= 0:
                     print("end of trial")
                     st.experimental_rerun()
@@ -201,7 +201,7 @@ class ChatBot:
                         container.warning("Your instruction does not comply with our security measures (code generated will not be populated). See the docs for more information.")
                     if self.user_role == "guest":
                         st.session_state.tries = self.auth.increment_tries(self.user_id)
-                        tries_left = 5 - st.session_state.tries
+                        tries_left = st.secrets["tries"] - st.session_state.tries
                         if tries_left == 0:
                             container.error("You have 0 try left.")
                         elif tries_left == 1:
@@ -214,7 +214,7 @@ class ChatBot:
 
     def check_tries_exceeded(self) -> bool:
         tries = self.auth.get_tries(self.user_id)
-        if tries < 5:
+        if tries < st.secrets["tries"]:
             return False
         return True
 

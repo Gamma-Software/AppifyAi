@@ -39,9 +39,11 @@ class LoginApp(HydraHeadApp):
             print("Auto login detected of user_id: ", user_id)
             self.redirect_after_login(user_id, self.auth.get_username_from_id(user_id))
 
-        st.markdown("<h1 style='text-align: center;'>Login to ChatbotX 💫</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center;'>Login to ChatbotX</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center;'>Empower Your Ideas, Build Web Apps with ChatbotX</p>", unsafe_allow_html=True)
 
         _,c2,_ = st.columns([2,2,2])
+        c2.divider()
 
         form_data, login_message_placeholder = self._create_login_form(c2)
 
