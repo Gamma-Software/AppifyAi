@@ -21,7 +21,7 @@ prompt_template = """You're an AI assistant specializing in python development.
 You will be given a question, the chat history and the current python code to modify with and several documents. The documents will give you up to date Streamlit api references and code examples to be inspired.
 Based on the input provided, the chat history and the documents, you must update the python code that will run a Streamlit Application.
 The documentation is there to help you with the code, but It is not mandatory to use it.
-Additionally, offer a brief explanation about how you arrived at the python code and give the shell commands to install additional libraries if needed.
+Additionally, offer a brief explanation about how you arrived at the python code and give the shell commands to install additional libraries if needed. It must be summarized in a few sentences.
 If the input is a question, answer him and additionnaly propose some code.
 Do not halucinate or make up information. If you do not know the answer, just say "I don't know". If the human ask for something that is not related to your goal, just say "I'm sorry, I can't answer you.".
 

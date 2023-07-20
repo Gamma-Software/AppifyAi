@@ -163,6 +163,7 @@ For now the bot is capable of simple Web Apps. It can't create complex Web Apps 
   - [ ] Implement code snippets for the bot to reuse it
   - [ ] Give the bot the possibility to check out the streamlit discussion space for ideas
 - [ ] Be able to undo multiple instrutions
+- [ ] User could tell the bot to generate an other version of the last instruction
 - [ ] Add admin administration
 - [ ] Do a tutorial on how to use the bot and iteract with it
 - [ ] Do a tutorial on how to serve the generated app (locally and on a server)
