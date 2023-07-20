@@ -39,7 +39,7 @@ class LoginApp(HydraHeadApp):
             print("Auto login detected of user_id: ", user_id)
             self.redirect_after_login(user_id, self.auth.get_username_from_id(user_id))
 
-        st.markdown("<h1 style='text-align: center;'>Login to ChatbotX</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center;'>Login to AppifyAi</h1>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: center;'>Your Personal Assistant for Web Application Development</p>", unsafe_allow_html=True)
 
         _,c2,_ = st.columns([2,2,2])
@@ -104,7 +104,7 @@ class LoginApp(HydraHeadApp):
             #Do the kick to the signup app
             self.do_redirect()
 
-        if parent_container.button('What is ChatbotX ?'):
+        if parent_container.button('What is AppifyAi ?'):
             # set access level to a negative number to allow a kick to the unsecure_app set in the parent
             self.set_access(1, 'guest')
 

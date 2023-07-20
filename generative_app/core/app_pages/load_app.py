@@ -18,11 +18,11 @@ class LoadingApp(HydraHeadApp):
         if hasattr(app_target,'title'):
             app_title = app_target.title
 
-            if app_title == 'ChatbotX':
+            if app_title == 'AppifyAi':
                 try:
                     app_target.run()
                 except Exception as e:
-                    st.error('An error has occurred, please report it here https://github.com/Gamma-Software/ChatbotX/issues (add screenshot and error details)')
+                    st.error('An error has occurred, please report it here https://github.com/Gamma-Software/AppifyAi/issues (add screenshot and error details)')
                     st.code(traceback.format_exc())
             else:
                 try:

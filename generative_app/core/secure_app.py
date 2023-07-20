@@ -3,7 +3,7 @@ from hydralit import HydraApp
 from app_pages.login_app import LoginApp
 from app_pages.signup import SignUpApp
 from app_pages.about import About
-from app_pages.chatbotx import ChatBotApp
+from app_pages.AppifyAi import ChatBotApp
 from app_pages.load_app import LoadingApp
 from app_pages.user_guide import UserGuide
 import sidebar
@@ -19,14 +19,14 @@ import streamlit as st
 
 #Only need to set these here as we are add controls outside of Hydralit, to customise a run Hydralit!
 st.set_page_config(
-    page_title="ChatbotX",
+    page_title="AppifyAi",
     #page_icon="🤖",
     layout="wide",
     initial_sidebar_state=sidebar.sidebar_init_state,
     menu_items={
-        "Report a bug": "https://github.com/Gamma-Software/ChatbotX/issues",
+        "Report a bug": "https://github.com/Gamma-Software/AppifyAi/issues",
         "About": f"""
-            # ChatbotX - {VERSION}
+            # AppifyAi - {VERSION}
             Transform conversations into stunning web apps. Dynamic code generation + intuitive interface. Unleash your creativity effortlessly. Use the power of GPT OpenAI LLM and Langchain.
 
             # Author
@@ -38,7 +38,7 @@ st.set_page_config(
             - Upload files
             - Execute any files or commands based on user input
 
-            Go to the GitHub repo to learn more about the project. https://github.com/Gamma-Software/ChatbotX
+            Go to the GitHub repo to learn more about the project. https://github.com/Gamma-Software/AppifyAi
             """,
     },
 )
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     over_theme = {'txc_inactive': '#FFFFFF','menu_background':'#26272f','txc_active':'white','option_active':'#3e404f'}
     #this is the host application, we add children to it and that's it!
     app = HydraApp(
-        title='ChatBotX',
+        title='AppifyAi',
         favicon="🤖",
         #hide_streamlit_markers=hide_st,
         #add a nice banner, this banner has been defined as 5 sections with spacing defined by the banner_spacing array below.
@@ -118,12 +118,12 @@ if __name__ == '__main__':
         #app_to_add = importlib.import_module(f"{sandboxe_name}", "../..").App("Generated App")
 
         #add all your application classes here
-        app.add_app("ChatbotX", icon="💬", app=ChatBotApp(title="ChatbotX", generative_app_path=path_to_script))
+        app.add_app("AppifyAi", icon="💬", app=ChatBotApp(title="AppifyAi", generative_app_path=path_to_script))
 
         #add all your application classes here
         app.add_app(title, icon="💫", app=app_to_add)
         complex_nav = {
-            'ChatbotX': ['ChatbotX'],
+            'AppifyAi': ['AppifyAi'],
         }
         complex_nav.update({title: [title]})
         complex_nav.update({'User Guide': ['User Guide']})

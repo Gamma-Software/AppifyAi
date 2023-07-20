@@ -1,6 +1,6 @@
 ## Instructions Examples
 
-Tell ChatbotX the following instructions:
+Tell AppifyAi the following instructions:
 
 Simple instructions:
 - Add a title with the text 'Hello World' and a subtitle with the text 'This is my first Streamlit application'.

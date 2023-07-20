@@ -20,7 +20,7 @@ class UserGuide(HydraHeadApp):
     def run(self) -> None:
         user_guide_tab, demo_tab = st.tabs(["User Guide", "Demonstrations"])
         with user_guide_tab:
-            st.write("This page showcase the elements ChatbotX can display. It will help you better interact with the bot by using the correct words it'll understand.")
+            st.write("This page showcase the elements AppifyAi can display. It will help you better interact with the bot by using the correct words it'll understand.")
 
             with st.expander("Text elements"):
                 st.header("This is a header")

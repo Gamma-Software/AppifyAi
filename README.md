@@ -1,38 +1,38 @@
-# 🤖 ChatbotX
+# 🤖 AppifyAi
 
-Welcome to ChatbotX, an innovative project that brings together the power of natural language processing and dynamic web application generation. ChatbotX is your personal assistant that can transform your instructions into fully functional and interactive web applications with just a conversation.
+Welcome to AppifyAi, an innovative project that brings together the power of natural language processing and dynamic web application generation. AppifyAi is your personal assistant that can transform your instructions into fully functional and interactive web applications with just a conversation.
 
 <details>
   <summary>Click me for more</summary>
 
 ## Unleash the Power of Conversational Programming
 
-With ChatbotX, you don't need to be a coding expert to create stunning web applications. Simply engage in a conversation with our intelligent chatbot, express your vision, and watch as the magic happens. Our cutting-edge natural language processing engine comprehends your instructions with remarkable accuracy, ensuring a seamless user experience.
+With AppifyAi, you don't need to be a coding expert to create stunning web applications. Simply engage in a conversation with our intelligent chatbot, express your vision, and watch as the magic happens. Our cutting-edge natural language processing engine comprehends your instructions with remarkable accuracy, ensuring a seamless user experience.
 
 ## Dynamic Code Generation, Instant Web Applications
 
-ChatbotX's intelligent core generates high-quality Python code snippets on the fly, tailored to your exact specifications. Through the fusion of your creativity and our advanced algorithms, you'll witness the birth of captivating visualizations, intuitive interfaces, and dynamic functionality. No need to fiddle with complex frameworks or wrestle with tedious coding – ChatbotX handles it all for you.
+AppifyAi's intelligent core generates high-quality Python code snippets on the fly, tailored to your exact specifications. Through the fusion of your creativity and our advanced algorithms, you'll witness the birth of captivating visualizations, intuitive interfaces, and dynamic functionality. No need to fiddle with complex frameworks or wrestle with tedious coding – AppifyAi handles it all for you.
 
 ## Streamlit: The Gateway to Web App Excellence
 
-We have chosen Streamlit, the beloved Python library, as the foundation for our web applications. With Streamlit's simplicity and elegance, your creations come to life effortlessly. Seamlessly integrated with ChatbotX, Streamlit ensures that your applications are not only visually stunning but also highly interactive, providing an immersive experience for your users.
+We have chosen Streamlit, the beloved Python library, as the foundation for our web applications. With Streamlit's simplicity and elegance, your creations come to life effortlessly. Seamlessly integrated with AppifyAi, Streamlit ensures that your applications are not only visually stunning but also highly interactive, providing an immersive experience for your users.
 
 ## Let Your Imagination Soar
 
-ChatbotX is the ultimate tool for unleashing your creativity. Whether you want to build captivating data visualizations, develop intuitive dashboards, or create innovative machine learning applications, ChatbotX is your steadfast companion. It adapts to your needs, guides you through the process, and transforms your ideas into reality.
+AppifyAi is the ultimate tool for unleashing your creativity. Whether you want to build captivating data visualizations, develop intuitive dashboards, or create innovative machine learning applications, AppifyAi is your steadfast companion. It adapts to your needs, guides you through the process, and transforms your ideas into reality.
 
-## Join the ChatbotX Revolution
+## Join the AppifyAi Revolution
 
-Become a part of the ChatbotX revolution and redefine the way web applications are built. Collaborate with fellow developers, share your creations, and inspire others. Your contributions make a difference, shaping the future of intelligent conversational programming.
+Become a part of the AppifyAi revolution and redefine the way web applications are built. Collaborate with fellow developers, share your creations, and inspire others. Your contributions make a difference, shaping the future of intelligent conversational programming.
 </details>
 
 ## Demo
 
-https://github.com/Gamma-Software/ChatbotX/assets/6960910/d34206e1-90cf-4408-b7c9-932d745ed96d
+https://github.com/Gamma-Software/AppifyAi/assets/6960910/d34206e1-90cf-4408-b7c9-932d745ed96d
 
-https://github.com/Gamma-Software/ChatbotX/assets/6960910/0360af37-23c7-49e1-8794-1d035435a13f
+https://github.com/Gamma-Software/AppifyAi/assets/6960910/0360af37-23c7-49e1-8794-1d035435a13f
 
-https://github.com/Gamma-Software/ChatbotX/assets/6960910/b6addffd-023d-4252-8a40-54259ce88f6b
+https://github.com/Gamma-Software/AppifyAi/assets/6960910/b6addffd-023d-4252-8a40-54259ce88f6b
 
 Here is a simple conversation with the chatbot:
 ![Simple conversation](demo/simple_conversation.png)
@@ -40,7 +40,7 @@ Here is a simple conversation with the chatbot:
 When you enter instructions that may compromise the application security, the chatbot will warn you and not apply the generated code:
 ![Security Compromised](demo/security_compomised.png)
 
-## Why using ChatbotX ?
+## Why using AppifyAi ?
 
 - Creativity and Flexibility: You can express your ideas in a natural way and the chatbot will generate the corresponding code. You can also ask him to be creative and let you surprise.
 - Rapid Prototyping: The chatbot enables users to quickly prototype web applications without the need for coding.
@@ -114,7 +114,7 @@ See the documentation for more details: [Doc](https://docs.streamlit.io/library/
 
 #### Usage Examples
 
-Tell ChatbotX the following instructions:
+Tell AppifyAi the following instructions:
 
 Simple instructions:
 - "Add a title with the text 'Hello World' and a subtitle with the text 'This is my first Streamlit application'."

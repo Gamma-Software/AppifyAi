@@ -26,7 +26,7 @@ class About(HydraHeadApp):
             #Do the kick to the signup app
             self.do_redirect()
 
-        user_guide_tab, demo_tab, dev = st.tabs(["What is ChatbotX ?", "Demonstrations", "More about the developer"])
+        user_guide_tab, demo_tab, dev = st.tabs(["What is AppifyAi ?", "Demonstrations", "More about the developer"])
         with user_guide_tab:
             with open(os.path.join(os.getcwd(), f"generative_app/core/ui/{st.session_state.lang}/about.md"), "r") as about_file:
                 about = about_file.read()
