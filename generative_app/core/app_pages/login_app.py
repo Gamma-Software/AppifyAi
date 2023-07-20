@@ -178,9 +178,13 @@ class LoginApp(HydraHeadApp):
                         module = importlib.util.module_from_spec(spec)
                         spec.loader.exec_module(module)
                 except BaseException:
-                    self.reset_sandbox(level, username)
+                    self.reset_sandbox(
+                        level, username, template_sandbox_app, sandbox_user_path
+                    )
                 except FileNotFoundError:
-                    self.reset_sandbox(level, username)
+                    self.reset_sandbox(
+                        level, username, template_sandbox_app, sandbox_user_path
+                    )
 
         def reset_sandbox(
             self, level, username, template_sandbox_app, sandbox_user_path
