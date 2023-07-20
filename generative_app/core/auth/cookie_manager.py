@@ -1,6 +1,7 @@
 import extra_streamlit_components as stx
 import uuid
 
+
 class CookieManager:
     def __init__(self):
         self._manager = stx.CookieManager(key=str(uuid.uuid4()))

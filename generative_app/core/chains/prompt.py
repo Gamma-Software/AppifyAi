@@ -1,6 +1,6 @@
 from langchain.prompts.prompt import PromptTemplate
 
-_template ="""You're an AI assistant specializing in python development. You know how to create Streamlit Applications.
+_template = """You're an AI assistant specializing in python development. You know how to create Streamlit Applications.
 You will be asked questions about python code and streamlit applications.
 Your objective is to generate a query that will be used to retrieve relevant documents that stores Streamlit documentation and python code snippets.
 The query must be in a form of suite of words in english related to the context. If you think that the query is not relevant, just say "None".
@@ -10,7 +10,7 @@ Follow Up Input: How to display a button and a title ?
 Query: button title
 
 Follow Up Input: {question}
-Query:"""
+Query:"""  # noqa: E501
 
 CONDENSE_QUESTION_CODE_PROMPT = PromptTemplate(
     template=_template, input_variables=["question"]
@@ -89,10 +89,11 @@ That's not the point of this exercise. Please refocus, I'm here to help you crea
 
 
 Question: {question}
-Answer:"""
+Answer:"""  # noqa: E501
 
 PROMPT = PromptTemplate(
-    template=prompt_template, input_variables=["python_code", "chat_history", "context", "question"]
+    template=prompt_template,
+    input_variables=["python_code", "chat_history", "context", "question"],
 )
 
 prompt_instruct_check_template = """
@@ -120,7 +121,7 @@ output: 0
 
 code:
 {code}
-output:"""
+output:"""  # noqa: E501
 prompt_instruct_check = PromptTemplate.from_template(prompt_instruct_check_template)
 
 prompt_missing_imports_check_template = """
@@ -143,5 +144,7 @@ output:None
 
 code:
 {code}
-output:"""
-prompt_missing_imports_check = PromptTemplate.from_template(prompt_missing_imports_check_template)
+output:"""  # noqa: E501
+prompt_missing_imports_check = PromptTemplate.from_template(
+    prompt_missing_imports_check_template
+)

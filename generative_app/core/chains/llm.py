@@ -1,11 +1,12 @@
-import time
+import os
+import re
+from uuid import UUID
+from typing import Any, Dict, List, Optional, Union
+
+import asyncio
 import langchain
-from langchain.schema.messages import BaseMessage
 import streamlit as st
-langchain.debug = st.secrets["langchain"]["debug"]
-from langchain.prompts import PromptTemplate
-from langchain.prompts.prompt import PromptTemplate
-from langchain.chains import LLMChain
+
 from langchain.schema import LLMResult
 from langchain.chat_models import ChatOpenAI
 from langchain.agents import Tool
@@ -16,20 +17,15 @@ from langchain.agents import initialize_agent
 from langchain.memory import ConversationBufferMemory
 from langchain.callbacks.base import AsyncCallbackHandler, BaseCallbackHandler
 
-import asyncio
-from uuid import UUID
-from typing import Any, Dict, List, Optional, Union
-import os
-import re
-
 from streamlit.delta_generator import DeltaGenerator
-import streamlit as st
 
-import chains.doc_retriever as doc_retriever
+from chains import doc_retriever
 from chains.conversational_retrieval_over_code import ConversationalRetrievalCodeChain
 from chains.parser import parse_code
 
-python_script = os.path.join(os.getcwd() , "langchain" ,"generated_script.py")
+langchain.debug = st.secrets["langchain"]["debug"]
+
+python_script = os.path.join(os.getcwd(), "langchain", "generated_script.py")
 
 
 class AsyncHandler(AsyncCallbackHandler):
@@ -46,7 +42,6 @@ class AsyncHandler(AsyncCallbackHandler):
         self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any
     ) -> None:
         """Run when chain starts running."""
-        class_name = serialized["name"]
         message = ""
         for chunk in "⌛Processing".split():
             message += chunk + " "
@@ -102,9 +97,25 @@ class Handler(BaseCallbackHandler):
         self.code_extracted = False
         self.full_response = ""
 
-    def on_chain_start(self, serialized: Dict[str, Any], inputs: Dict[str, Any], *, run_id: UUID, parent_run_id: Union[UUID, None] = None, tags: Union[List[str], None] = None, **kwargs: Any) -> Any:
+    def on_chain_start(
+        self,
+        serialized: Dict[str, Any],
+        inputs: Dict[str, Any],
+        *,
+        run_id: UUID,
+        parent_run_id: Union[UUID, None] = None,
+        tags: Union[List[str], None] = None,
+        **kwargs: Any,
+    ) -> Any:
         """Run when chain starts running."""
-        return super().on_chain_start(serialized, inputs, run_id=run_id, parent_run_id=parent_run_id, tags=tags, **kwargs)
+        return super().on_chain_start(
+            serialized,
+            inputs,
+            run_id=run_id,
+            parent_run_id=parent_run_id,
+            tags=tags,
+            **kwargs,
+        )
 
     def on_llm_new_token(
         self,
@@ -139,78 +150,142 @@ class Handler(BaseCallbackHandler):
             if message != "":
                 # Add a blinking cursor to simulate typing
                 self.message_placeholder.markdown(message + "▌")
-        return super().on_llm_new_token(token, run_id=run_id, parent_run_id=parent_run_id, **kwargs)
+        return super().on_llm_new_token(
+            token, run_id=run_id, parent_run_id=parent_run_id, **kwargs
+        )
 
-    def on_chain_end(self, outputs: Dict[str, Any], *, run_id: UUID, parent_run_id: Union[UUID, None] = None, **kwargs: Any) -> Any:
+    def on_chain_end(
+        self,
+        outputs: Dict[str, Any],
+        *,
+        run_id: UUID,
+        parent_run_id: Union[UUID, None] = None,
+        **kwargs: Any,
+    ) -> Any:
         """Run when chain ends running."""
         self.code_extracted = False
         self.full_response = ""
-        return super().on_chain_end(outputs, run_id=run_id, parent_run_id=parent_run_id, **kwargs)
+        return super().on_chain_end(
+            outputs, run_id=run_id, parent_run_id=parent_run_id, **kwargs
+        )
 
-def load_conversation_chain(message_placeholder: DeltaGenerator, openai_api_key: str) -> ConversationalRetrievalCodeChain:
+
+def load_conversation_chain(
+    message_placeholder: DeltaGenerator, openai_api_key: str
+) -> ConversationalRetrievalCodeChain:
     if openai_api_key is None:
         raise ValueError("OpenAI API key is required to load the chain.")
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo-16k", temperature=0, openai_api_key=openai_api_key,
-                     streaming=True, callbacks=[Handler(message_placeholder)])
-    condense_question_llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key)
-    missing_imports_llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key,verbose=False)
-    retriever = doc_retriever.load_streamlit_doc_retriever(st.secrets["openai_api_key"],
-                                                           chroma_server_host=st.secrets["chroma"]["host"],
-                                                           chroma_server_port=st.secrets["chroma"]["port"],
-                                                           mode="docker")
-    qa_over_streamlit_code = ConversationalRetrievalCodeChain.from_llm(llm=llm, retriever=retriever,
-                                                                       condense_question_llm=condense_question_llm,
-                                                                       return_source_documents=True,
-                                                                       missing_imports_llm=missing_imports_llm,
-                                                                       return_revision_request=True,
-                                                                       verbose=False)
+    llm = ChatOpenAI(
+        model_name="gpt-3.5-turbo-16k",
+        temperature=0,
+        openai_api_key=openai_api_key,
+        streaming=True,
+        callbacks=[Handler(message_placeholder)],
+    )
+    condense_question_llm = ChatOpenAI(
+        model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_api_key
+    )
+    missing_imports_llm = ChatOpenAI(
+        model_name="gpt-3.5-turbo",
+        temperature=0,
+        openai_api_key=openai_api_key,
+        verbose=False,
+    )
+    retriever = doc_retriever.load_streamlit_doc_retriever(
+        st.secrets["openai_api_key"],
+        chroma_server_host=st.secrets["chroma"]["host"],
+        chroma_server_port=st.secrets["chroma"]["port"],
+        mode="docker",
+    )
+    qa_over_streamlit_code = ConversationalRetrievalCodeChain.from_llm(
+        llm=llm,
+        retriever=retriever,
+        condense_question_llm=condense_question_llm,
+        return_source_documents=True,
+        missing_imports_llm=missing_imports_llm,
+        return_revision_request=True,
+        verbose=False,
+    )
     return qa_over_streamlit_code
+
 
 def load_agent():
     if st.secrets["openai_api_key"] is None:
         st.error("OpenAI API key is missing! Please add it to your secrets.")
         st.stop()
     doc_chain = doc_retriever.load_streamlit_doc_chain(
-        OpenAI(temperature=0, max_tokens=2000, openai_api_key=st.secrets["openai_api_key"]))
+        OpenAI(
+            temperature=0, max_tokens=2000, openai_api_key=st.secrets["openai_api_key"]
+        )
+    )
 
     tools = [
         Tool(
             name="Streamlit up to date source code",
             func=doc_chain.run,
-            description="useful for when you need to answer questions about the streamlit Python API. Input should be a fully formed question.",
+            description="useful for when you need to answer questions about the "
+            "streamlit Python API. Input should be a fully formed question.",
         ),
     ]
 
     model_name = "text-davinci-003"
     memory = ConversationBufferMemory(memory_key="chat_history")
-    llm=OpenAI(openai_api_key=st.secrets["openai_api_key"], max_tokens=2000, temperature=0, model_name=model_name)
-    agent_chain = initialize_agent(tools, llm, agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION, verbose=False, memory=memory)
+    llm = OpenAI(
+        openai_api_key=st.secrets["openai_api_key"],
+        max_tokens=2000,
+        temperature=0,
+        model_name=model_name,
+    )
+    agent_chain = initialize_agent(
+        tools,
+        llm,
+        agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
+        verbose=False,
+        memory=memory,
+    )
     return agent_chain
+
 
 def load_chat_agent():
     if st.secrets["openai_api_key"] is None:
         st.error("OpenAI API key is missing! Please add it to your secrets.")
         st.stop()
     doc_chain = doc_retriever.load_streamlit_doc_chain(
-        OpenAI(temperature=0, max_tokens=2000, openai_api_key=st.secrets["openai_api_key"]))
+        OpenAI(
+            temperature=0, max_tokens=2000, openai_api_key=st.secrets["openai_api_key"]
+        )
+    )
 
     tools = [
         Tool(
             name="Streamlit up to date source code",
             func=doc_chain.run,
-            description="useful for when you need to answer questions about the streamlit Python API. Input should be a fully formed question.",
+            description="useful for when you need to answer questions about the streamlit "
+            "Python API. Input should be a fully formed question.",
         ),
     ]
 
     model_name = "text-davinci-003"
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-    llm = ChatOpenAI(openai_api_key=st.secrets["openai_api_key"], max_tokens=2000, temperature=0, model_name=model_name)
-    agent_chain = initialize_agent(tools, llm, agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION, verbose=False, memory=memory)
+    llm = ChatOpenAI(
+        openai_api_key=st.secrets["openai_api_key"],
+        max_tokens=2000,
+        temperature=0,
+        model_name=model_name,
+    )
+    agent_chain = initialize_agent(
+        tools,
+        llm,
+        agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
+        verbose=False,
+        memory=memory,
+    )
     return agent_chain
 
 
 # https://regex101.com/r/fHlyKq/1
 parse_code_regex = r"(```python(.*?)```)?(.*?)$"
+
 
 def parse(output):
     python_code = None

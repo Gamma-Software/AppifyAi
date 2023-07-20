@@ -1,11 +1,10 @@
 """Chain for chatting with a vector database."""
 from __future__ import annotations
 
-import re
 import inspect
 from abc import abstractmethod
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from pydantic import Extra
 
@@ -23,30 +22,43 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts.base import BasePromptTemplate
 from langchain.schema import BaseRetriever, Document
 
-from langchain.chains.conversational_retrieval.base import CHAT_TURN_TYPE, _get_chat_history
+from langchain.chains.conversational_retrieval.base import (
+    CHAT_TURN_TYPE,
+    _get_chat_history,
+)
 
-from chains.prompt import CONDENSE_QUESTION_CODE_PROMPT, PROMPT, prompt_missing_imports_check
+from chains.prompt import (
+    CONDENSE_QUESTION_CODE_PROMPT,
+    PROMPT,
+    prompt_missing_imports_check,
+)
 from utils.security import analyze_security
 from chains.parser import parse_code
 
+
 def remove_entrypoint(code):
-    lines = code.split('\n')
+    lines = code.split("\n")
     modified_lines = []
     entrypoint_found = False
     for line in lines:
-        if line.strip() == 'if __name__ == "__main__":' or line.strip() == 'if __name__ == \'__main__\':':
+        if (
+            line.strip() == 'if __name__ == "__main__":'
+            or line.strip() == "if __name__ == '__main__':"
+        ):
             entrypoint_found = True
         elif entrypoint_found:
             modified_lines.append(line.lstrip())
         else:
             modified_lines.append(line)
 
-    modified_code = '\n'.join(modified_lines)
+    modified_code = "\n".join(modified_lines)
     modified_code = modified_code.rstrip()
     return modified_code
 
+
 class BaseConversationalRetrievalCodeChain(Chain):
-    """Chain for chatting with an index. Given the chat history, the current code and a question, return the answer."""
+    """Chain for chatting with an index. Given the chat history,
+    the current code and a question, return the answer."""
 
     combine_docs_chain: BaseCombineDocumentsChain
     question_generator: LLMChain
@@ -174,7 +186,9 @@ class BaseConversationalRetrievalCodeChain(Chain):
         )
         if new_request is not None:
             if accepts_run_manager:
-                docs = await self._aget_docs(new_request, inputs, run_manager=_run_manager)
+                docs = await self._aget_docs(
+                    new_request, inputs, run_manager=_run_manager
+                )
             else:
                 docs = await self._aget_docs(new_request, inputs)  # type: ignore[call-arg]
         else:
@@ -306,7 +320,9 @@ class ConversationalRetrievalCodeChain(BaseConversationalRetrievalCodeChain):
         )
 
         _llm_3 = missing_imports_llm or llm
-        missing_imports_chain = LLMChain(llm=_llm_3, prompt=prompt_missing_imports_check)
+        missing_imports_chain = LLMChain(
+            llm=_llm_3, prompt=prompt_missing_imports_check
+        )
 
         return cls(
             retriever=retriever,
