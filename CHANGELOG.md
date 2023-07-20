@@ -11,6 +11,7 @@ Change ChatbotX name to AppifyAi
 
 ### Added
 
+- demo on face detection
 - add pylint workflow
 - Catch phrase at first
 - secrets for tries

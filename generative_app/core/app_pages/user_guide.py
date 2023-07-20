@@ -23,7 +23,8 @@ class UserGuide(HydraHeadApp):
 
         with demo_tab:
             with st.expander("Camera input demo"):
-                # Check if the user is already logged in
                 st.video("demo/camera_input_demo.mov")
+            with st.expander("Detect and crop faces"):
+                st.video("demo/detect_crop_faces.mov")
             with st.expander("Data stats"):
                 st.video("demo/complex_example.mov")
