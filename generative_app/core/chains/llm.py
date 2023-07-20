@@ -24,7 +24,6 @@ from chains.conversational_retrieval_over_code import ConversationalRetrievalCod
 from chains.parser import parse_code
 
 langchain.debug = st.secrets["langchain"]["debug"]
-
 python_script = os.path.join(os.getcwd(), "langchain", "generated_script.py")
 
 
