@@ -1,6 +1,6 @@
 name: Pylint
 
-on: [push]
+on: [pull_request]
 
 jobs:
   build:
@@ -17,7 +17,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
           python -m pip install -r .github/requirements.txt
       - name: linting with pylint
         run: pylint $(git ls-files '*.py') --threshold=5
