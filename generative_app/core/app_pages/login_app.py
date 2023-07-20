@@ -6,6 +6,7 @@ import shutil
 from pathlib import Path
 import streamlit as st
 from auth.auth_connection import AuthSingleton
+from utils.custom_background import set_background, load_backgounds
 import ui.chat_init as chat_init
 from hydralit import HydraHeadApp
 from streamlit.delta_generator import DeltaGenerator
@@ -38,6 +39,12 @@ class LoginApp(HydraHeadApp):
         if auto_login:
             print("Auto login detected of user_id: ", user_id)
             self.redirect_after_login(user_id, self.auth.get_username_from_id(user_id))
+
+        # Set custom background
+        # TODO Too long to process for now
+        #with st.spinner(f"Loading data..."):
+        #    load_backgounds([('back1', 'resources/back1.jpg'), ('back2', 'resources/back2.jpg')])
+        #set_background('back2')
 
         st.markdown("<h1 style='text-align: center;'>Login to AppifyAi</h1>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: center;'>Your Personal Assistant for Web Application Development</p>", unsafe_allow_html=True)
