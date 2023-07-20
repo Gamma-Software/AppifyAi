@@ -142,6 +142,10 @@ Using open APIs:
 
 The chatbot will interpret these instructions, generate the corresponding Python code, and create a Streamlit application accordingly in the page 🤖GeneratedApp.
 
+## Limitations
+
+For now the bot is capable of simple Web Apps. It can't create complex Web Apps with multiple pages and complex interactions. It can't resonate and provide complex results.
+
 ## Roadmap
 
 - [x] Add a chatbot
@@ -168,6 +172,8 @@ The chatbot will interpret these instructions, generate the corresponding Python
 - [ ] Add command to upload a file in order to use it in the generated app (and the bot will know that the file exists and have its filepath)
 - [ ] Add a voice assistant (text to speech and speech to text)
 - [ ] Automate the installation of more libraries
+- [ ] Self healing code generated (when the code generated is not working, the bot will try to fix it)
+- [ ] Propose the user to import a starting code (that will be analysed for security issues)
 - [ ] Check confusing instructions and give the chatbot the possibility to improve the instruction of the user and he will need to valide the new instruction.
 
 ## Built With
