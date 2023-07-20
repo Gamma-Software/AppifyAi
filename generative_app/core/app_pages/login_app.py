@@ -182,7 +182,9 @@ class LoginApp(HydraHeadApp):
                 except FileNotFoundError:
                     self.reset_sandbox(level, username)
 
-        def reset_sandbox(self, level, username):
+        def reset_sandbox(
+            self, level, username, template_sandbox_app, sandbox_user_path
+        ):
             with st.spinner("Sandbox needs to be recreated..."):
                 time.sleep(2)
                 # Delete the sandbox file
