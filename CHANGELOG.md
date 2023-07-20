@@ -18,6 +18,10 @@ Change ChatbotX name to AppifyAi
 - Now you can quickly login and signup when enter is pressed
 - About page
 
+### Fixed
+
+- Code history to undo
+
 ## [1.3.0] - 2023-07-19
 
 ### Added

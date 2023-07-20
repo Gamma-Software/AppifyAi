@@ -34,11 +34,26 @@ class ChatBot:
         self.auth = AuthSingleton().get_instance()
         self.user_role = self.auth.get_user_role(self.user_id)
 
+    def append_code_history(self, code: str):
+        """Store the code into the last_code session data"""
+        if "last_code" not in st.session_state:
+            st.session_state["last_code"] = [code]
+        else:
+            st.session_state.last_code.append(code)
+
+    def pop_code_history(self):
+        """Store the code into the last_code session data"""
+        if "last_code" not in st.session_state:
+            return None
+        else:
+            st.session_state.last_code.pop()
+
     def apply_code(self, code: str):
         if code is None:
             return
         # save code to database
         self.auth.set_code(self.user_id, code)
+        self.append_code_history(code)
 
     @staticmethod
     def check_commands(instruction: str) -> CommandResult or None:
@@ -64,7 +79,9 @@ class ChatBot:
         if command == CommandResult.NOTUNDO:
             chat_placeholder.error("Nothing to undo")
         if command == CommandResult.UNDO:
-            self.apply_code(st.session_state.last_code)
+            # remove the last code
+            self.pop_code_history()
+            self.apply_code(st.session_state.last_code[-1])
             # remove the last 4 keys
             if len(st.session_state.messages) > 1:
                 for _ in range(min(len(st.session_state.messages), 3)):
@@ -138,9 +155,6 @@ class ChatBot:
             st.warning(no_code[1 if st.session_state.lang == "fr" else 0])
 
     def setup(self):
-        # Save last code
-        st.session_state["last_code"] = self.auth.get_code(self.user_id)
-
         if self.user_role == "guest" and self.check_tries_exceeded():
             self.end_of_trial()
             return
@@ -159,6 +173,7 @@ class ChatBot:
                         message = f"```python\n{code}\n```"
                         ex = st.expander("Code")
                         ex.code(code)
+                        self.append_code_history(code)
                     st.markdown(explanation)
                 else:
                     st.markdown(message["content"])
