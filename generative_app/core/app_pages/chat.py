@@ -37,9 +37,8 @@ class ChatBot:
     def append_code_history(self, code: str):
         """Store the code into the last_code session data"""
         if "last_code" not in st.session_state:
-            st.session_state["last_code"] = [code]
-        else:
-            st.session_state.last_code.append(code)
+            st.session_state["last_code"] = []
+        st.session_state.last_code.append(code)
 
     def pop_code_history(self):
         """Store the code into the last_code session data"""
