@@ -21,4 +21,4 @@ jobs:
           python -m pip install -r .github/requirements.txt
 
       - name: linting with pylint
-        run: pylint **/*.py --load-plugins pylint_quotes;
+        run: pylint $(git ls-files '*.py')
