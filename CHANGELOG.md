@@ -20,6 +20,7 @@ Change ChatbotX name to AppifyAi
 
 ### Fixed
 
+- Sandbox was not recreated after a syntax error
 - Code history to undo
 
 ## [1.3.0] - 2023-07-19
