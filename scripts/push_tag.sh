@@ -1,16 +1,14 @@
-# Verify we are on main branch
-git branch --show-current | grep -q "main"
+# Get the version in args
+version=$1
 
-# If the branch is not main, exit with an error
+# Check if the version is in the right format (v1.0.0)
+echo $version | grep -qP "^v[0-9]+\.[0-9]+\.[0-9]+$"
+
+# If the version is not in the right format, exit with an error
 if [ $? -ne 0 ]; then
-    echo "You are not on the main branch"
+    echo "Version $version is not in the right format (v1.0.0)"
     exit 1
 fi
-
-# Get the version (ex: 1.0.0) in the generative_app/core/version.py file that has the following format: VERSION="1.0.0"
-get_version() {
-    version=v$(grep -oP '(?<=VERSION=")[^"]*' generative_app/core/version.py)
-}
 
 # Check if the version is not already tagged
 git tag | grep -q $version
@@ -21,5 +19,17 @@ if [ $? -eq 0 ]; then
     exit 1
 fi
 
-# Otherwise tag the version
+# Verify we are on main branch
+git branch --show-current | grep -q "main"
+
+# If the branch is not main, exit with an error
+if [ $? -ne 0 ]; then
+    echo "You are not on the main branch"
+    exit 1
+fi
+
+# Apply the version number
+sed -i "s/VERSION=\".*\"/VERSION=\"$version\"/" generative_app/core/version.py
+
+# Tag the version
 git tag "$version"
