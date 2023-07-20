@@ -225,7 +225,7 @@ class ChatBot:
                                 {
                                     "question": instruction,
                                     "chat_history": st.session_state.chat_history,
-                                    "python_code": st.session_state.last_code,
+                                    "python_code": st.session_state.last_code[-1],
                                 }
                             )
                         except Exception as e:
