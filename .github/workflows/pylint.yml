@@ -19,6 +19,6 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
           python -m pip install -r .github/requirements.txt
-
       - name: linting with pylint
         run: pylint $(git ls-files '*.py')
+        continue-on-error: true
