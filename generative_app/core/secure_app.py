@@ -3,7 +3,7 @@ from hydralit import HydraApp
 from app_pages.login_app import LoginApp
 from app_pages.signup import SignUpApp
 from app_pages.about import About
-from app_pagesa.ppifyai import ChatBotApp
+from app_pages.appifyai import ChatBotApp
 from app_pages.load_app import LoadingApp
 from app_pages.user_guide import UserGuide
 import sidebar
