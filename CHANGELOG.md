@@ -11,6 +11,7 @@ Change ChatbotX name to AppifyAi
 
 ### Added
 
+- add pylint workflow
 - Catch phrase at first
 - secrets for tries
 - Now you can quickly login and signup when enter is pressed
