@@ -145,6 +145,7 @@ The chatbot will interpret these instructions, generate the corresponding Python
 ## Limitations
 
 For now the bot is capable of simple Web Apps. It can't create complex Web Apps with multiple pages and complex interactions. It can't resonate and provide complex results.
+Sometimes, the bot looses the context and can't understand what you are saying. In this case, you can use the command `/reset` to reset the context and start over or the `/undo` to undo the last instruction and the bot answer.
 
 ## Roadmap
 
