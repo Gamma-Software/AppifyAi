@@ -46,8 +46,13 @@ https://github.com/Gamma-Software/AppifyAi/assets/6960910/475bcb01-07b2-4db0-b84
 Here is a simple conversation with the chatbot:
 ![Simple conversation](demo/simple_conversation.png)
 
+This example shows how the bot is capable to understand the user's intent as it generated errors in the reading of the GPX file.
+The user questioned him if it know the format asked for an gpx example and use this knowledge to update the script.
+![Security Compromised](demo/gpx_reader.png)
+
 When you enter instructions that may compromise the application security, the chatbot will warn you and not apply the generated code:
 ![Security Compromised](demo/security_compomised.png)
+
 </details>
 
 ## Why using AppifyAi ?
