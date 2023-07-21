@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed the bug where the signup was not done for new users
 - Now on signup the message is better looking and well placed
 
 ## [1.4.0] - 2023-07-21
