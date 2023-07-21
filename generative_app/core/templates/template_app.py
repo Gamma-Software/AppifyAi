@@ -17,3 +17,5 @@ class App(HydraHeadApp):
 {code}
         #---end
 """
+
+init_app = "pass\n"
