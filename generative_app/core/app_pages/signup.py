@@ -132,6 +132,7 @@ class SignUpApp(HydraHeadApp):
             msg_container.error("User already exists, please login instead.")
         else:
             with st.spinner("now redirecting to login...."):
+                self._save_signup(form_data)
                 time.sleep(2)
                 self.set_access(0, None)
                 self.do_redirect()
