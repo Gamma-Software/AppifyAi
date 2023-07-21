@@ -178,8 +178,10 @@ Sometimes, the bot looses the context and can't understand what you are saying. 
 - [ ] Add page when we can build the app together with the chatbot
 - [ ] Add page where we can instruct the bot to build the app and see the changes live
 - [ ] Add command to upload a file in order to use it in the generated app (and the bot will know that the file exists and have its filepath)
+- [ ] Better handle large context (chat history)
 - [ ] Add a voice assistant (text to speech and speech to text)
 - [ ] Automate the installation of more libraries
+- [ ] Propose to the user to upload a file (such as csv) and get the type and size of the file to add it into context
 - [ ] Self healing code generated (when the code generated is not working, the bot will try to fix it)
 - [ ] Propose the user to import a starting code (that will be analysed for security issues)
 - [ ] Check confusing instructions and give the chatbot the possibility to improve the instruction of the user and he will need to valide the new instruction.
