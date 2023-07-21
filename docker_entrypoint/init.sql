@@ -28,3 +28,6 @@ CREATE TABLE UserData (
   openai_key TEXT,
   FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
+
+-- Add the first user
+INSERT INTO Users (username, password, email, role) VALUES ('admin', 'admin', 'admin@localhost.com', 'guest');

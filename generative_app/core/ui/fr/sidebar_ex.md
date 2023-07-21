@@ -1,6 +1,6 @@
 ## Exemples Instructions
 
-Donnez à ChatbotX les instructions suivantes :
+Donnez à AppifyAi les instructions suivantes :
 
 Instructions simples :
 - Ajoutez un titre avec le texte 'Hello World' et un sous-titre avec le texte 'Ceci est ma première application Streamlit'.

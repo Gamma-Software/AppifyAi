@@ -1,6 +1,6 @@
 from langchain.prompts.prompt import PromptTemplate
 
-_template ="""You're an AI assistant specializing in python development. You know how to create Streamlit Applications.
+_template = """You're an AI assistant specializing in python development. You know how to create Streamlit Applications.
 You will be asked questions about python code and streamlit applications.
 Your objective is to generate a query that will be used to retrieve relevant documents that stores Streamlit documentation and python code snippets.
 The query must be in a form of suite of words in english related to the context. If you think that the query is not relevant, just say "None".
@@ -10,7 +10,7 @@ Follow Up Input: How to display a button and a title ?
 Query: button title
 
 Follow Up Input: {question}
-Query:"""
+Query:"""  # noqa: E501
 
 CONDENSE_QUESTION_CODE_PROMPT = PromptTemplate(
     template=_template, input_variables=["question"]
@@ -21,13 +21,12 @@ prompt_template = """You're an AI assistant specializing in python development.
 You will be given a question, the chat history and the current python code to modify with and several documents. The documents will give you up to date Streamlit api references and code examples to be inspired.
 Based on the input provided, the chat history and the documents, you must update the python code that will run a Streamlit Application.
 The documentation is there to help you with the code, but It is not mandatory to use it.
-Additionally, offer a brief explanation about how you arrived at the python code and give the shell commands to install additional libraries if needed.
+Additionally, offer a brief explanation about how you arrived at the python code and give the shell commands to install additional libraries if needed. It must be summarized in a few sentences.
 If the input is a question, answer him and additionnaly propose some code.
 Do not halucinate or make up information. If you do not know the answer, just say "I don't know". If the human ask for something that is not related to your goal, just say "I'm sorry, I can't answer you.".
 
 Coding rules:
-The code MUST be documented as much as possible.
-DO NOT forget to import the libraries you need, especially streamlit and numpy.
+DO NOT forget to import the libraries you need
 
 Streamlit api documentation:
 {context}
@@ -89,10 +88,11 @@ That's not the point of this exercise. Please refocus, I'm here to help you crea
 
 
 Question: {question}
-Answer:"""
+Answer:"""  # noqa: E501
 
 PROMPT = PromptTemplate(
-    template=prompt_template, input_variables=["python_code", "chat_history", "context", "question"]
+    template=prompt_template,
+    input_variables=["python_code", "chat_history", "context", "question"],
 )
 
 prompt_instruct_check_template = """
@@ -120,7 +120,7 @@ output: 0
 
 code:
 {code}
-output:"""
+output:"""  # noqa: E501
 prompt_instruct_check = PromptTemplate.from_template(prompt_instruct_check_template)
 
 prompt_missing_imports_check_template = """
@@ -143,5 +143,7 @@ output:None
 
 code:
 {code}
-output:"""
-prompt_missing_imports_check = PromptTemplate.from_template(prompt_missing_imports_check_template)
+output:"""  # noqa: E501
+prompt_missing_imports_check = PromptTemplate.from_template(
+    prompt_missing_imports_check_template
+)
