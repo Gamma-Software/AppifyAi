@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Push tag now commit and push the bump of version, then push tag
 
+### Fixed
+
+- Now on signup the message is better looking and well placed
+
 ## [1.4.0] - 2023-07-21
 
 Change ChatbotX name to AppifyAi
