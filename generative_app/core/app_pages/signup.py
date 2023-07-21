@@ -1,10 +1,11 @@
 import time
 import os
 import re
-from typing import Dict
+from typing import Dict, Union
 
 import streamlit as st
 from hydralit import HydraHeadApp
+from streamlit.delta_generator import DeltaGenerator
 import streamlit.components.v1 as components
 
 from auth.auth_connection import AuthSingleton
@@ -43,18 +44,13 @@ class SignUpApp(HydraHeadApp):
         </style>
         <br><br>
         """
-        (
-            c1,
-            c2,
-            c3,
-        ) = st.columns([2, 2, 2])
-        message_placeholder = c2.empty()
+        _, c2, _ = st.columns([2, 2, 2])
         # c2.markdown(pretty_btn,unsafe_allow_html=True)
 
         if "MSG" in os.environ.keys():
             st.info(os.environ["MSG"])
 
-        form_data = self._create_signup_form(c2)
+        form_data, message_placeholder = self._create_signup_form(c2)
 
         pretty_btn = """
         <style>
@@ -69,17 +65,19 @@ class SignUpApp(HydraHeadApp):
         if form_data["submitted"]:
             self._do_signup(form_data, message_placeholder)
 
-    def _create_signup_form(self, parent_container) -> Dict:
-        login_form = parent_container.form(key="login_form")
+    def _create_signup_form(self, parent_container) -> Union[Dict, DeltaGenerator]:
+        signup_form = parent_container.form(key="login_form")
+
+        signup_message = parent_container.empty()
 
         form_state = {}
-        form_state["username"] = login_form.text_input("Username")
-        form_state["password"] = login_form.text_input("Password", type="password")
-        form_state["password2"] = login_form.text_input(
+        form_state["username"] = signup_form.text_input("Username")
+        form_state["password"] = signup_form.text_input("Password", type="password")
+        form_state["password2"] = signup_form.text_input(
             "Confirm Password", type="password"
         )
-        form_state["email"] = login_form.text_input("email")
-        form_state["submitted"] = login_form.form_submit_button("Sign Up")
+        form_state["email"] = signup_form.text_input("email")
+        form_state["submitted"] = signup_form.form_submit_button("Sign Up")
 
         # Add the javascript to submit the form on enter
         components.html(
@@ -105,7 +103,7 @@ class SignUpApp(HydraHeadApp):
             self.set_access(0, None)
             self.do_redirect()
 
-        return form_state
+        return form_state, signup_message
 
     def _do_signup(self, form_data, msg_container):
         # Check if all fields are filled
@@ -131,11 +129,12 @@ class SignUpApp(HydraHeadApp):
         ):
             msg_container.error("User already exists, please login instead.")
         else:
-            with st.spinner("now redirecting to login...."):
-                self._save_signup(form_data)
-                time.sleep(2)
-                self.set_access(0, None)
-                self.do_redirect()
+            with msg_container:
+                with st.spinner("now redirecting to login...."):
+                    self._save_signup(form_data)
+                    time.sleep(2)
+                    self.set_access(0, None)
+                    self.do_redirect()
 
     @staticmethod
     def _email_is_valid(email):
@@ -157,7 +156,6 @@ class SignUpApp(HydraHeadApp):
             .get_instance()
             .check_user(signup_data["username"], signup_data["password"])
         ):
-            st.write("User added")
             return (
                 AuthSingleton()
                 .get_instance()
