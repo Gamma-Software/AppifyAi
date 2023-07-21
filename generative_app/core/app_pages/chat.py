@@ -104,7 +104,7 @@ class ChatBot:
                 st.experimental_rerun()
         if command == CommandResult.SAVE:
             code = self.get_code_history()[-1]
-            if code is None or code == "pass\n":
+            if code is None or code == init_app:
                 chat_placeholder.error("No code to save")
                 return
             chat_placeholder.info(

@@ -18,4 +18,4 @@ class App(HydraHeadApp):
         #---end
 """
 
-init_app = "pass"
+init_app = "pass\n"
