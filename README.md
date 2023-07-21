@@ -28,6 +28,10 @@ Become a part of the AppifyAi revolution and redefine the way web applications a
 
 ## Demo
 
+Here is a list of demonstration in video and screenshot of conversation examples:
+
+<details>
+  <summary>See the demo</summary>
 https://github.com/Gamma-Software/AppifyAi/assets/6960910/d34206e1-90cf-4408-b7c9-932d745ed96d
 
 https://github.com/Gamma-Software/AppifyAi/assets/6960910/0360af37-23c7-49e1-8794-1d035435a13f
@@ -39,6 +43,7 @@ Here is a simple conversation with the chatbot:
 
 When you enter instructions that may compromise the application security, the chatbot will warn you and not apply the generated code:
 ![Security Compromised](demo/security_compomised.png)
+</details>
 
 ## Why using AppifyAi ?
 
