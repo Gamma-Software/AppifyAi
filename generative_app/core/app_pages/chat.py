@@ -41,6 +41,12 @@ class ChatBot:
             st.session_state["last_code"] = []
         st.session_state.last_code.append(code)
 
+    def get_code_history(self) -> str or None:
+        """Get the last_code session data"""
+        if "last_code" not in st.session_state:
+            return None
+        return st.session_state.last_code
+
     def pop_code_history(self):
         """Store the code into the last_code session data"""
         if "last_code" not in st.session_state:
@@ -97,7 +103,7 @@ class ChatBot:
                 chat_placeholder.info("Code resetted")
                 st.experimental_rerun()
         if command == CommandResult.SAVE:
-            code = parse_current_app(open(self.python_script_path, "r").read())
+            code = self.get_code_history()[-1]
             if code is None or code == "pass\n":
                 chat_placeholder.error("No code to save")
                 return

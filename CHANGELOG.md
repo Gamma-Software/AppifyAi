@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - make sure the last code is at least the init code
+- get last code generated instead of the code in the current sandbox file
 
 ## [1.5.0] - 2023-07-21
 
