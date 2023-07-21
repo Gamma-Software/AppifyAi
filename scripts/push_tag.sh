@@ -30,6 +30,10 @@ fi
 
 # Apply the version number
 sed -i "s/VERSION=\".*\"/VERSION=\"$version\"/" generative_app/core/version.py
+git add generative_app/core/version.py
+git commit -m "Bump version to $version"
+git push origin main
 
 # Tag the version
 git tag "$version"
+git push origin "$version"
