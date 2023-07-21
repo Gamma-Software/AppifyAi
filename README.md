@@ -39,6 +39,10 @@ https://github.com/Gamma-Software/AppifyAi/assets/6960910/0360af37-23c7-49e1-879
 
 https://github.com/Gamma-Software/AppifyAi/assets/6960910/b6addffd-023d-4252-8a40-54259ce88f6b
 
+https://github.com/Gamma-Software/AppifyAi/assets/6960910/475bcb01-07b2-4db0-b841-b38830a1dfdf
+
+
+
 Here is a simple conversation with the chatbot:
 ![Simple conversation](demo/simple_conversation.png)
 
