@@ -162,38 +162,9 @@ The chatbot will interpret these instructions, generate the corresponding Python
 For now the bot is capable of simple Web Apps. It can't create complex Web Apps with multiple pages and complex interactions. It can't resonate and provide complex results.
 Sometimes, the bot looses the context and can't understand what you are saying. In this case, you can use the command `/reset` to reset the context and start over or the `/undo` to undo the last instruction and the bot answer.
 
-## Roadmap
+## Features
 
-- [x] Add a chatbot
-- [x] Add a sandbox page for the bot to play with
-- [x] Add commands to /undo, /reset, /save
-- [x] Embed in vector stores the up to date documentation of Streamlit https://github.com/streamlit/docs/tree/main/content and Langchain (and other libraries)
-- [x] Create login and register pages
-- [x] Dockerize it all
-- [x] Crypt the user password
-- [x] Add prompt tries
-- [x] Security measures check of inputs
-- [x] Add welcome page
-- [ ] Do a pylint check on the generated app and give it to the bot to fix some errors
-- [ ] Add an agent that can better interact with the user
-  - [ ] Implement code snippets for the bot to reuse it
-  - [ ] Give the bot the possibility to check out the streamlit discussion space for ideas
-- [ ] Be able to undo multiple instrutions
-- [ ] User could tell the bot to generate an other version of the last instruction
-- [ ] Add admin administration
-- [ ] Do a tutorial on how to use the bot and iteract with it
-- [ ] Do a tutorial on how to serve the generated app (locally and on a server)
-- [ ] Compile the generated code into a executable binary for cross platform compatibility
-- [ ] Add page when we can build the app together with the chatbot
-- [ ] Add page where we can instruct the bot to build the app and see the changes live
-- [ ] Add command to upload a file in order to use it in the generated app (and the bot will know that the file exists and have its filepath)
-- [ ] Better handle large context (chat history)
-- [ ] Add a voice assistant (text to speech and speech to text)
-- [ ] Automate the installation of more libraries
-- [ ] Propose to the user to upload a file (such as csv) and get the type and size of the file to add it into context
-- [ ] Self healing code generated (when the code generated is not working, the bot will try to fix it)
-- [ ] Propose the user to import a starting code (that will be analysed for security issues)
-- [ ] Check confusing instructions and give the chatbot the possibility to improve the instruction of the user and he will need to valide the new instruction.
+The incoming features are listed the [AppifyAi's Kanban board](https://github.com/users/Gamma-Software/projects/3)
 
 ## Built With
 
