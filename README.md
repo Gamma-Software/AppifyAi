@@ -94,6 +94,18 @@ streamlit run generative_app/core/secure_app.py
 
 3. Interact with the bot to generate the Streamlit App of your dreams !
 
+### Implement vector store
+
+* Create a vector store with the following command:
+```shell
+python generative_app/core/chains/doc_retriever.py create ${openai_key} ${mode}
+```
+
+* Update a vector store to add streamlit python snippets with the following command:
+```shell
+python generative_app/core/chains/doc_retriever.py snippets ${openai_key} ${mode}
+```
+
 ### Usage
 
 This is a **chatbot**, simply enter your instruction and it will generate the corresponding Python code and create a Streamlit Web app application accordingly. To see it in action go to the page 🤖GeneratedApp.

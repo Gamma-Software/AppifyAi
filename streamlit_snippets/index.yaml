@@ -1,0 +1,11 @@
+indexes:
+  - index: streamlit_snippets_0
+    source: create_title_header_subheader_text.py
+    language: python
+    description: "This code snippet shows how to add a title, subheader, and text and order them correctly to a Streamlit app."
+    keywords: "title, subheader, text"
+  - index: streamlit_snippets_1
+    source: center_element.py
+    language: python
+    description: "this code snippets shows how to center an element in streamlit"
+    keywords: "center, element"
