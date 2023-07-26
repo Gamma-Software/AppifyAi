@@ -1,7 +1,8 @@
 import shutil
 import os
-import sys
+import yaml
 from typing import List
+from pathlib import Path
 
 
 import streamlit as st
@@ -98,7 +99,7 @@ def is_docker_container_running(container_name: str) -> bool:
     return False
 
 
-def generate_retriever(
+def create_vector_store(
     openai_api_key: str,
     chroma_server_host="localhost",
     chroma_server_port="8000",
@@ -219,15 +220,170 @@ def generate_retriever(
         shutil.rmtree("streamlit")
 
 
-if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("OpenAI API key is missing! Please add it in argument.")
-        print("Or you are missing the mode 'docker' or 'local'.")
-        exit(1)
-    openai_api_key = sys.argv[1]
-    generate_retriever(
-        openai_api_key,
-        mode=sys.argv[2],
-        chroma_server_host=st.secrets["chroma"]["host"],
-        chroma_server_port=st.secrets["chroma"]["port"],
+def snippets_to_vector_store(
+    openai_api_key: str,
+    chroma_server_host="localhost",
+    chroma_server_port="8000",
+    mode="docker",
+):
+    # First check if the vector store exists
+    openai_ef = embedding_functions.OpenAIEmbeddingFunction(
+        api_key=openai_api_key,  # Replace with your own OpenAI API key
+        model_name="text-embedding-ada-002",
     )
+    if mode == "local":
+        if not os.path.exists(".doc_db/streamlit_chroma_db"):
+            raise Exception(
+                "The Chroma database for Streamlit does not exist. "
+                "Please run the script `doc_retriever.py` to create it."
+            )
+        # TODO create local client
+    if mode == "docker":
+        client = chromadb.Client(
+            Settings(
+                chroma_api_impl="rest",
+                chroma_server_host=chroma_server_host,
+                chroma_server_http_port=chroma_server_port,
+            )
+        )
+        collection = client.get_collection(
+            "streamlit_doc", embedding_function=openai_ef
+        )
+        if not collection:
+            raise Exception(
+                "The Chroma database for Streamlit does not exist. "
+                "Please run the script `doc_retriever.py` to create it."
+            )
+
+    # Then get the list of snippets
+    snippets_indexes = read_snippets_index()
+
+    my_bar = st.progress(0, text="Adding snippets to the vector store...")
+    len_indexes_to_process = len(snippets_indexes["indexes"])
+    for idx, data in enumerate(snippets_indexes["indexes"]):
+        # check if the snippet file exists
+        snippet_filepath = Path("streamlit_snippets/" + data["source"])
+        if not snippet_filepath.exists():
+            raise FileNotFoundError("The snippet file does not exist.")
+
+        # Check if the snippet is not already in the vector store
+        try:
+            if not collection.get(where={"ids": data["index"]}):
+                raise Exception
+        except BaseException:
+            print("Snippet not found in the vector store, adding it...")
+
+        # Load the snippet document
+        python_splitter = RecursiveCharacterTextSplitter.from_language(
+            language=Language.PYTHON, chunk_size=1000, chunk_overlap=50
+        )
+        with open(snippet_filepath, "r") as f:
+            PYTHON_CODE = f.read()
+        doc = python_splitter.create_documents([PYTHON_CODE])
+        for doc in doc:
+            doc.metadata = {
+                "source": data["source"],
+                "description": data["description"],
+                "keywords": data["keywords"],
+                "language": data["language"],
+                "content_type": "simplyfied code",
+            }
+
+        # Add the snippet to the vector store
+        collection.add(
+            ids=[str(data["index"])],
+            metadatas=[doc.metadata],
+            documents=[doc.page_content],
+        )
+        my_bar.progress(
+            (idx + 1) / len_indexes_to_process, text=str(data["source"]) + " added"
+        )
+
+
+def consult_vector_store(
+    openai_api_key: str,
+    chroma_server_host="localhost",
+    chroma_server_port="8000",
+    mode="docker",
+):
+    # First check if the vector store exists
+    openai_ef = embedding_functions.OpenAIEmbeddingFunction(
+        api_key=openai_api_key,  # Replace with your own OpenAI API key
+        model_name="text-embedding-ada-002",
+    )
+    if mode == "local":
+        if not os.path.exists(".doc_db/streamlit_chroma_db"):
+            raise Exception(
+                "The Chroma database for Streamlit does not exist. "
+                "Please run the script `doc_retriever.py` to create it."
+            )
+        # TODO create local client
+    if mode == "docker":
+        client = chromadb.Client(
+            Settings(
+                chroma_api_impl="rest",
+                chroma_server_host=chroma_server_host,
+                chroma_server_http_port=chroma_server_port,
+            )
+        )
+        collection = client.get_collection(
+            "streamlit_doc", embedding_function=openai_ef
+        )
+        if not collection:
+            raise Exception(
+                "The Chroma database for Streamlit does not exist. "
+                "Please run the script `doc_retriever.py` to create it."
+            )
+    st.write(str(collection.count()) + " documents")
+    if "query" in st.session_state and st.session_state["query"]:
+        results = collection.query(query_texts=[st.session_state.query], n_results=20)
+    if "ids" in st.session_state and st.session_state["ids"]:
+        results = collection.get(where={"ids": "streamlit_snippets_0"})
+    st.write(results)
+
+
+def read_snippets_index() -> dict:
+    """Reads the snippets index yaml file and returns it as a dict."""
+    with open("streamlit_snippets/index.yaml", "r") as f:
+        snippets_index = yaml.load(f, Loader=yaml.FullLoader)
+    return snippets_index
+
+
+if __name__ == "__main__":
+    st.title("AppifyAI Doc Retriever")
+    openai_api_key = st.text_input("OpenAI API key")
+    mode = st.selectbox("Mode", ["docker", "local"])
+    choice = st.selectbox("Action", ["create", "add snippets", "consult vector store"])
+
+    if choice == "create":
+        pass
+    elif choice == "add snippets":
+        pass
+    elif choice == "consult vector store":
+        ids = st.text_input("Ids", key="ids")
+        query = st.text_input("Query", key="query")
+
+    button = st.button("Run")
+
+    if button:
+        if choice == "create":
+            create_vector_store(
+                openai_api_key=openai_api_key,
+                mode=mode,
+                chroma_server_host=st.secrets["chroma"]["host"],
+                chroma_server_port=st.secrets["chroma"]["port"],
+            )
+        elif choice == "add snippets":
+            snippets_to_vector_store(
+                openai_api_key=openai_api_key,
+                mode=mode,
+                chroma_server_host=st.secrets["chroma"]["host"],
+                chroma_server_port=st.secrets["chroma"]["port"],
+            )
+        elif choice == "consult vector store" and (query or ids):
+            consult_vector_store(
+                openai_api_key=openai_api_key,
+                mode=mode,
+                chroma_server_host=st.secrets["chroma"]["host"],
+                chroma_server_port=st.secrets["chroma"]["port"],
+            )
