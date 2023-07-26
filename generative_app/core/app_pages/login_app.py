@@ -186,34 +186,32 @@ class LoginApp(HydraHeadApp):
                         level, username, template_sandbox_app, sandbox_user_path
                     )
 
-        def reset_sandbox(
-            self, level, username, template_sandbox_app, sandbox_user_path
-        ):
-            with st.spinner("Sandbox needs to be recreated..."):
-                time.sleep(2)
-                # Delete the sandbox file
-                if sandbox_user_path.exists():
-                    os.remove(sandbox_user_path)
-                # Create the sandbox app
-                shutil.copyfile(src=template_sandbox_app, dst=sandbox_user_path)
+    def reset_sandbox(self, level, username, template_sandbox_app, sandbox_user_path):
+        with st.spinner("Sandbox needs to be recreated..."):
+            time.sleep(2)
+            # Delete the sandbox file
+            if sandbox_user_path.exists():
+                os.remove(sandbox_user_path)
+            # Create the sandbox app
+            shutil.copyfile(src=template_sandbox_app, dst=sandbox_user_path)
 
-                # Reset chat and code
-                if "messages" not in st.session_state:
-                    st.session_state["messages"] = []
-                if "lang" not in st.session_state:
-                    st.session_state["lang"] = "en"
-                st.session_state.messages = {
-                    "message_0": {
-                        "role": "assistant",
-                        "content": chat_init.message_en.format(name=username)
-                        if st.session_state.lang == "en"
-                        else chat_init.message_fr.format(name=username),
-                    },
-                }
-                if "chat_history" in st.session_state:
-                    st.session_state.chat_history = []
-                self.auth.set_message_history(level, st.session_state.messages)
-                self.auth.set_code(level, "pass")
+            # Reset chat and code
+            if "messages" not in st.session_state:
+                st.session_state["messages"] = []
+            if "lang" not in st.session_state:
+                st.session_state["lang"] = "en"
+            st.session_state.messages = {
+                "message_0": {
+                    "role": "assistant",
+                    "content": chat_init.message_en.format(name=username)
+                    if st.session_state.lang == "en"
+                    else chat_init.message_fr.format(name=username),
+                },
+            }
+            if "chat_history" in st.session_state:
+                st.session_state.chat_history = []
+            self.auth.set_message_history(level, st.session_state.messages)
+            self.auth.set_code(level, "pass")
 
     def reset_chat(self):
         print("resetting chat")
