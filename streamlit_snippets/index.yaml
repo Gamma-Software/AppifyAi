@@ -2,10 +2,20 @@ indexes:
   - index: streamlit_snippets_0
     source: create_title_header_subheader_text.py
     language: python
-    description: "This code snippet shows how to add a title, subheader, and text and order them correctly to a Streamlit app."
+    description: "how to add a title, subheader, and text and order them correctly to a Streamlit app."
     keywords: "title, subheader, text"
   - index: streamlit_snippets_1
-    source: center_element.py
+    source: center_title_header_subheader_text.py
     language: python
-    description: "this code snippets shows how to center an element in streamlit"
+    description: "how to center a title, header, subheader or a text in streamlit"
     keywords: "center, element"
+  - index: streamlit_snippets_2
+    source: realtime_webcam_capture.py
+    language: python
+    description: "how to display an histogram in realtime webcam capture with streamlit and opencv and matplotlib"
+    keywords: "webcam, realtime, histogram, plot"
+  - index: streamlit_snippets_3
+    source: segmentation_pose_detection_classification.py
+    language: python
+    description: "how to segment, detect object and pose and classify an image with streamlit and yolo"
+    keywords: "segmentation, detection, pose, classify"
