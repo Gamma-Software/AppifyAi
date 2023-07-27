@@ -246,8 +246,8 @@ def snippets_to_vector_store(
                 chroma_server_http_port=chroma_server_port,
             )
         )
-        collection = client.get_collection(
-            "streamlit_doc", embedding_function=openai_ef
+        collection = client.get_or_create_collection(
+            "streamlit_snippets", embedding_function=openai_ef
         )
         if not collection:
             raise Exception(
@@ -290,7 +290,8 @@ def snippets_to_vector_store(
             }
 
         # Add the snippet to the vector store
-        collection.add(
+        # upsert items. new items will be added, existing items will be updated.
+        collection.upsert(
             ids=[str(data["index"])],
             metadatas=[doc.metadata],
             documents=[doc.page_content],
@@ -326,20 +327,30 @@ def consult_vector_store(
                 chroma_server_http_port=chroma_server_port,
             )
         )
-        collection = client.get_collection(
-            "streamlit_doc", embedding_function=openai_ef
+        if "collection" not in st.session_state:
+            return
+        collection = client.get_or_create_collection(
+            st.session_state.collection, embedding_function=openai_ef
         )
         if not collection:
             raise Exception(
                 "The Chroma database for Streamlit does not exist. "
                 "Please run the script `doc_retriever.py` to create it."
             )
+
     st.write(str(collection.count()) + " documents")
     if "query" in st.session_state and st.session_state["query"]:
+        st.write(st.session_state["query"])
         results = collection.query(query_texts=[st.session_state.query], n_results=20)
-    if "ids" in st.session_state and st.session_state["ids"]:
-        results = collection.get(where={"ids": "streamlit_snippets_0"})
+        results = collection.similarity_search_with_score(query)
+    elif "ids" in st.session_state and st.session_state["ids"]:
+        st.write(st.session_state["ids"])
+        results = collection.get(ids=[st.session_state["ids"]])
+    else:
+        results = collection.get()
     st.write(results)
+
+    collection
 
 
 def read_snippets_index() -> dict:
@@ -360,6 +371,11 @@ if __name__ == "__main__":
     elif choice == "add snippets":
         pass
     elif choice == "consult vector store":
+        collection = st.selectbox(
+            "Select collection",
+            ["streamlit_doc", "streamlit_snippets"],
+            key="collection",
+        )
         ids = st.text_input("Ids", key="ids")
         query = st.text_input("Query", key="query")
 
@@ -380,7 +396,7 @@ if __name__ == "__main__":
                 chroma_server_host=st.secrets["chroma"]["host"],
                 chroma_server_port=st.secrets["chroma"]["port"],
             )
-        elif choice == "consult vector store" and (query or ids):
+        elif choice == "consult vector store":
             consult_vector_store(
                 openai_api_key=openai_api_key,
                 mode=mode,
