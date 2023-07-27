@@ -17,6 +17,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from chromadb.utils import embedding_functions
 from langchain.document_loaders import DirectoryLoader
 from langchain.document_loaders import UnstructuredMarkdownLoader
+from langchain.retrievers.ensemble import EnsembleRetriever
 import chromadb
 import uuid
 from chromadb.config import Settings
@@ -65,6 +66,10 @@ def load_streamlit_doc_retriever(
             persist_directory=".doc_db/streamlit_chroma_db",
             embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key),
         ).as_retriever()
+        retriever.search_kwargs["distance_metric"] = "cos"
+        retriever.search_kwargs["fetch_k"] = 4
+        retriever.search_kwargs["maximal_marginal_relevance"] = True
+        retriever.search_kwargs["k"] = 4
     if mode == "docker":
         client = chromadb.Client(
             Settings(
@@ -74,17 +79,34 @@ def load_streamlit_doc_retriever(
             )
         )
 
-        # tell LangChain to use our client and collection name
-        retriever = Chroma(
+        # Get the streamlit doc collection
+        streamlit_doc_retriever = Chroma(
             client=client,
             collection_name="streamlit_doc",
             embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key),
         ).as_retriever()
+        streamlit_doc_retriever.search_kwargs["distance_metric"] = "cos"
+        streamlit_doc_retriever.search_kwargs["fetch_k"] = 4
+        streamlit_doc_retriever.search_kwargs["maximal_marginal_relevance"] = True
+        streamlit_doc_retriever.search_kwargs["k"] = 4
 
-    retriever.search_kwargs["distance_metric"] = "cos"
-    retriever.search_kwargs["fetch_k"] = 4
-    retriever.search_kwargs["maximal_marginal_relevance"] = True
-    retriever.search_kwargs["k"] = 4
+        # Get the streamlit custom snippets collection
+        streamlit_snippets_retriever = Chroma(
+            client=client,
+            collection_name="streamlit_snippets",
+            embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key),
+        ).as_retriever()
+        streamlit_snippets_retriever.search_kwargs["distance_metric"] = "cos"
+        streamlit_snippets_retriever.search_kwargs["fetch_k"] = 4
+        streamlit_snippets_retriever.search_kwargs["maximal_marginal_relevance"] = True
+        streamlit_snippets_retriever.search_kwargs["k"] = 4
+
+        # initialize the ensemble retriever (give more weights on the snippets)
+        retriever = EnsembleRetriever(
+            retrievers=[streamlit_doc_retriever, streamlit_snippets_retriever],
+            weights=[0.4, 0.6],
+        )
+
     return retriever
 
 
@@ -204,7 +226,7 @@ def create_vector_store(
             )
         )
         print(client.heartbeat())
-        client.reset()  # resets the databas
+        client.delete_collection("streamlit_doc")
         collection = client.create_collection(
             "streamlit_doc", embedding_function=openai_ef
         )
