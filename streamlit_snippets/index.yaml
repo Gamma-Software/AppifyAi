@@ -1,21 +1,38 @@
 indexes:
-  - index: streamlit_snippets_0
-    source: create_title_header_subheader_text.py
+  - source: streamlit/create_title_header_subheader_text.py
     language: python
     description: "how to add a title, subheader, and text and order them correctly to a Streamlit app."
     keywords: "title, subheader, text"
-  - index: streamlit_snippets_1
-    source: center_title_header_subheader_text.py
+  - source: streamlit/center_title_header_subheader_text.py
     language: python
     description: "how to center a title, header, subheader or a text in streamlit"
     keywords: "center, element"
-  - index: streamlit_snippets_2
-    source: realtime_webcam_capture.py
+  - source: image_processing/realtime_webcam_capture.py
     language: python
     description: "how to display an histogram in realtime webcam capture with streamlit and opencv and matplotlib"
     keywords: "webcam, realtime, histogram, plot"
-  - index: streamlit_snippets_3
-    source: segmentation_pose_detection_classification.py
+  - source: image_processing/segmentation_pose_detection_classification.py
     language: python
-    description: "how to segment, detect object and pose and classify an image with streamlit and yolo"
+    description: "This code shows how to segment or detect an object, get the pose of a person and classify a static image with streamlit and yolo"
+    ask:
     keywords: "segmentation, detection, pose, classify"
+  - source: send_telegram.py
+    language: python
+    description: "This code will send a message to a telegram bot. The bot must be created first and the ChatID must be known."
+    ask: "Please enter the bot token and the chat id, follow the instructions here https://github.com/Gamma-Software/AppifyAi/wiki/How-to-create-a-Telegram-Bot."
+    keywords: "telegram, message, notification"
+  - source: image_processing/hand_detect.py
+    language: python
+    description: "In realtime, detect hand and fingers with cvzone library and display in a streamlit plot the distance between finger tips"
+    ask: ""
+    keywords: "detect, hands, finger, distance, fingertips"
+  - source: image_processing/face_mesh.py
+    language: python
+    description: "In realtime, detect the face and apply a mesh to it"
+    ask: ""
+    keywords: "detect, face, mesh"
+  - source: image_processing/anonymize_face.py
+    language: python
+    description: "In realtime, detect the face and blur it"
+    ask: ""
+    keywords: "detect, face, blur"
