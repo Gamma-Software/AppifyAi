@@ -313,13 +313,13 @@ def snippets_to_vector_store(
                 "content_type": "simplyfied code",
             }
 
-        # Add the snippet to the vector store
-        # upsert items. new items will be added, existing items will be updated.
-        collection.upsert(
-            ids=[f"streamlit_snippet_{str(file_idx)}_{str(doc_id)}"],
-            metadatas=[doc.metadata],
-            documents=[doc.page_content],
-        )
+            # Add the snippet to the vector store
+            # upsert items. new items will be added, existing items will be updated.
+            collection.upsert(
+                ids=[f"streamlit_snippet_{str(file_idx)}_{str(doc_id)}"],
+                metadatas=[doc.metadata],
+                documents=[doc.page_content],
+            )
         my_bar.progress(
             (file_idx + 1) / len_indexes_to_process, text=str(data["source"]) + " added"
         )

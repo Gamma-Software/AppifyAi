@@ -10,7 +10,7 @@ detector = FaceDetector()
 
 
 def anonymize_face_simple(image, factor=3.0):
-    """ Simply blurs the face in the image by a factor"""
+    """Simply blurs the face in the image by a factor"""
     (h, w) = image.shape[:2]
     kW = int(w / factor)
     kH = int(h / factor)
@@ -22,28 +22,20 @@ def anonymize_face_simple(image, factor=3.0):
 
 
 def video_frame_callback(frame):
-    """This is the callback function that will be called when a new frame is received
-    by the webrtc_streamer.Streamlit methods such as st.write() cannot be used inside the callback.
-    """
     img = frame.to_ndarray(format="bgr24")
-
-    # You can work with the image here... process it then display it back in the player
     _, bboxs = detector.findFaces(img, draw=False)
 
     if bboxs:
-        # Crop the face from the original image
-        face = img[
+        cropped_face = img[
             bboxs[0]["bbox"][1]: bboxs[0]["bbox"][1] + bboxs[0]["bbox"][3],
             bboxs[0]["bbox"][0]: bboxs[0]["bbox"][0] + bboxs[0]["bbox"][2],
         ]
 
-        face = anonymize_face_simple(face, factor=3.0)
-
-        # Draw the face on the black image
+        blurred_face = anonymize_face_simple(cropped_face, factor=3.0)
         img[
             bboxs[0]["bbox"][1]: bboxs[0]["bbox"][1] + bboxs[0]["bbox"][3],
             bboxs[0]["bbox"][0]: bboxs[0]["bbox"][0] + bboxs[0]["bbox"][2],
-        ] = face
+        ] = blurred_face
 
     return av.VideoFrame.from_ndarray(img, format="bgr24")
 
@@ -52,7 +44,7 @@ ctx = webrtc_streamer(
     key="example",
     video_frame_callback=video_frame_callback,
     media_stream_constraints={
-        "video": {"sampleRate": 5},
+        "video": True,
         "audio": False,
     },
     video_html_attrs={

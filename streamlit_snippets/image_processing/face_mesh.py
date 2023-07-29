@@ -15,7 +15,7 @@ def video_frame_callback(frame):
     img = frame.to_ndarray(format="bgr24")
 
     # You can work with the image here... process it then display it back in the player
-    processed_image, faces = detector.findFaceMesh(img)
+    processed_image, _ = detector.findFaceMesh(img)
 
     return av.VideoFrame.from_ndarray(processed_image, format="bgr24")
 
