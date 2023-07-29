@@ -1,0 +1,59 @@
+indexes:
+  - source: streamlit/create_title_header_subheader_text.py
+    language: python
+    description: "how to add a title, subheader, and text and order them correctly to a Streamlit app."
+    keywords: "title, subheader, text"
+  - source: streamlit/center_title_header_subheader_text.py
+    language: python
+    description: "how to center a title, header, subheader or a text in streamlit"
+    keywords: "center, element"
+  - source: image_processing/realtime_webcam_capture.py
+    language: python
+    description: "how to display an histogram in realtime webcam capture with streamlit and opencv and matplotlib"
+    keywords: "webcam, realtime, histogram, plot"
+  - source: image_processing/segmentation_pose_detection_classification.py
+    language: python
+    description: "This code shows how to segment or detect an object, get the pose of a person and classify a static image with streamlit and yolo. Additionnaly it croppes the detections and zip them to download them."
+    ask:
+    keywords: "segmentation, detection, pose, classify, crop"
+  - source: send_telegram.py
+    language: python
+    description: "This code will send a message to a telegram bot. The bot must be created first and the ChatID must be known."
+    ask: "Please enter the bot token and the chat id, follow the instructions here https://github.com/Gamma-Software/AppifyAi/wiki/How-to-create-a-Telegram-Bot."
+    keywords: "telegram, message, notification"
+  - source: image_processing/hand_detect.py
+    language: python
+    description: "In realtime, detect hand and fingers with cvzone library and display in a streamlit plot the distance between finger tips"
+    ask: ""
+    keywords: "detect, hands, finger, distance, fingertips"
+  - source: image_processing/face_mesh.py
+    language: python
+    description: "In realtime, detect the face and apply a mesh to it"
+    ask: ""
+    keywords: "detect, face, mesh"
+  - source: image_processing/anonymize_face.py
+    language: python
+    description: "In realtime, detect the face and blur it"
+    ask: ""
+    keywords: "detect, face, blur"
+
+  - source: langchain/chatbot.py
+    language: python
+    description: "Create a chatbot with langchain"
+    ask: ""
+    keywords: "chatbot, bot, langchain, ai"
+  - source: langchain/internet_search.py
+    language: python
+    description: "Search over the web with langchain"
+    ask: ""
+    keywords: "search, internet, scrap, langchain, ai"
+  - source: langchain/correct_sentence.py
+    language: python
+    description: "Fix the grammar of any given text with langchain and LLM"
+    ask: ""
+    keywords: "grammar, text, langchain, ai"
+  - source: langchain/given_prompt.py
+    language: python
+    description: "This is a LLM sandbox, you can give any prompt and see what the model will generate with langchain"
+    ask: "What is the prompt you want to give to the model?"
+    keywords: "prompt, custom, langchain, ai"

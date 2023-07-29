@@ -1,4 +1,4 @@
-langchain
+langchain==0.0.244
 structlog
 openai
 docarray
@@ -26,10 +26,12 @@ extra-streamlit-components
 scrypt
 passlib
 pycryptodome
-opencv-python
 pillow>=7.1.0, <10
 tensorflow
 streamlit-folium
-opencv-python
+opencv-python-headless
 scikit-image
 pyzbar
+streamlit-webrtc
+ultralytics
+lapx>=0.5.2
