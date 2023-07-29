@@ -282,15 +282,17 @@ def snippets_to_vector_store(
 
     my_bar = st.progress(0, text="Adding snippets to the vector store...")
     len_indexes_to_process = len(snippets_indexes["indexes"])
-    for idx, data in enumerate(snippets_indexes["indexes"]):
+    for file_idx, data in enumerate(snippets_indexes["indexes"]):
         # check if the snippet file exists
         snippet_filepath = Path("streamlit_snippets/" + data["source"])
         if not snippet_filepath.exists():
-            raise FileNotFoundError("The snippet file does not exist.")
+            raise FileNotFoundError(
+                f"The snippet file {str(snippet_filepath)} does not exist."
+            )
 
         # Check if the snippet is not already in the vector store
         try:
-            if not collection.get(where={"ids": data["index"]}):
+            if not collection.get(where={"ids": file_idx}):
                 raise Exception
         except BaseException:
             print("Snippet not found in the vector store, adding it...")
@@ -302,7 +304,7 @@ def snippets_to_vector_store(
         with open(snippet_filepath, "r") as f:
             PYTHON_CODE = f.read()
         doc = python_splitter.create_documents([PYTHON_CODE])
-        for doc in doc:
+        for doc_id, doc in enumerate(doc):
             doc.metadata = {
                 "source": data["source"],
                 "description": data["description"],
@@ -314,13 +316,54 @@ def snippets_to_vector_store(
         # Add the snippet to the vector store
         # upsert items. new items will be added, existing items will be updated.
         collection.upsert(
-            ids=[str(data["index"])],
+            ids=[f"streamlit_snippet_{str(file_idx)}_{str(doc_id)}"],
             metadatas=[doc.metadata],
             documents=[doc.page_content],
         )
         my_bar.progress(
-            (idx + 1) / len_indexes_to_process, text=str(data["source"]) + " added"
+            (file_idx + 1) / len_indexes_to_process, text=str(data["source"]) + " added"
         )
+
+
+def delete_vector_store(
+    openai_api_key: str,
+    chroma_server_host="localhost",
+    chroma_server_port="8000",
+    mode="docker",
+):
+    # First check if the vector store exists
+    openai_ef = embedding_functions.OpenAIEmbeddingFunction(
+        api_key=openai_api_key,  # Replace with your own OpenAI API key
+        model_name="text-embedding-ada-002",
+    )
+    if mode == "local":
+        if not os.path.exists(".doc_db/streamlit_chroma_db"):
+            raise Exception(
+                "The Chroma database for Streamlit does not exist. "
+                "Please run the script `doc_retriever.py` to create it."
+            )
+        # TODO create local client
+    if mode == "docker":
+        client = chromadb.Client(
+            Settings(
+                chroma_api_impl="rest",
+                chroma_server_host=chroma_server_host,
+                chroma_server_http_port=chroma_server_port,
+            )
+        )
+        if "collection" not in st.session_state:
+            return
+        collection = client.get_or_create_collection(
+            st.session_state.collection, embedding_function=openai_ef
+        )
+        if not collection:
+            raise Exception(
+                "The Chroma database for Streamlit does not exist. "
+                "Please run the script `doc_retriever.py` to create it."
+            )
+
+    if "ids" in st.session_state and st.session_state["ids"]:
+        collection.delete(ids=[st.session_state["ids"]])
 
 
 def consult_vector_store(
@@ -386,7 +429,9 @@ if __name__ == "__main__":
     st.title("AppifyAI Doc Retriever")
     openai_api_key = st.text_input("OpenAI API key")
     mode = st.selectbox("Mode", ["docker", "local"])
-    choice = st.selectbox("Action", ["create", "add snippets", "consult vector store"])
+    choice = st.selectbox(
+        "Action", ["create", "add snippets", "consult vector store", "delete data"]
+    )
 
     if choice == "create":
         pass
@@ -400,6 +445,13 @@ if __name__ == "__main__":
         )
         ids = st.text_input("Ids", key="ids")
         query = st.text_input("Query", key="query")
+    elif choice == "delete data":
+        collection = st.selectbox(
+            "Select collection",
+            ["streamlit_doc", "streamlit_snippets"],
+            key="collection",
+        )
+        ids = st.text_input("Ids", key="ids")
 
     button = st.button("Run")
 
@@ -420,6 +472,13 @@ if __name__ == "__main__":
             )
         elif choice == "consult vector store":
             consult_vector_store(
+                openai_api_key=openai_api_key,
+                mode=mode,
+                chroma_server_host=st.secrets["chroma"]["host"],
+                chroma_server_port=st.secrets["chroma"]["port"],
+            )
+        elif choice == "delete data":
+            delete_vector_store(
                 openai_api_key=openai_api_key,
                 mode=mode,
                 chroma_server_host=st.secrets["chroma"]["host"],
