@@ -13,9 +13,9 @@ indexes:
     keywords: "webcam, realtime, histogram, plot"
   - source: image_processing/segmentation_pose_detection_classification.py
     language: python
-    description: "This code shows how to segment or detect an object, get the pose of a person and classify a static image with streamlit and yolo"
+    description: "This code shows how to segment or detect an object, get the pose of a person and classify a static image with streamlit and yolo. Additionnaly it croppes the detections and zip them to download them."
     ask:
-    keywords: "segmentation, detection, pose, classify"
+    keywords: "segmentation, detection, pose, classify, crop"
   - source: send_telegram.py
     language: python
     description: "This code will send a message to a telegram bot. The bot must be created first and the ChatID must be known."
