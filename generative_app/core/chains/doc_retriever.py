@@ -406,8 +406,7 @@ def consult_vector_store(
     st.write(str(collection.count()) + " documents")
     if "query" in st.session_state and st.session_state["query"]:
         st.write(st.session_state["query"])
-        results = collection.query(query_texts=[st.session_state.query], n_results=20)
-        results = collection.similarity_search_with_score(query)
+        results = collection.query(query_texts=[st.session_state.query], n_results=4)
     elif "ids" in st.session_state and st.session_state["ids"]:
         st.write(st.session_state["ids"])
         results = collection.get(ids=[st.session_state["ids"]])
