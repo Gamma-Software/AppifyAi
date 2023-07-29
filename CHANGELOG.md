@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- GPX reader demo
 - A bunch of streamlit snippets with real image processing examples
 - streamlit-webrtc library to handle video streaming
 
