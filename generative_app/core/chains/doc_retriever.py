@@ -91,23 +91,25 @@ def load_streamlit_doc_retriever(
         streamlit_doc_retriever.search_kwargs["k"] = 4
 
         # Get the streamlit custom snippets collection
+        """
         streamlit_snippets_retriever = Chroma(
             client=client,
             collection_name="streamlit_snippets",
             embedding_function=OpenAIEmbeddings(openai_api_key=openai_api_key),
         ).as_retriever()
         streamlit_snippets_retriever.search_kwargs["distance_metric"] = "cos"
-        streamlit_snippets_retriever.search_kwargs["fetch_k"] = 4
+        streamlit_snippets_retriever.search_kwargs["fetch_k"] = 1
         streamlit_snippets_retriever.search_kwargs["maximal_marginal_relevance"] = True
-        streamlit_snippets_retriever.search_kwargs["k"] = 4
+        streamlit_snippets_retriever.search_kwargs["k"] = 1
 
         # initialize the ensemble retriever (give more weights on the snippets)
         retriever = EnsembleRetriever(
             retrievers=[streamlit_doc_retriever, streamlit_snippets_retriever],
-            weights=[0.4, 0.6],
+            weights=[1.0, 0.0],
         )
+        """
 
-    return retriever
+    return streamlit_doc_retriever
 
 
 def is_docker_container_running(container_name: str) -> bool:
